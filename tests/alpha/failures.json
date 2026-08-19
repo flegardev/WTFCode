@@ -17,6 +17,48 @@
       "fix_commit": "8ead5bc492fdc892df030c4cc3506fba97478d73",
       "regression_test": "tests/V3FeatureEvidenceTest.php — catalogue JSON named chat cannot create AI chat",
       "status": "fixed"
+    },
+    {
+      "id": "ALPHA-002",
+      "repo": "django-framework",
+      "commit": "cccc004b46f71b4e54d87b376be691a17de6b903",
+      "category": "MISLEADING_EXPLANATION",
+      "severity": "P1",
+      "description": "A completed partial scan was stored as a crash after Windows returned -1 from proc_close.",
+      "expected": "Use the final proc_get_status exit code and preserve the partial scan result.",
+      "actual": "The corpus record said failed with an empty crash reason.",
+      "root_cause": "Alpha child-process orchestration discarded the final non-negative exit code on Windows.",
+      "fix_commit": null,
+      "regression_test": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-003",
+      "repo": "drizzle-orm",
+      "commit": "b7862528fd8fc39bc2653a6c18dad7c1f4e68d10",
+      "category": "MEMORY",
+      "severity": "P2",
+      "description": "Quick analysis exhausted 128 MiB while decoding unbounded TypeScript worker evidence.",
+      "expected": "Bound worker output, disclose partial evidence, and finish below the memory ceiling.",
+      "actual": "PHP exhausted memory in NodeWorkerAnalyzerProvider while decoding the worker graph.",
+      "root_cause": "Node workers emitted unbounded symbol and relationship arrays while PHP retained duplicate input buffers.",
+      "fix_commit": null,
+      "regression_test": "tests/V3AstTest.php — semantic output is capped before PHP graph decoding",
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-004",
+      "repo": "wtfcode",
+      "commit": "3cece8a96d12badeac609cf84497a35c086fa86b",
+      "category": "UNSUPPORTED_PATTERN",
+      "severity": "P2",
+      "description": "Self-dogfood attempted an authentication-gated remote despite an explicitly authorized local repository being available.",
+      "expected": "Use a static exact-commit archive from the authorized local repository.",
+      "actual": "Safe Git import failed because terminal authentication was disabled.",
+      "root_cause": "The initial corpus importer only supported anonymous public HTTPS repositories.",
+      "fix_commit": null,
+      "regression_test": null,
+      "status": "confirmed"
     }
   ]
 }

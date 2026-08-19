@@ -51,6 +51,7 @@ abstract class NodeWorkerAnalyzerProvider implements AnalyzerProviderInterface
         }
         if ($files === []) return new AnalyzerResult($this->id(), $this->version(), AnalyzerResult::SUCCESS, self::emptyGraph(), durationMs: 0, message: 'No supported files were present.');
         $payload = json_encode(['repository' => $request->repositoryRoot(), 'files' => $files], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        unset($files);
         $node = ToolDetector::findExecutable('node');
         if ($node === null) return AnalyzerResult::unavailable($this->id(), $this->version(), 'Node executable is unavailable.');
         $result = $this->runner->run(new ProcessRunRequest(
@@ -61,6 +62,7 @@ abstract class NodeWorkerAnalyzerProvider implements AnalyzerProviderInterface
             524_288,
             stdin: $payload,
         ));
+        unset($payload);
         if (!$result->succeeded() || $result->stdoutTruncated) {
             $reason = $result->timedOut ? 'timed out' : ($result->stdoutTruncated ? 'exceeded its output limit' : 'exited with code ' . $result->exitCode);
             return AnalyzerResult::failed($this->id(), $this->version(), 'Node worker ' . $reason . '.', $result->durationMs);
@@ -74,10 +76,12 @@ abstract class NodeWorkerAnalyzerProvider implements AnalyzerProviderInterface
             $findings = is_array($graph['findings'] ?? null) ? $graph['findings'] : [];
             unset($graph['errors']);
             unset($graph['findings']);
-            $partial = $errors !== [] || $selectionLimited;
+            $outputLimited = (int) ($graph['stats']['symbol_limit_reached'] ?? 0) === 1 || (int) ($graph['stats']['relationship_limit_reached'] ?? 0) === 1;
+            $partial = $errors !== [] || $selectionLimited || $outputLimited;
             $messages = [];
             if ($errors !== []) $messages[] = count($errors) . ' file(s) contained syntax the worker could not fully parse.';
             if ($selectionLimited) $messages[] = 'Worker input was capped at ' . $this->maxFiles() . ' files or ' . $this->maxInputBytes() . ' bytes.';
+            if ($outputLimited) $messages[] = 'Worker evidence reached the bounded fusion output budget.';
             return new AnalyzerResult(
                 $this->id(), $this->version(), $partial ? AnalyzerResult::PARTIAL : AnalyzerResult::SUCCESS,
                 $graph, $findings, $result->durationMs,

@@ -10,6 +10,10 @@ const files = Array.isArray(input.files) ? input.files : [];
 const symbols = [];
 const relationships = [];
 const routes = [];
+const MAX_SYMBOLS = 2000;
+const MAX_RELATIONSHIPS = 4000;
+let symbolLimitReached = false;
+let relationshipLimitReached = false;
 const loaded = new Map();
 const errors = [];
 
@@ -37,7 +41,7 @@ for (const file of files) {
   }
 }
 
-process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0, parse_errors: errors.length }, errors }));
+process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0, parse_errors: errors.length, symbol_limit_reached: Number(symbolLimitReached), relationship_limit_reached: Number(relationshipLimitReached) }, errors }));
 
 function walk(node, path, languageName, moduleKey, scope) {
   let nextScope = scope;
@@ -94,10 +98,13 @@ function firstErrorLine(root) {
 }
 function addSymbol(symbol) {
   const key = hash([symbol.path, symbol.type, symbol.qualified_name, symbol.start_line].join('|'));
+  if (symbols.length >= MAX_SYMBOLS) { symbolLimitReached = true; return null; }
   symbols.push({ key, signature: null, exported: false, visibility: 'unknown', parent_key: null, metadata: {}, ...symbol });
   return key;
 }
 function addRelationship(sourceKey, targetKey, externalName, type, path, line, metadata) {
+  if (!sourceKey) return;
+  if (relationships.length >= MAX_RELATIONSHIPS) { relationshipLimitReached = true; return; }
   relationships.push({ source_key: sourceKey, target_key: targetKey, external_name: externalName, target_name: externalName ?? '', type, confidence: 'medium', evidence_path: path, line_start: line, line_end: line, excerpt: null, metadata });
 }
 function grammarFor(path, language) {

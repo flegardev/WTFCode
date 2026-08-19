@@ -25,6 +25,10 @@ for (const file of files) project.createSourceFile('/repo/' + normalize(file.pat
 const symbols = [];
 const relationships = [];
 const routes = [];
+const MAX_SYMBOLS = 2000;
+const MAX_RELATIONSHIPS = 4000;
+let symbolLimitReached = false;
+let relationshipLimitReached = false;
 const nodeKeys = new Map();
 const moduleKeys = new Map();
 const modulePathKeys = new Map();
@@ -109,16 +113,18 @@ for (const source of project.getSourceFiles()) {
 }
 
 resolveRelationships();
-process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0 } }));
+process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0, symbol_limit_reached: Number(symbolLimitReached), relationship_limit_reached: Number(relationshipLimitReached) } }));
 
 function addSymbol(symbol) {
   const key = hash([symbol.path, symbol.type, symbol.qualified_name, symbol.start_line].join('|'));
+  if (symbols.length >= MAX_SYMBOLS) { symbolLimitReached = true; return null; }
   symbols.push({ key, signature: null, exported: false, visibility: 'unknown', parent_key: null, metadata: {}, ...symbol });
   return key;
 }
 
 function addRelationship(sourceKey, targetKey, externalName, type, path, line, metadata) {
-  if (!targetKey && !externalName) return;
+  if (!sourceKey || (!targetKey && !externalName)) return;
+  if (relationships.length >= MAX_RELATIONSHIPS) { relationshipLimitReached = true; return; }
   relationships.push({ source_key: sourceKey, target_key: targetKey, external_name: externalName, target_name: externalName ?? '', type, confidence: targetKey ? 'high' : 'medium', evidence_path: path, line_start: line, line_end: line, excerpt: null, metadata });
 }
 

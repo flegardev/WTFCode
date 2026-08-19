@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class AnalysisEngine
 {
-    public const VERSION = 'alpha.1-runtime-evidence';
+    public const VERSION = 'alpha.2';
     public const NATIVE_VERSION = '2.0.0';
 
     /** @var array<int, LanguageAdapterInterface> */

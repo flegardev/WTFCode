@@ -43,6 +43,13 @@ ast_assert(in_array($tree->status, [AnalyzerResult::SUCCESS, AnalyzerResult::PAR
 ast_assert(count($tree->graph['symbols']) >= count($tsFiles), 'Tree-sitter should create a module for every supported source file');
 ast_assert(count(array_filter($tree->graph['symbols'], static fn (array $symbol): bool => $symbol['type'] === 'function')) > 0, 'Tree-sitter should extract syntax declarations');
 
+$largeSource = implode("\n", array_map(static fn (int $index): string => 'export function alphaBound' . $index . '(): number { return ' . $index . '; }', range(1, 2100)));
+$largeRequest = new AnalysisRequest($tsRoot, [['path' => 'src/generated-large.ts', 'language' => 'TypeScript', 'content' => $largeSource, 'lines' => 2100]]);
+$bounded = (new TypeScriptSemanticAnalyzerProvider())->analyze($largeRequest);
+ast_assert($bounded->status === AnalyzerResult::PARTIAL, 'A semantic worker that reaches its evidence budget must report partial analysis');
+ast_assert(count($bounded->graph['symbols']) === 2000, 'Semantic worker output must be bounded before PHP decodes the graph');
+ast_assert((int) ($bounded->graph['stats']['symbol_limit_reached'] ?? 0) === 1, 'Bounded semantic evidence must disclose the symbol limit');
+
 $fused = (new AnalysisCoordinator())->analyze($tsRequest);
 $confirmedImports = array_filter($fused['relationships'], static fn (array $edge): bool => $edge['type'] === 'imports' && count($edge['metadata']['engines'] ?? []) >= 2);
 ast_assert($confirmedImports !== [], 'Independent syntax and semantic engines should fuse matching import evidence');
