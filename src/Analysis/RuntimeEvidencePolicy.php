@@ -8,7 +8,7 @@ final class RuntimeEvidencePolicy
     public static function isRuntimePath(string $path): bool
     {
         $normalized = strtolower(str_replace('\\', '/', $path));
-        if (preg_match('#(^|/)(?:tests?|specs?|fixtures?|benchmarks?|docs?|examples?|tools?|reports?|snapshots?|generators?|storage|vendor|node_modules|analysis|analyzers?|detectors?|\.playwright-cli)(/|$)#', $normalized)) return false;
+        if (preg_match('#(^|/)(?:tests?|specs?|fixtures?|benchmarks?|docs?|examples?|tools?|scripts?|reports?|snapshots?|generators?|loadgenerators?|storage|vendor|node_modules|analysis|analyzers?|detectors?|\.playwright-cli)(/|$)#', $normalized)) return false;
         if (preg_match('#(^|/)config/(?:security|rules?)(/|$)|(^|/)(?:rules?|generated|output|artifacts?)(/|$)#', $normalized)) return false;
         if (preg_match('#(?:^|/)(?:readme|changelog|license)(?:\.[^/]+)?$|\.(?:md|css|scss|html|blade\.php|snap|snapshot|log)$#', $normalized)) return false;
         return true;
@@ -45,7 +45,7 @@ final class RuntimeEvidencePolicy
         if (preg_match('/\.py$/i', $path) && (substr_count($before, '"""') + substr_count($before, "'''")) % 2 === 1) return false;
         if (!preg_match('/\.py$/i', $path) && substr_count($before, '/*') > substr_count($before, '*/')) return false;
         if (preg_match('/\b(?:fetch|axios(?:\.[a-z]+)?|requests?\.[a-z]+|httpx\.[a-z]+|aiohttp|curl_[a-z]+|new\s+URL|openConnection|Http::(?:get|post|put|patch|delete)|->(?:get|post|put|patch|delete|request|send))\b/i', $line)) return true;
-        return preg_match('/(?:\b[A-Za-z_][A-Za-z0-9_]*(?:api|endpoint|base[_-]?(?:url|uri)|webhook|dsn|origin|service[_-]?url|host)[A-Za-z0-9_]*\b|\burl\b)[^\r\n]{0,80}(?:=>|:=|=|:)\s*[\'\"]https?:\/\//i', $line) === 1;
+        return preg_match('/\b[A-Za-z_][A-Za-z0-9_]*(?:api|endpoint|base[_-]?(?:url|uri)|webhook|dsn|origin|service[_-]?url|host)[A-Za-z0-9_]*\b[^\r\n]{0,80}(?:=>|:=|=|:)\s*[\'\"]https?:\/\//i', $line) === 1;
     }
 
     public static function isAnalysisImplementation(string $content): bool

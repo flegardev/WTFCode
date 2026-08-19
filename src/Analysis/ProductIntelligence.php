@@ -72,11 +72,14 @@ final class ProductIntelligence
         foreach ($fileMap as $path => $file) {
             $content = (string) ($file['content'] ?? '');
             if ($content === '') continue;
+            $runtimeSource = RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content);
+            $runtimeBehavior = RuntimeEvidencePolicy::isRuntimeBehaviorPath($path) && $runtimeSource;
+            $databaseEvidence = $runtimeSource && ($runtimeBehavior || preg_match('/\.sql$/i', $path) === 1);
             $lines = preg_split('/\R/', $content) ?: [];
             foreach ($lines as $offset => $line) {
                 $lineNumber = $offset + 1;
                 $sourceKey = $this->sourceAt($ranges[$path] ?? [], $lineNumber);
-                foreach ($this->databaseOperations($line) as $operation) {
+                foreach ($databaseEvidence ? $this->databaseOperations($line) : [] as $operation) {
                     if ($derivedRelationships >= $relationshipBudget) break;
                     $tableKey = $this->tableKey($symbols, $path, $lineNumber, $operation['table']);
                     if (!isset($symbolIndex[$tableKey]) && $derivedSymbols < $symbolBudget) {
@@ -91,19 +94,19 @@ final class ProductIntelligence
                     $derivedRelationships++;
                     $databaseOperationCount++;
                 }
-                foreach ($this->controlFacts($line) as $control) {
+                foreach ($runtimeBehavior ? $this->controlFacts($line) : [] as $control) {
                     if ($derivedRelationships >= $relationshipBudget) break;
                     $relationships[] = $this->derivedRelationship($sourceKey, null, 'control:' . $control['kind'], $control['relationship'], $path, $lineNumber, $line, ['control_flow' => $control['kind']]);
                     $derivedRelationships++;
                     $controlFactCount++;
                 }
-                foreach ($this->uiAndTransportFacts($line) as $fact) {
+                foreach ($runtimeBehavior ? $this->uiAndTransportFacts($line) : [] as $fact) {
                     if ($derivedRelationships >= $relationshipBudget) break;
                     $relationships[] = $this->derivedRelationship($sourceKey, null, $fact['target'], $fact['relationship'], $path, $lineNumber, $line, $fact['metadata']);
                     $derivedRelationships++;
                 }
             }
-            if (!RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) continue;
+            if (!$runtimeSource) continue;
             foreach (self::SERVICES as $service => $needles) {
                 $matches = $this->runtimeServiceMatches($path, $content, $needles);
                 if ($matches === []) continue;
@@ -359,11 +362,15 @@ final class ProductIntelligence
         foreach ($needles as $needle) {
             $quoted = preg_quote($needle, '/');
             if (!preg_match('/' . $quoted . '/i', $content)) continue;
-            $explicitEndpoint = str_contains($needle, '://') || str_contains($needle, '.') || str_ends_with($needle, ':');
+            $explicitEndpoint = false;
             $runtimeContext = false;
-            foreach ($runtimeBehavior ? (preg_split('/\R/', $content) ?: []) : [] as $line) {
+            foreach (preg_split('/\R/', $content) ?: [] as $offset => $line) {
                 if (!RuntimeEvidencePolicy::containsTerm($line, $needle) || RuntimeEvidencePolicy::isDetectorDefinition($line)) continue;
-                if (preg_match('/(?:import|require|from|use|new|client|sdk|endpoint|base[_-]?url|dsn|connect|request|fetch|axios|curl|->(?:get|post|put|patch|delete))[^\r\n]{0,140}' . $quoted . '|' . $quoted . '[^\r\n]{0,140}(?:client|sdk|endpoint|connect|request|fetch|axios|curl)/i', $line) === 1) { $runtimeContext = true; break; }
+                $trimmed = trim($line);
+                if ($trimmed === '' || preg_match('#^(?://|/\*|\*|\#|<!--)#', $trimmed)) continue;
+                if ($runtimeBehavior && $needle !== 'apiVersion:' && preg_match('/(?:import|require|from|use|new|client|sdk|endpoint|base[_-]?url|dsn|connect|request|fetch|axios|curl|->(?:get|post|put|patch|delete))[^\r\n]{0,140}' . $quoted . '|' . $quoted . '[^\r\n]{0,140}(?:client|sdk|endpoint|connect|request|fetch|axios|curl)/i', $line) === 1) { $runtimeContext = true; break; }
+                $endpointNeedle = str_contains($needle, '://') || preg_match('/\.[a-z]{2,}(?:\/|$)/i', $needle) === 1 || in_array(strtolower($needle), ['pgsql:', 'mysql:', 'rediss:', 's3:'], true);
+                if ($endpointNeedle && RuntimeEvidencePolicy::isRuntimeServiceReference($path, $content, $offset + 1, $needle)) $explicitEndpoint = true;
             }
             $deploymentFile = ($needle === 'vercel.json' && $basename === 'vercel.json')
                 || ($needle === 'dockerfile' && ($basename === 'dockerfile' || str_starts_with($basename, 'docker-compose')))

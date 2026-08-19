@@ -23,6 +23,8 @@ $nonRuntime = [
     ['path' => 'README.md', 'language' => 'Markdown', 'content' => 'Authentication login sessions and Stripe billing are example capabilities.', 'lines' => 1],
     ['path' => 'specs/e2e/auth.ts', 'language' => 'TypeScript', 'content' => "export function login() { return '/login'; }", 'lines' => 1],
     ['path' => 'assets/generator/search.py', 'language' => 'Python', 'content' => "def search(): return 'generated asset'", 'lines' => 1],
+    ['path' => 'scripts/prepare_release.py', 'language' => 'Python', 'content' => "def search(): return 'release support only'", 'lines' => 1],
+    ['path' => 'src/loadgenerator/checkout.py', 'language' => 'Python', 'content' => "def checkout(): return 'load test support only'", 'lines' => 1],
 ];
 $nonRuntimeGraph = feature_evidence_graph($nonRuntime);
 $nonRuntimeLabels = array_column($nonRuntimeGraph['features'] ?? [], 'label');
