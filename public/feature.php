@@ -12,6 +12,7 @@ $node = $nodeKey === '' ? null : Project::architectureNode((int) $project['id'],
 $query = isset($_GET['q']) && is_string($_GET['q']) ? trim(substr($_GET['q'], 0, 160)) : '';
 if ($node !== null && $query === '') $query = $node['node_key'];
 $trace = $query === '' ? FeatureTracer::trace((int) $project['id'], '') : ExplanationService::traceFeatureV2((int) $project['id'], $query);
+$detectedFeatures = SymbolRepository::featureCatalog((int) $project['id']);
 $evidencePaths = $node === null ? [] : (json_decode((string) $node['evidence_json'], true) ?: []);
 $evidenceFiles = $node === null ? [] : Project::filesForPaths((int) $project['id'], $evidencePaths);
 $pageTitle = $query === '' ? 'Trace a feature' : 'Trace ' . $query;
@@ -24,6 +25,7 @@ require __DIR__ . '/../views/header.php';
     <div class="project-heading compact"><div><p class="landing-kicker">Cross-layer flow</p><h1>Trace a feature end to end.</h1><p>Start with a route, symbol, table, or file name. Every hop reports confidence and the source line that supports it.</p></div></div>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
     <form class="trace-search" method="get"><input type="hidden" name="id" value="<?= (int) $project['id'] ?>"><label><span>Feature, route, or symbol</span><input name="q" value="<?= e($query) ?>" placeholder="authentication, /login, checkout, UserController"></label><button class="button button-primary" type="submit">Trace evidence</button></form>
+    <?php if ($detectedFeatures !== []): ?><section class="node-evidence-strip"><strong>Detected from multiple signals</strong><?php foreach ($detectedFeatures as $feature): ?><a href="<?= e(url('feature.php?id=' . (int) $project['id'] . '&q=' . urlencode($feature['label']))) ?>"><?= e($feature['label']) ?> · <?= (int) $feature['symbols'] ?></a><?php endforeach; ?></section><?php endif; ?>
     <?php if ($node !== null && $evidenceFiles !== []): ?><section class="node-evidence-strip"><strong><?= e($node['label']) ?> evidence</strong><?php foreach ($evidenceFiles as $file): ?><a href="<?= e(url('file.php?project=' . (int) $project['id'] . '&id=' . (int) $file['id'])) ?>"><?= e($file['path']) ?></a><?php endforeach; ?></section><?php endif; ?>
     <?php if ($query === ''): ?><section class="panel empty-state-v2"><strong>Choose a real feature name.</strong><p>Good starting points are a route path, controller, table, component, authentication, database, or API.</p></section><?php else: ?>
         <section class="trace-status"><div><span>Trace confidence</span><strong class="confidence <?= e($trace['confidence']) ?>"><?= e($trace['confidence']) ?></strong></div><div><span>Entry points</span><strong><?= count($trace['entry_points']) ?></strong></div><div><span>Symbols</span><strong><?= count($trace['symbols']) ?></strong></div><div><span>Evidence hops</span><strong><?= count($trace['hops']) ?></strong></div><div><span>Files</span><strong><?= count($trace['files']) ?></strong></div></section>

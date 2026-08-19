@@ -26,7 +26,17 @@ final class FeatureTracer
         $normalizedQuery = strtolower(preg_replace('/\s+/', ' ', $query) ?? $query);
         $aliases = match ($normalizedQuery) {
             'authentication', 'login', 'signin', 'sign-in', 'session' => ['auth', 'login', 'session'],
-            'repository import', 'repository importing', 'import repository' => ['RepositoryImporter', 'import', 'clone'],
+            'registration', 'register', 'signup', 'sign-up' => ['Registration', 'register', 'signup'],
+            'checkout' => ['Checkout', 'cart', 'order'],
+            'payments', 'payment' => ['Payments', 'stripe', 'payment'],
+            'upload', 'uploads' => ['Upload', 'attachment', 'storage'],
+            'profile' => ['Profile', 'account', 'avatar'],
+            'search' => ['Search', 'query', 'filter'],
+            'admin' => ['Admin', 'manage', 'moderation'],
+            'billing' => ['Billing', 'subscription', 'invoice'],
+            'notifications' => ['Notifications', 'notification', 'mailer'],
+            'ai chat', 'chat' => ['AI chat', 'openai', 'anthropic', 'completion'],
+            'repository import', 'repository importing', 'import repository' => ['Repository import', 'RepositoryImporter', 'import', 'clone'],
             'repository scan', 'repository scanning', 'scan repository' => ['RepoScanner', 'scan'],
             'feature trace', 'feature tracing', 'trace feature' => ['FeatureTracer', 'trace'],
             'safe prompt', 'safe prompt generation', 'prompt generation' => ['PromptSafetyService', 'prompt'],
@@ -41,6 +51,13 @@ final class FeatureTracer
         foreach ($aliases as $alias) {
             foreach (SymbolRepository::routes($projectId, $alias) as $route) $routes[$route['id']] = $route;
             foreach (SymbolRepository::search($projectId, $alias, 24) as $symbol) $symbols[$symbol['id']] = $symbol;
+        }
+        foreach (SymbolRepository::featureCatalog($projectId) as $feature) {
+            if (!in_array(strtolower((string) $feature['label']), array_map('strtolower', $aliases), true) && !str_contains(strtolower((string) $feature['label']), $normalizedQuery)) continue;
+            foreach ($feature['evidence'] as $symbol) {
+                $stored = SymbolRepository::symbol($projectId, (int) $symbol['id']);
+                if ($stored !== null) $symbols[$symbol['id']] = $stored + ['path' => $symbol['path']];
+            }
         }
         $routes = array_values($routes);
         $symbols = array_values($symbols);

@@ -127,7 +127,8 @@ final class SymbolRepository
             catch (Throwable) { $metadata = []; }
             $node['subsystem'] = self::graphSubsystem((string) $node['symbol_type'], (string) $node['path'], (string) $node['role_name']);
             $node['architecture'] = self::graphArchitecture((string) $node['subsystem']);
-            $node['feature'] = self::graphFeature((string) $node['name'], (string) $node['path'], (string) $node['symbol_type']);
+            $detectedFeatures = is_array($metadata['features'] ?? null) ? array_values(array_filter($metadata['features'], 'is_string')) : [];
+            $node['feature'] = $detectedFeatures[0] ?? self::graphFeature((string) $node['name'], (string) $node['path'], (string) $node['symbol_type']);
             $node['framework'] = (string) ($metadata['framework'] ?? 'Unspecified');
             $node['risk'] = self::graphRisk((string) $node['symbol_type'], (string) $node['name'], (string) $node['path']);
             unset($node['metadata_json']);
@@ -207,6 +208,36 @@ final class SymbolRepository
     {
         $statement = Database::connection()->prepare("SELECT sr.*, source.file_id AS source_file_id, source.name AS source_name, source.symbol_type AS source_type, source_file.path AS source_path, target.file_id AS target_file_id, target.name AS target_name, target.symbol_type AS target_type, target_file.path AS target_path, evidence.path AS evidence_path FROM symbol_relationships sr LEFT JOIN code_symbols source ON source.id = sr.source_symbol_id LEFT JOIN project_files source_file ON source_file.id = source.file_id LEFT JOIN code_symbols target ON target.id = sr.target_symbol_id LEFT JOIN project_files target_file ON target_file.id = target.file_id INNER JOIN project_files evidence ON evidence.id = sr.evidence_file_id WHERE sr.project_id = :project_id AND sr.confidence IN ('high', 'medium') ORDER BY sr.id");
         $statement->execute(['project_id' => $projectId]);
+        return $statement->fetchAll();
+    }
+
+    /** @return array<int, array{label: string, symbols: int, evidence: array<int, array<string, mixed>>}> */
+    public static function featureCatalog(int $projectId): array
+    {
+        $statement = Database::connection()->prepare("SELECT cs.id, cs.name, cs.symbol_type, cs.start_line, cs.confidence, cs.metadata_json, pf.path FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND JSON_LENGTH(JSON_EXTRACT(cs.metadata_json, '$.features')) > 0 ORDER BY cs.confidence, pf.path, cs.start_line");
+        $statement->execute(['project_id' => $projectId]);
+        $features = [];
+        foreach ($statement->fetchAll() as $symbol) {
+            $metadata = json_decode((string) ($symbol['metadata_json'] ?? '{}'), true);
+            foreach (is_array($metadata['features'] ?? null) ? $metadata['features'] : [] as $feature) {
+                if (!is_string($feature) || $feature === '') continue;
+                $features[$feature]['label'] = $feature;
+                $features[$feature]['symbols'] = ($features[$feature]['symbols'] ?? 0) + 1;
+                if (count($features[$feature]['evidence'] ?? []) < 8) $features[$feature]['evidence'][] = [
+                    'id' => (int) $symbol['id'], 'name' => $symbol['name'], 'type' => $symbol['symbol_type'],
+                    'path' => $symbol['path'], 'line' => (int) $symbol['start_line'], 'confidence' => $symbol['confidence'],
+                ];
+            }
+        }
+        uasort($features, static fn (array $a, array $b): int => ($b['symbols'] <=> $a['symbols']) ?: strcmp($a['label'], $b['label']));
+        return array_values($features);
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public static function tableOperations(int $projectId, int $tableSymbolId): array
+    {
+        $statement = Database::connection()->prepare("SELECT sr.relationship_type, sr.confidence, sr.evidence_line_start, sr.metadata_json, evidence.path AS evidence_path, source.id AS source_id, source.name AS source_name, source.symbol_type AS source_type FROM symbol_relationships sr INNER JOIN project_files evidence ON evidence.id = sr.evidence_file_id LEFT JOIN code_symbols source ON source.id = sr.source_symbol_id WHERE sr.project_id = :project_id AND sr.target_symbol_id = :table_id AND sr.relationship_type IN ('reads_table','creates_in_table','updates_table','deletes_from_table','defines_table') ORDER BY sr.relationship_type, evidence.path, sr.evidence_line_start");
+        $statement->execute(['project_id' => $projectId, 'table_id' => $tableSymbolId]);
         return $statement->fetchAll();
     }
 }

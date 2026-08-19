@@ -75,6 +75,7 @@ final class RepoScanner
         $files = $this->discoverFiles($root);
         $analysis = $this->analyse($files);
         $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files, $profile));
+        $analysis['symbol_graph'] = (new ProductIntelligence())->enrich($analysis['symbol_graph'], $files);
         $analysis['findings'] = array_merge($analysis['findings'], $analysis['symbol_graph']['findings'] ?? []);
         return $analysis + ['files' => $files];
     }
