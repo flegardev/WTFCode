@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "allowed_categories": ["FALSE_POSITIVE","FALSE_NEGATIVE","WRONG_RELATIONSHIP","WRONG_CONFIDENCE","MISLEADING_EXPLANATION","MISSING_CONTEXT","USELESS_OUTPUT","TOO_MUCH_NOISE","PERFORMANCE","MEMORY","SECURITY","UI_CONFUSION","UNSUPPORTED_PATTERN"],
+  "allowed_severities": ["P0","P1","P2","P3"],
+  "allowed_statuses": ["open","confirmed","fixed","accepted_limitation"],
+  "failures": [
+    {
+      "id": "ALPHA-001",
+      "repo": "nuxt-starter",
+      "commit": "1f391e58fa5f108d2b2bd98c1d604ca625f0290e",
+      "category": "FALSE_POSITIVE",
+      "severity": "P1",
+      "description": "A template catalogue entry named chat was presented as a strong AI chat runtime feature.",
+      "expected": "Catalogue JSON may be described as metadata but must not establish a runtime feature.",
+      "actual": "AI chat was reported as a strong feature with two symbols.",
+      "root_cause": "Feature source signals accepted non-executable JSON catalogue content as runtime behavior evidence.",
+      "fix_commit": null,
+      "regression_test": null,
+      "status": "confirmed"
+    }
+  ]
+}
