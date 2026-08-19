@@ -1,0 +1,75 @@
+# WTFCode V3 multi-engine foundation
+
+This document describes the implemented V3 phase-1 boundary. It does not claim that the later AST, security, graph-UX, change-intelligence, or product-mode phases are complete.
+
+## Scan flow
+
+```text
+RepoScanner safe file discovery
+  -> AnalysisRequest (validated repository root, in-memory readable files, profile)
+  -> AnalysisCoordinator
+  -> AnalyzerRegistry
+  -> independent AnalyzerProviderInterface implementations
+  -> AnalyzerResult per provider
+  -> EvidenceFusion
+  -> normalized symbol graph with provenance
+  -> SymbolGraphStore + AnalyzerRunStore
+```
+
+The native V2 analyzer is retained as `wtfcode-native` version `2.0.0`. The platform scan version is `v3.0-foundation`. This separation lets WTFCode improve orchestration and combine engines without pretending that the native parser itself changed.
+
+## Provider contract
+
+Every provider declares a stable ID, version, supported languages, capabilities, availability, analysis entry point, and health check. Providers return data; they do not write directly to the WTFCode graph tables.
+
+Provider failures are converted into an isolated result with one of these statuses:
+
+- `success`
+- `partial`
+- `unavailable`
+- `failed`
+
+A failed optional provider does not discard successful results from another provider.
+
+## Evidence identity and fusion
+
+Symbol identity uses normalized language, file, qualified name, symbol type, and source range. Relationship identity uses the resolved source and target, relationship type, evidence file, and evidence line. Route identity uses file, HTTP method, normalized path, and evidence line.
+
+Equivalent facts retain one graph row. Their metadata contains a provenance list with:
+
+- engine and engine version
+- platform analysis version
+- confidence
+- evidence file, line, and range
+- raw evidence type
+
+Agreement from independent engines increases the source count and can promote the beginner-facing confidence label to `confirmed`. It never manufactures an edge that no provider emitted.
+
+## Process boundary
+
+`SafeProcessRunner` is the only approved boundary for future analyzer CLIs. It uses an argument array with shell bypass, validates the working directory, passes only allowlisted environment keys, caps captured stdout and stderr independently, records truncation and exit codes, and terminates timed-out processes.
+
+On Windows, process output is written to monitored private temporary files. PHP's Windows pipe implementation can block despite nonblocking mode, which would defeat timeout enforcement. Temporary files are removed after every run.
+
+Imported repositories remain data. The process runner is for trusted analyzer executables only and does not authorize project scripts, package installation, framework bootstrapping, tests, hooks, Dockerfiles, or repository binaries.
+
+## Persistence
+
+Migration `003_multi_engine_foundation.sql` adds:
+
+- scan profile and provider status JSON on `scan_runs`
+- queryable `analysis_provider_runs`
+- provenance JSON on symbols, relationships, and routes
+
+The complete normalized metadata is still retained in `metadata_json` for compatibility with existing V2 readers.
+
+## Doctor
+
+Run:
+
+```powershell
+php tools/doctor.php
+php tools/doctor.php --json
+```
+
+The doctor only probes installed tools and the configured MySQL connection. It does not install anything or execute imported repository code.

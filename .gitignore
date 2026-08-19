@@ -1,0 +1,8 @@
+.env
+config/database.local.php
+storage/repos/*
+!storage/repos/.gitkeep
+storage/logs/*
+!storage/logs/.gitkeep
+.playwright-cli/
+output/

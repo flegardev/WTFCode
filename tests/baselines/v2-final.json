@@ -1,0 +1,134 @@
+{
+  "baseline": "WTFCode V2 final",
+  "captured_at": "2026-08-19T17:48:00+02:00",
+  "environment": {
+    "os": "Windows",
+    "php": "8.4.24",
+    "database": "MySQL via pdo_mysql",
+    "git_worktree": false
+  },
+  "test_status": {
+    "tests/UnitTest.php": {
+      "status": "passed",
+      "duration_ms": 117
+    },
+    "tests/V2AnalysisTest.php": {
+      "status": "passed",
+      "duration_ms": 185
+    },
+    "tests/V2IntegrationTest.php": {
+      "status": "passed",
+      "duration_ms": 694
+    },
+    "tests/Benchmark.php --group=core": {
+      "status": "passed",
+      "duration_ms": 69065,
+      "repositories_passed": 6,
+      "repositories_failed": 0
+    }
+  },
+  "analyzer_version": "v2",
+  "dogfood": {
+    "target": "WTFCode repository",
+    "files": 96,
+    "stack": [
+      "PHP",
+      "Database"
+    ],
+    "architecture_nodes": 3,
+    "architecture_edges": 1,
+    "findings": 3,
+    "symbol_count": 630,
+    "relationship_count": 2800,
+    "routes": 22,
+    "files_with_symbols": 88,
+    "duration_seconds": 0.1055,
+    "peak_memory_bytes": 6291456,
+    "symbol_limit_reached": false,
+    "relationship_limit_reached": false,
+    "route_limit_reached": false
+  },
+  "benchmark_status": {
+    "group": "core",
+    "status": "passed",
+    "fixtures": [
+      "laravel",
+      "adminer",
+      "next-template",
+      "react-crud",
+      "express-realworld",
+      "fastapi"
+    ]
+  },
+  "browser_status": {
+    "server": "php -S 127.0.0.1:8123 -t public",
+    "status": "passed",
+    "verified_pages": [
+      "/",
+      "/login.php",
+      "/register.php"
+    ],
+    "verified_interactions": [
+      "landing page to login navigation",
+      "login page to registration navigation"
+    ],
+    "console_errors": 0,
+    "console_warnings": 0
+  },
+  "database_migration_state": {
+    "database": "wtfcode",
+    "status": "v2 schema present",
+    "verification": "structural",
+    "migration_ledger_present": false,
+    "tables": [
+      "architecture_edges",
+      "architecture_nodes",
+      "code_routes",
+      "code_symbols",
+      "learning_progress",
+      "project_dependencies",
+      "project_files",
+      "projects",
+      "scan_findings",
+      "scan_runs",
+      "symbol_relationships",
+      "users"
+    ]
+  },
+  "current_scan_limits": {
+    "repository_bytes": 104857600,
+    "readable_files": 3000,
+    "bytes_per_file": 262144,
+    "total_readable_bytes": 20971520,
+    "graph_symbols": 8000,
+    "graph_relationships": 16000,
+    "graph_routes": 4000
+  },
+  "available_tools": {
+    "required": [
+      "php",
+      "mysql",
+      "git"
+    ],
+    "enhancement_ready": [
+      "node",
+      "ripgrep"
+    ],
+    "not_installed": [
+      "composer",
+      "tree-sitter",
+      "ctags",
+      "ast-grep",
+      "semgrep",
+      "gitleaks",
+      "osv-scanner",
+      "syft",
+      "grype"
+    ]
+  },
+  "notes": [
+    "The project directory is not a Git worktree, so no baseline commit SHA is available.",
+    "The database has no migration ledger; state was confirmed by table and column inspection.",
+    "Dogfood analysis is read-only and did not execute repository code."
+  ]
+}
