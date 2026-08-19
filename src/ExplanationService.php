@@ -53,6 +53,11 @@ final class ExplanationService
 
     public static function answerQuestion(int $projectId, string $question): array
     {
+        return ExplanationManager::answer($projectId, $question);
+    }
+
+    public static function deterministicAnswer(int $projectId, string $question): array
+    {
         $question = trim($question);
         $lower = strtolower($question);
         if ($question === '') return ['answer' => 'Ask about a file, authentication, Docker, routes, data, or how parts of this project connect.', 'evidence' => []];
