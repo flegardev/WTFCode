@@ -48,6 +48,8 @@ final class ProductIntelligence
         $ranges = $this->symbolRanges($symbols);
         $symbolIndex = [];
         foreach ($symbols as $index => $symbol) $symbolIndex[(string) $symbol['key']] = $index;
+        $relationshipBudget = count($relationships) > 12_000 ? 400 : (count($relationships) > 8_000 ? 800 : 2_500);
+        $symbolBudget = count($symbols) > 7_000 ? 100 : 600;
         $derivedRelationships = 0;
         $derivedSymbols = 0;
         $databaseOperationCount = 0;
@@ -61,9 +63,9 @@ final class ProductIntelligence
                 $lineNumber = $offset + 1;
                 $sourceKey = $this->sourceAt($ranges[$path] ?? [], $lineNumber);
                 foreach ($this->databaseOperations($line) as $operation) {
-                    if ($derivedRelationships >= 4000) break;
+                    if ($derivedRelationships >= $relationshipBudget) break;
                     $tableKey = $this->tableKey($symbols, $path, $lineNumber, $operation['table']);
-                    if (!isset($symbolIndex[$tableKey]) && $derivedSymbols < 1000) {
+                    if (!isset($symbolIndex[$tableKey]) && $derivedSymbols < $symbolBudget) {
                         $symbols[] = $this->derivedSymbol($tableKey, $path, (string) ($file['language'] ?? 'Unknown'), 'table', $operation['table'], $lineNumber, ['reference_only' => true]);
                         $symbolIndex[$tableKey] = array_key_last($symbols);
                         $derivedSymbols++;
@@ -76,13 +78,13 @@ final class ProductIntelligence
                     $databaseOperationCount++;
                 }
                 foreach ($this->controlFacts($line) as $control) {
-                    if ($derivedRelationships >= 4000) break;
+                    if ($derivedRelationships >= $relationshipBudget) break;
                     $relationships[] = $this->derivedRelationship($sourceKey, null, 'control:' . $control['kind'], $control['relationship'], $path, $lineNumber, $line, ['control_flow' => $control['kind']]);
                     $derivedRelationships++;
                     $controlFactCount++;
                 }
                 foreach ($this->uiAndTransportFacts($line) as $fact) {
-                    if ($derivedRelationships >= 4000) break;
+                    if ($derivedRelationships >= $relationshipBudget) break;
                     $relationships[] = $this->derivedRelationship($sourceKey, null, $fact['target'], $fact['relationship'], $path, $lineNumber, $line, $fact['metadata']);
                     $derivedRelationships++;
                 }
@@ -97,18 +99,18 @@ final class ProductIntelligence
                 $lineNumber = $this->firstLine($content, $matches[0]);
                 $sourceKey = $this->sourceAt($ranges[$path] ?? [], $lineNumber);
                 $serviceKey = hash('sha256', $path . '|external_service|service:' . strtolower($service) . '|' . $lineNumber);
-                if (!isset($symbolIndex[$serviceKey]) && $derivedSymbols < 1000) {
+                if (!isset($symbolIndex[$serviceKey]) && $derivedSymbols < $symbolBudget) {
                     $symbols[] = $this->derivedSymbol($serviceKey, $path, (string) ($file['language'] ?? 'Unknown'), 'external_service', $service, $lineNumber, ['service' => $service, 'runtime_evidence' => true, 'matched_signals' => $matches]);
                     $symbolIndex[$serviceKey] = array_key_last($symbols);
                     $derivedSymbols++;
                 }
-                if (!isset($symbolIndex[$serviceKey]) || $derivedRelationships >= 4000) continue;
+                if (!isset($symbolIndex[$serviceKey]) || $derivedRelationships >= $relationshipBudget) continue;
                 $relationships[] = $this->derivedRelationship($sourceKey, $serviceKey, null, 'uses_service', $path, $lineNumber, '', ['service' => $service, 'matched_signals' => $matches]);
                 $derivedRelationships++;
             }
         }
 
-        [$symbols, $features] = $this->detectFeatures($symbols, $relationships, $routes, $fileMap);
+        $features = $this->detectFeatures($symbols, $relationships, $routes, $fileMap);
         $routes = $this->enrichRoutes($routes, $relationships, $symbols, $fileMap);
         $graph['symbols'] = $symbols;
         $graph['relationships'] = $relationships;
@@ -117,7 +119,7 @@ final class ProductIntelligence
         $graph['stats']['features'] = count($features);
         $graph['stats']['database_operations'] = $databaseOperationCount;
         $graph['stats']['control_flow_facts'] = $controlFactCount;
-        $graph['stats']['product_intelligence_limited'] = $derivedRelationships >= 4000 || $derivedSymbols >= 1000 ? 1 : 0;
+        $graph['stats']['product_intelligence_limited'] = $derivedRelationships >= $relationshipBudget || $derivedSymbols >= $symbolBudget ? 1 : 0;
         return $graph;
     }
 
@@ -125,7 +127,7 @@ final class ProductIntelligence
     private function symbolRanges(array $symbols): array
     {
         $ranges = [];
-        foreach ($symbols as $symbol) $ranges[(string) $symbol['path']][] = $symbol;
+        foreach ($symbols as $symbol) $ranges[(string) $symbol['path']][] = ['key' => $symbol['key'], 'type' => $symbol['type'], 'start_line' => $symbol['start_line'], 'end_line' => $symbol['end_line']];
         foreach ($ranges as &$items) usort($items, static fn (array $a, array $b): int => (($a['end_line'] - $a['start_line']) <=> ($b['end_line'] - $b['start_line'])));
         return $ranges;
     }
@@ -217,13 +219,13 @@ final class ProductIntelligence
         return ['source_key' => $source, 'target_key' => $target, 'external_name' => $external, 'target_name' => $external ?? '', 'type' => $type, 'confidence' => 'medium', 'evidence_path' => $path, 'line_start' => $line, 'line_end' => $line, 'excerpt' => function_exists('mb_substr') ? mb_substr(trim($excerpt), 0, 300) : substr(trim($excerpt), 0, 300), 'metadata' => $metadata + ['derived_by' => 'wtfcode-product-intelligence', 'confidence_label' => 'likely']];
     }
 
-    /** @return array{0: array<int, array<string, mixed>>, 1: array<int, array<string, mixed>>} */
-    private function detectFeatures(array $symbols, array $relationships, array $routes, array $fileMap): array
+    /** @return array<int, array<string, mixed>> */
+    private function detectFeatures(array &$symbols, array $relationships, array $routes, array $fileMap): array
     {
         $edgeSignals = [];
         foreach ($relationships as $edge) {
             $source = $edge['source_key'] ?? null;
-            if ($source === null || strlen($edgeSignals[$source] ?? '') >= 2000) continue;
+            if ($source === null || strlen($edgeSignals[$source] ?? '') >= 500) continue;
             $edgeSignals[$source] = ($edgeSignals[$source] ?? '') . ' ' . strtolower(implode(' ', [(string) ($edge['type'] ?? ''), (string) ($edge['target_name'] ?? ''), (string) ($edge['external_name'] ?? '')]));
         }
         $fileFeatureSignals = [];
@@ -267,14 +269,14 @@ final class ProductIntelligence
         }
         unset($cluster);
         uasort($clusters, static fn (array $a, array $b): int => $b['score'] <=> $a['score']);
-        return [$symbols, array_values($clusters)];
+        return array_values($clusters);
     }
 
     /** @param array<int, array<string, mixed>> $routes */
     private function enrichRoutes(array $routes, array $relationships, array $symbols, array $fileMap): array
     {
         $symbolByKey = [];
-        foreach ($symbols as $symbol) $symbolByKey[$symbol['key']] = $symbol;
+        foreach ($symbols as $symbol) $symbolByKey[$symbol['key']] = ['name' => $symbol['name'], 'features' => $symbol['metadata']['features'] ?? []];
         foreach ($routes as &$route) {
             $handler = $route['handler_key'] ?? null;
             $path = (string) $route['path'];
@@ -292,7 +294,7 @@ final class ProductIntelligence
             $route['metadata']['input_hints'] = $this->inputHints($content);
             $route['metadata']['response_hints'] = $this->responseHints($content);
             $route['metadata']['effects'] = $effects;
-            $route['metadata']['features'] = $handler !== null ? ($symbolByKey[$handler]['metadata']['features'] ?? []) : [];
+            $route['metadata']['features'] = $handler !== null ? ($symbolByKey[$handler]['features'] ?? []) : [];
             $route['metadata']['partial'] = true;
         }
         unset($route);
@@ -301,8 +303,15 @@ final class ProductIntelligence
 
     private function endpointType(array $route, string $content): string
     {
-        $signal = strtolower((string) ($route['route_path'] ?? '') . ' ' . $content);
-        return match (true) { str_contains($signal, 'graphql') => 'GraphQL', str_contains($signal, 'webhook') => 'Webhook', str_contains($signal, 'websocket') || str_contains($signal, 'socket.io') => 'WebSocket', str_contains($signal, 'rpc') => 'RPC', str_contains($signal, 'use server') => 'Server action', default => 'REST' };
+        $routePath = (string) ($route['route_path'] ?? '');
+        return match (true) {
+            stripos($routePath, 'graphql') !== false || stripos($content, 'graphql') !== false => 'GraphQL',
+            stripos($routePath, 'webhook') !== false || stripos($content, 'webhook') !== false => 'Webhook',
+            stripos($routePath, 'websocket') !== false || stripos($content, 'websocket') !== false || stripos($content, 'socket.io') !== false => 'WebSocket',
+            stripos($routePath, 'rpc') !== false || stripos($content, 'rpc') !== false => 'RPC',
+            stripos($content, 'use server') !== false => 'Server action',
+            default => 'REST',
+        };
     }
 
     /** @return array<int, string> */
