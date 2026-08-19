@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+/** Shared boundary between runtime product evidence and analysis/support material. */
+final class RuntimeEvidencePolicy
+{
+    public static function isRuntimePath(string $path): bool
+    {
+        $normalized = strtolower(str_replace('\\', '/', $path));
+        if (preg_match('#(^|/)(?:tests?|fixtures?|benchmarks?|docs?|examples?|tools?|reports?|snapshots?|storage|vendor|node_modules|analysis|analyzers?|detectors?|\.playwright-cli)(/|$)#', $normalized)) return false;
+        if (preg_match('#(^|/)config/(?:security|rules?)(/|$)|(^|/)(?:rules?|generated|output|artifacts?)(/|$)#', $normalized)) return false;
+        if (preg_match('#(?:^|/)(?:readme|changelog|license)(?:\.[^/]+)?$|\.(?:md|css|scss|html|blade\.php|snap|snapshot|log)$#', $normalized)) return false;
+        return true;
+    }
+
+    public static function containsTerm(string $text, string $term): bool
+    {
+        return preg_match('/(?<![\pL\pN])' . preg_quote($term, '/') . '(?![\pL\pN])/iu', $text) === 1;
+    }
+
+    public static function isRuntimeSourceEvidence(string $path, string $content): bool
+    {
+        return self::isRuntimePath($path) && !self::isAnalysisImplementation($content);
+    }
+
+    public static function isAnalysisImplementation(string $content): bool
+    {
+        $families = 0;
+        foreach ([
+            '/\b(?:AnalyzerProviderInterface|AnalysisRequest|AnalyzerResult)\b/',
+            '/\b(?:addSymbol|addRelationship|addRoute)\s*\(/',
+            '/\b(?:symbol_graph|engine_runs|EvidenceFusion)\b/i',
+            '/\b(?:discoverFiles|extractSymbols|detectFeatures|matchingPaths)\b/',
+            '/\b(?:code_symbols|symbol_relationships|code_routes)\b/',
+            '/\b(?:analysis provider|runtime evidence|confidence label)\b/i',
+        ] as $pattern) if (preg_match($pattern, $content)) $families++;
+        return $families >= 2;
+    }
+
+    public static function isDetectorDefinition(string $line): bool
+    {
+        return preg_match('/\b(?:preg_match(?:_all)?|regex|regexp|[A-Za-z0-9_]*(?:pattern|matcher|detector|signal)[A-Za-z0-9_]*|needles?|rule[_-]?id)\b/i', $line) === 1
+            && preg_match('/["\'][^"\']*(?:stripe|supabase|firebase|openai|anthropic|cloudflare|sentry|mongodb|kubernetes)[^"\']*["\']/i', $line) === 1;
+    }
+}

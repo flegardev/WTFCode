@@ -21,8 +21,10 @@ final class ProductIntelligence
         'Notifications' => ['notification', 'mailer', 'email', 'web push'],
         'AI chat' => ['chat', 'completion', 'openai', 'anthropic', 'ollama'],
         'Repository import' => ['repository import', 'repo import', 'clone repository', 'repositoryimporter'],
-        'Scanning' => ['repository scan', 'repo scan', 'scanner', 'analysis provider'],
-        'Git review' => ['git diff', 'commit compare', 'change guard', 'scope drift'],
+        'Repository scan' => ['repository scan', 'repo scan', 'reposcanner', 'repositoryscanner', 'analysis provider'],
+        'Feature tracing' => ['feature trace', 'featuretracer', 'trace evidence', 'trace feature'],
+        'Safe prompt generation' => ['safe prompt', 'promptsafetyservice', 'prompt safety', 'generate prompt'],
+        'Git comparison' => ['git diff', 'git comparison', 'gitdiffservice', 'compare commit', 'change guard', 'scope drift'],
     ];
 
     private const SERVICES = [
@@ -45,6 +47,17 @@ final class ProductIntelligence
         $relationships = $graph['relationships'] ?? [];
         $routes = $graph['routes'] ?? [];
         unset($graph['symbols'], $graph['relationships'], $graph['routes']);
+        $excludedServiceKeys = [];
+        $symbols = array_values(array_filter($symbols, function (array $symbol) use (&$excludedServiceKeys, $fileMap): bool {
+            $path = (string) ($symbol['path'] ?? '');
+            $content = (string) ($fileMap[$path]['content'] ?? '');
+            if (($symbol['type'] ?? '') !== 'external_service' || RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) return true;
+            $excludedServiceKeys[(string) ($symbol['key'] ?? '')] = true;
+            return false;
+        }));
+        if ($excludedServiceKeys !== []) {
+            $relationships = array_values(array_filter($relationships, static fn (array $relationship): bool => !isset($excludedServiceKeys[(string) ($relationship['source_key'] ?? '')]) && !isset($excludedServiceKeys[(string) ($relationship['target_key'] ?? '')])));
+        }
         $ranges = $this->symbolRanges($symbols);
         $symbolIndex = [];
         foreach ($symbols as $index => $symbol) $symbolIndex[(string) $symbol['key']] = $index;
@@ -89,12 +102,9 @@ final class ProductIntelligence
                     $derivedRelationships++;
                 }
             }
-            if (!$this->runtimeEvidencePath($path)) continue;
+            if (!RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) continue;
             foreach (self::SERVICES as $service => $needles) {
-                $matches = [];
-                foreach ($needles as $needle) {
-                    if (stripos($content, $needle) !== false) $matches[] = $needle;
-                }
+                $matches = $this->runtimeServiceMatches($path, $content, $needles);
                 if ($matches === []) continue;
                 $lineNumber = $this->firstLine($content, $matches[0]);
                 $sourceKey = $this->sourceAt($ranges[$path] ?? [], $lineNumber);
@@ -231,13 +241,15 @@ final class ProductIntelligence
         $fileFeatureSignals = [];
         foreach ($fileMap as $path => $file) {
             $content = (string) ($file['content'] ?? '');
+            if (!RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) continue;
             foreach (self::FEATURES as $feature => $needles) {
-                foreach ($needles as $needle) if (stripos($content, $needle) !== false) $fileFeatureSignals[$path][$feature][] = $needle;
+                foreach ($needles as $needle) if (RuntimeEvidencePolicy::containsTerm($content, $needle)) $fileFeatureSignals[$path][$feature][] = $needle;
             }
         }
         $clusters = [];
         foreach ($symbols as &$symbol) {
             $path = (string) $symbol['path'];
+            if (!RuntimeEvidencePolicy::isRuntimePath($path)) continue;
             $identity = strtolower(implode(' ', [(string) $symbol['name'], (string) $symbol['qualified_name'], $path]));
             $edgeText = $edgeSignals[$symbol['key']] ?? '';
             $routeText = '';
@@ -245,9 +257,9 @@ final class ProductIntelligence
             foreach (self::FEATURES as $feature => $needles) {
                 $signals = [];
                 foreach ($needles as $needle) {
-                    if (str_contains($identity, $needle)) $signals['identity'][] = $needle;
-                    if ($edgeText !== '' && str_contains($edgeText, $needle)) $signals['graph'][] = $needle;
-                    if ($routeText !== '' && str_contains($routeText, $needle)) $signals['route'][] = $needle;
+                    if (RuntimeEvidencePolicy::containsTerm($identity, $needle)) $signals['identity'][] = $needle;
+                    if ($edgeText !== '' && RuntimeEvidencePolicy::containsTerm($edgeText, $needle)) $signals['graph'][] = $needle;
+                    if ($routeText !== '' && RuntimeEvidencePolicy::containsTerm($routeText, $needle)) $signals['route'][] = $needle;
                     if (in_array($needle, $fileFeatureSignals[$path][$feature] ?? [], true)) $signals['source'][] = $needle;
                 }
                 if (count($signals) < 2) continue;
@@ -330,10 +342,29 @@ final class ProductIntelligence
         return $hints;
     }
 
-    private function runtimeEvidencePath(string $path): bool
+    /** @param array<int, string> $needles @return array<int, string> */
+    private function runtimeServiceMatches(string $path, string $content, array $needles): array
     {
-        $normalized = strtolower(str_replace('\\', '/', $path));
-        return !preg_match('#(^|/)(?:docs?|tests?|fixtures?|examples?|vendor|node_modules)(/|$)|(^|/)(?:analysis|analyzers?|scanners?|detectors?)(/|$)|(?:reposcanner|analyzer|detector)\.[^/]+$|(?:readme|changelog|license)\.(?:md|txt)$|\.(?:md|css|scss|html|blade\.php)$#', $normalized);
+        if (!RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) return [];
+        $matches = [];
+        $basename = strtolower(basename($path));
+        foreach ($needles as $needle) {
+            $quoted = preg_quote($needle, '/');
+            if (!preg_match('/' . $quoted . '/i', $content)) continue;
+            $explicitEndpoint = str_contains($needle, '://') || str_contains($needle, '.') || str_ends_with($needle, ':');
+            $runtimeContext = false;
+            foreach (preg_split('/\R/', $content) ?: [] as $line) {
+                if (!RuntimeEvidencePolicy::containsTerm($line, $needle) || RuntimeEvidencePolicy::isDetectorDefinition($line)) continue;
+                if (preg_match('/(?:import|require|from|use|new|client|sdk|endpoint|base[_-]?url|dsn|connect|request|fetch|axios|curl|->(?:get|post|put|patch|delete))[^\r\n]{0,140}' . $quoted . '|' . $quoted . '[^\r\n]{0,140}(?:client|sdk|endpoint|connect|request|fetch|axios|curl)/i', $line) === 1) { $runtimeContext = true; break; }
+            }
+            $manifestDependency = in_array($basename, ['package.json', 'composer.json', 'pyproject.toml', 'requirements.txt', 'gemfile', 'go.mod'], true)
+                && preg_match('/["\']' . $quoted . '(?:\/[^"\']+)?["\']\s*[:=]?/i', $content) === 1;
+            $deploymentFile = ($needle === 'vercel.json' && $basename === 'vercel.json')
+                || ($needle === 'dockerfile' && ($basename === 'dockerfile' || str_starts_with($basename, 'docker-compose')))
+                || ($needle === 'apiversion:' && preg_match('/\.ya?ml$/', $basename) === 1);
+            if ($explicitEndpoint || $runtimeContext || $manifestDependency || $deploymentFile) $matches[] = $needle;
+        }
+        return array_values(array_unique($matches));
     }
 
     private function firstLine(string $content, string $needle): int

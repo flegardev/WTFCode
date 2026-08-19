@@ -118,6 +118,7 @@ php tests/V3StructuralTest.php
 php tests/V3SecurityTest.php
 php tests/V3GraphTest.php
 php tests/V3FeatureTest.php
+php tests/V3FeatureEvidenceTest.php
 php tests/V3ChangeTest.php
 php tests/V3ModesTest.php
 php tests/V3ExplanationTest.php
@@ -125,10 +126,11 @@ php tests/V3PerformanceTest.php
 php tests/V3FailureIsolationTest.php
 php tests/V3FalsePositiveTest.php
 php tests/V3IntegrationTest.php
+php tests/FusionBenchmark.php
 php tests/Benchmark.php --group=core
 ```
 
-`UnitTest.php` covers repository URL restriction, blast-radius explanation behavior, and read-only scanner inspection of imports and symbols. The V2 and V3 integration suites require the configured MySQL database. `Benchmark.php` shallow-clones a versioned public-repository suite and reports whether required stack and architecture signals are present; see `tests/benchmarks/README.md` for the human scorecard workflow.
+`UnitTest.php` covers repository URL restriction, blast-radius explanation behavior, and read-only scanner inspection of imports and symbols. `V3FeatureEvidenceTest.php` separates runtime feature signals from fixtures, analyzer patterns, documentation, and generated artifacts. The V2 and V3 integration suites require the configured MySQL database. `FusionBenchmark.php` compares native, external, and fused evidence on the curated local fixtures. `Benchmark.php` shallow-clones a versioned public-repository suite and reports whether required stack and architecture signals are present; see `tests/benchmarks/README.md` for the human scorecard workflow.
 
 ## Roadmap
 

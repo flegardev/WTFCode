@@ -7,7 +7,7 @@ final class RepoScanner
     private const MAX_FILES = 3000;
     private const MAX_FILE_SIZE = 262144;
     private const MAX_TOTAL_SCANNED_BYTES = 20971520;
-    private const IGNORED_DIRECTORIES = ['.git', '.idea', '.vscode', 'node_modules', 'vendor', '.next', 'dist', 'build', 'coverage', '.turbo', '.cache', 'storage', 'tmp', 'temp'];
+    private const IGNORED_DIRECTORIES = ['.git', '.idea', '.vscode', '.playwright-cli', 'node_modules', 'vendor', '.next', 'dist', 'build', 'coverage', '.turbo', '.cache', 'storage', 'tmp', 'temp'];
     private const TEXT_EXTENSIONS = ['php', 'js', 'jsx', 'ts', 'tsx', 'py', 'rb', 'go', 'java', 'cs', 'rs', 'vue', 'svelte', 'json', 'yml', 'yaml', 'toml', 'sql', 'md', 'html', 'css', 'scss', 'sh', 'env'];
     private array $discoveryLimits = [];
 
@@ -453,6 +453,8 @@ final class RepoScanner
     {
         if (!is_dir($root . DIRECTORY_SEPARATOR . '.git') && !is_file($root . DIRECTORY_SEPARATOR . '.git')) return null;
         try {
+            $status = (new SafeProcessRunner())->run(new ProcessRunRequest(['git', '-C', $root, 'status', '--porcelain=v1', '--untracked-files=normal'], $root, 10, 262144, 4096));
+            if (!$status->succeeded() || trim($status->stdout) !== '') return null;
             $result = (new SafeProcessRunner())->run(new ProcessRunRequest(['git', '-C', $root, 'rev-parse', 'HEAD'], $root, 10, 4096, 4096));
             $output = trim($result->stdout);
             return $result->succeeded() && preg_match('/^[a-f0-9]{40}$/i', $output) ? $output : null;

@@ -30,6 +30,12 @@ try {
     performance_git($directory, ['add', '.']);
     performance_git($directory, ['-c', 'user.name=WTFCode Test', '-c', 'user.email=test@wtfcode.local', 'commit', '-m', 'initial']);
 
+    $currentCommit = new ReflectionMethod(RepoScanner::class, 'currentCommit');
+    performance_assert(is_string($currentCommit->invoke(new RepoScanner(), $directory)), 'A clean Git worktree should use its commit as the scan revision');
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'dirty.php', '<?php function dirtyWorktree(): void {}');
+    performance_assert($currentCommit->invoke(new RepoScanner(), $directory) === null, 'A dirty Git worktree must fall back to a content digest so provider cache entries cannot go stale');
+    unlink($directory . DIRECTORY_SEPARATOR . 'dirty.php');
+
     $firstInspection = (new RepoScanner())->inspect($directory, AnalysisProfile::QUICK);
     $secondInspection = (new RepoScanner())->inspect($directory, AnalysisProfile::QUICK);
     $secondRuns = $secondInspection['symbol_graph']['engine_runs'];

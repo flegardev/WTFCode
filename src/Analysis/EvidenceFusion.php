@@ -19,6 +19,10 @@ final class EvidenceFusion
         $vulnerabilityIndex = [];
         $symbolIdentityToKey = [];
         $providerKeyMap = [];
+        // Build the bounded diagnostic sample before materializing the much larger
+        // fused graph. Holding both working sets at once can exceed the 128 MiB CLI
+        // ceiling on public repositories even though each set is independently bounded.
+        $disagreements = $this->disagreements($results);
 
         foreach ($this->successful($results) as $result) {
             foreach ($result->graph['symbols'] ?? [] as $symbol) {
@@ -123,7 +127,6 @@ final class EvidenceFusion
         }
 
         $engineRuns = array_map(static fn (AnalyzerResult $result): array => $result->summary(), $results);
-        $disagreements = $this->disagreements($results);
         $providerStats = [
             'symbol_limit_reached' => $this->limitReached($results, 'symbol_limit_reached'),
             'relationship_limit_reached' => $this->limitReached($results, 'relationship_limit_reached'),

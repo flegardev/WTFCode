@@ -10,7 +10,7 @@ if ($project === null) { http_response_code(404); exit('Project not found.'); }
 $architecture = Project::architecture((int) $project['id']);
 $features = SymbolRepository::featureCatalog((int) $project['id']);
 $tables = SymbolRepository::tables((int) $project['id']);
-$services = SymbolRepository::services((int) $project['id']);
+$services = array_values(array_filter(SymbolRepository::services((int) $project['id']), static fn (array $item): bool => ($item['symbol_type'] ?? '') === 'external_service'));
 $stack = json_decode((string) $project['stack_json'], true) ?: [];
 $deployment = array_values(array_filter($architecture['nodes'], static fn (array $node): bool => in_array($node['node_key'], ['deployment', 'docker'], true)));
 $pageTitle = 'Understand ' . $project['name'];
