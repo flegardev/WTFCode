@@ -123,11 +123,26 @@ final class EvidenceFusion
         }
 
         $engineRuns = array_map(static fn (AnalyzerResult $result): array => $result->summary(), $results);
+        $disagreements = $this->disagreements($results);
+        $providerStats = [
+            'symbol_limit_reached' => $this->limitReached($results, 'symbol_limit_reached'),
+            'relationship_limit_reached' => $this->limitReached($results, 'relationship_limit_reached'),
+            'route_limit_reached' => $this->limitReached($results, 'route_limit_reached'),
+            'engines_succeeded' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::SUCCESS)),
+            'engines_failed' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::FAILED)),
+            'engines_unavailable' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::UNAVAILABLE)),
+        ];
+        unset($results, $symbolIdentityToKey, $providerKeyMap, $vulnerabilityIndex);
+        $symbols = array_values($symbols);
+        $relationships = array_values($relationships);
+        $routes = array_values($routes);
+        $packages = array_values($packages);
+        $findings = array_values($findings);
         return [
-            'symbols' => array_values($symbols),
-            'relationships' => array_values($relationships),
-            'routes' => array_values($routes),
-            'packages' => array_values($packages),
+            'symbols' => $symbols,
+            'relationships' => $relationships,
+            'routes' => $routes,
+            'packages' => $packages,
             'stats' => [
                 'symbols' => count($symbols),
                 'relationships' => count($relationships),
@@ -135,15 +150,16 @@ final class EvidenceFusion
                 'packages' => count($packages),
                 'findings' => count($findings),
                 'files_with_symbols' => count(array_unique(array_column($symbols, 'path'))),
-                'symbol_limit_reached' => count($symbols) >= self::MAX_SYMBOLS ? 1 : $this->limitReached($results, 'symbol_limit_reached'),
-                'relationship_limit_reached' => count($relationships) >= self::MAX_RELATIONSHIPS ? 1 : $this->limitReached($results, 'relationship_limit_reached'),
-                'route_limit_reached' => count($routes) >= self::MAX_ROUTES ? 1 : $this->limitReached($results, 'route_limit_reached'),
-                'engines_succeeded' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::SUCCESS)),
-                'engines_failed' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::FAILED)),
-                'engines_unavailable' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::UNAVAILABLE)),
+                'symbol_limit_reached' => count($symbols) >= self::MAX_SYMBOLS ? 1 : $providerStats['symbol_limit_reached'],
+                'relationship_limit_reached' => count($relationships) >= self::MAX_RELATIONSHIPS ? 1 : $providerStats['relationship_limit_reached'],
+                'route_limit_reached' => count($routes) >= self::MAX_ROUTES ? 1 : $providerStats['route_limit_reached'],
+                'engines_succeeded' => $providerStats['engines_succeeded'],
+                'engines_failed' => $providerStats['engines_failed'],
+                'engines_unavailable' => $providerStats['engines_unavailable'],
             ],
             'engine_runs' => $engineRuns,
-            'findings' => array_values($findings),
+            'findings' => $findings,
+            'disagreements' => $disagreements,
         ];
     }
 
@@ -324,5 +340,36 @@ final class EvidenceFusion
             if ((int) ($result->graph['stats'][$key] ?? 0) === 1) return 1;
         }
         return 0;
+    }
+
+    /** @param array<int, AnalyzerResult> $results @return array<int, array<string, mixed>> */
+    private function disagreements(array $results): array
+    {
+        $facts = [];
+        foreach ($this->successful($results) as $result) {
+            $sampled = 0;
+            foreach ($result->graph['relationships'] ?? [] as $edge) {
+                if ($sampled++ >= 1500) break;
+                $identity = hash('sha256', strtolower(implode('|', [(string) ($edge['evidence_path'] ?? ''), (string) ($edge['line_start'] ?? $edge['line'] ?? 1), (string) ($edge['type'] ?? ''), (string) ($edge['target_name'] ?? $edge['external_name'] ?? '')])));
+                if (!isset($facts[$identity]) && count($facts) >= 5000) continue;
+                $facts[$identity]['t'] = (string) ($edge['type'] ?? 'relationship');
+                $facts[$identity]['p'][$result->engine] = [($edge['target_key'] ?? null) === null ? 0 : 1, (string) ($edge['confidence'] ?? 'medium')];
+            }
+        }
+        $disagreements = [];
+        foreach ($facts as $identity => $fact) {
+            $providers = [];
+            foreach ($fact['p'] ?? [] as $provider => [$resolved, $confidence]) $providers[] = ['provider' => $provider, 'result' => $resolved ? 'resolved' : 'unresolved', 'confidence' => $confidence];
+            if (count($providers) < 2) continue;
+            $resolutions = array_unique(array_column($providers, 'result'));
+            $confidences = array_unique(array_column($providers, 'confidence'));
+            if (count($resolutions) < 2 && count($confidences) < 2) continue;
+            $resolution = count($resolutions) > 1
+                ? 'The fused graph selected a resolved target when stronger evidence supported it; unresolved provider evidence remains in provenance.'
+                : 'The fused graph retained the strongest conservatively ranked confidence and preserved every provider in provenance.';
+            $disagreements[] = ['identity' => $identity, 'type' => $fact['t'], 'provider_results' => $providers, 'resolution' => $resolution];
+            if (count($disagreements) >= 2000) break;
+        }
+        return $disagreements;
     }
 }

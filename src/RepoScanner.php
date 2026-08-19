@@ -18,7 +18,18 @@ final class RepoScanner
         }
 
         $profile = AnalysisProfile::normalize($profile);
-        $inspection = $this->inspect($root, $profile);
+        $currentCommit = $this->currentCommit($root);
+        $previousScan = SymbolRepository::latestScan($projectId);
+        $previousCommit = is_string($previousScan['commit_sha'] ?? null) ? $previousScan['commit_sha'] : null;
+        $changedPaths = $this->changedPaths($root, $previousCommit, $currentCommit);
+        $jobId = AnalysisJobStore::create($projectId, $profile, $currentCommit, $previousCommit, $changedPaths);
+        AnalysisJobStore::running($jobId);
+        try {
+            $inspection = $this->inspect($root, $profile, $currentCommit, $previousCommit, $changedPaths);
+        } catch (Throwable $exception) {
+            AnalysisJobStore::finish($jobId, 'failed', $exception->getMessage());
+            throw $exception;
+        }
         $files = $inspection['files'];
         unset($inspection['files']);
         $analysis = $inspection;
@@ -31,7 +42,7 @@ final class RepoScanner
             $this->persistDependencies($projectId, $files, $fileIds);
             $nodeIds = $this->persistNodes($projectId, $analysis['nodes']);
             $this->persistEdges($projectId, $analysis['edges'], $nodeIds);
-            $commit = $this->currentCommit($root);
+            $commit = $currentCommit;
             $pdo->prepare('INSERT INTO scan_runs (project_id, commit_sha, analysis_version, analysis_profile, files_scanned, findings_count, analyzer_stats_json, engine_status_json) VALUES (:project_id, :commit_sha, :analysis_version, :analysis_profile, :files_scanned, :findings_count, :analyzer_stats_json, :engine_status_json)')
                 ->execute([
                     'project_id' => $projectId,
@@ -48,6 +59,8 @@ final class RepoScanner
             SymbolGraphStore::persist($projectId, $scanRunId, $fileIds, $analysis['symbol_graph']);
             AnalyzerRunStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['engine_runs'] ?? []);
             PackageInventoryStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['packages'] ?? []);
+            DisagreementStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['disagreements'] ?? []);
+            AnalysisJobStore::steps($jobId, $analysis['symbol_graph']['engine_runs'] ?? []);
             $statement = $pdo->prepare('UPDATE projects SET status = :status, stack_json = :stack_json, overview = :overview, last_scan_at = NOW(), last_error = NULL WHERE id = :id');
             $statement->execute([
                 'status' => 'ready',
@@ -56,8 +69,11 @@ final class RepoScanner
                 'id' => $projectId,
             ]);
             $pdo->commit();
+            $partial = count(array_filter($analysis['symbol_graph']['engine_runs'] ?? [], static fn (array $run): bool => in_array($run['status'] ?? '', ['partial', 'failed', 'unavailable'], true))) > 0;
+            AnalysisJobStore::finish($jobId, $partial ? 'partial' : 'completed');
         } catch (Throwable $exception) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            AnalysisJobStore::finish($jobId, 'failed', $exception->getMessage());
             throw $exception;
         }
 
@@ -68,16 +84,29 @@ final class RepoScanner
      * Read-only inspection used by the scanner and lightweight unit checks.
      * Source contents only exist in this method's in-memory result.
      */
-    public function inspect(string $root, string $profile = AnalysisProfile::QUICK): array
+    public function inspect(string $root, string $profile = AnalysisProfile::QUICK, ?string $currentRevision = null, ?string $previousRevision = null, array $changedPaths = []): array
     {
         if (!is_dir($root)) throw new RuntimeException('The repository files are no longer available.');
         $this->discoveryLimits = [];
         $files = $this->discoverFiles($root);
         $analysis = $this->analyse($files);
-        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files, $profile));
+        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files, $profile, $currentRevision, $previousRevision, $changedPaths));
         $analysis['symbol_graph'] = (new ProductIntelligence())->enrich($analysis['symbol_graph'], $files);
         $analysis['findings'] = array_merge($analysis['findings'], $analysis['symbol_graph']['findings'] ?? []);
         return $analysis + ['files' => $files];
+    }
+
+    /** @return array<int, string> */
+    private function changedPaths(string $root, ?string $previous, ?string $current): array
+    {
+        if ($previous === null || $current === null || $previous === $current || !preg_match('/^[a-f0-9]{40}$/i', $previous) || !preg_match('/^[a-f0-9]{40}$/i', $current)) return [];
+        try {
+            $result = (new SafeProcessRunner())->run(new ProcessRunRequest(['git', '-C', $root, 'diff', '--name-only', '--diff-filter=ACDMRTUXB', $previous, $current, '--'], $root, 20, 1_048_576, 262_144));
+            if (!$result->succeeded()) return [];
+            return array_slice(array_values(array_filter(array_map(static fn (string $path): string => str_replace('\\', '/', trim($path)), preg_split('/\R/', $result->stdout) ?: []))), 0, 1000);
+        } catch (Throwable) {
+            return [];
+        }
     }
 
     private function discoverFiles(string $root): array
@@ -422,12 +451,13 @@ final class RepoScanner
 
     private function currentCommit(string $root): ?string
     {
-        $process = proc_open(['git', '-C', $root, 'rev-parse', 'HEAD'], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null, null, ['bypass_shell' => true]);
-        if (!is_resource($process)) return null;
-        $output = trim((string) stream_get_contents($pipes[1]));
-        stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        return proc_close($process) === 0 && preg_match('/^[a-f0-9]{40}$/i', $output) ? $output : null;
+        if (!is_dir($root . DIRECTORY_SEPARATOR . '.git') && !is_file($root . DIRECTORY_SEPARATOR . '.git')) return null;
+        try {
+            $result = (new SafeProcessRunner())->run(new ProcessRunRequest(['git', '-C', $root, 'rev-parse', 'HEAD'], $root, 10, 4096, 4096));
+            $output = trim($result->stdout);
+            return $result->succeeded() && preg_match('/^[a-f0-9]{40}$/i', $output) ? $output : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 }

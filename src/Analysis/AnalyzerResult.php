@@ -18,6 +18,7 @@ final class AnalyzerResult
         public readonly array $findings = [],
         public readonly int $durationMs = 0,
         public readonly ?string $message = null,
+        public readonly array $execution = [],
     ) {
     }
 
@@ -46,6 +47,11 @@ final class AnalyzerResult
             'routes' => count($this->graph['routes'] ?? []),
             'packages' => count($this->graph['packages'] ?? []),
             'findings' => count($this->findings),
+        ] + [
+            'cache_hit' => (bool) ($this->execution['cache_hit'] ?? false),
+            'incremental' => (bool) ($this->execution['incremental'] ?? false),
+            'files_analyzed' => max(0, (int) ($this->execution['files_analyzed'] ?? 0)),
+            'cache_key' => isset($this->execution['cache_key']) ? substr((string) $this->execution['cache_key'], 0, 64) : null,
         ];
     }
 }

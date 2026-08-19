@@ -78,6 +78,17 @@ foundation_assert(($isolated['stats']['symbols'] ?? 0) > 0, 'A failed optional p
 foundation_assert(($isolated['stats']['engines_failed'] ?? 0) === 1, 'Provider failures must be represented in engine status');
 foundation_assert(count($isolated['engine_runs'] ?? []) === 2, 'Every attempted provider must produce a run summary');
 
+$relationshipHigh = $relationshipB;
+$relationshipHigh['confidence'] = 'high';
+$disagreementGraph = $graphB;
+$disagreementGraph['relationships'] = [$relationshipHigh];
+$disagreed = (new EvidenceFusion())->fuse([
+    (new FoundationFixtureProvider('engine-a-confidence', $graphA))->analyze($request),
+    (new FoundationFixtureProvider('engine-b-confidence', $disagreementGraph))->analyze($request),
+]);
+foundation_assert(($disagreed['disagreements'] ?? []) !== [], 'Provider confidence disagreements must be retained as internal diagnostics');
+foundation_assert(count($disagreed['disagreements'][0]['provider_results'] ?? []) === 2, 'A disagreement must identify every provider result');
+
 $literal = 'literal;echo SHOULD_NOT_RUN';
 $process = (new SafeProcessRunner())->run(new ProcessRunRequest(
     [PHP_BINARY, '-r', 'echo $argv[1];', $literal],

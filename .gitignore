@@ -4,6 +4,8 @@ storage/repos/*
 !storage/repos/.gitkeep
 storage/logs/*
 !storage/logs/.gitkeep
+storage/cache/*
+!storage/cache/.gitkeep
 .playwright-cli/
 output/
 vendor/

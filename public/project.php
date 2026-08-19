@@ -9,7 +9,7 @@ $project = $projectId === false || $projectId === null ? null : Project::findFor
 if ($project === null) { http_response_code(404); exit('Project not found.'); }
 if (is_post()) {
     verify_csrf();
-    $error = Project::rescan($project, Auth::id());
+    $error = Project::rescan($project, Auth::id(), post_string('profile'));
     flash($error === null ? 'success' : 'error', $error ?? 'Repository analysis refreshed.');
     redirect('project.php?id=' . (int) $project['id']);
 }
@@ -20,6 +20,7 @@ $stack = json_decode((string) $project['stack_json'], true) ?: [];
 $progress = ExplorationService::progress(Auth::id(), (int) $project['id']);
 $symbolCounts = SymbolRepository::counts((int) $project['id']);
 $latestScan = SymbolRepository::latestScan((int) $project['id']);
+$latestJob = AnalysisJobStore::latest((int) $project['id']);
 $pageTitle = $project['name'];
 $activePage = 'dashboard';
 $activeProjectSection = 'overview';
@@ -29,7 +30,7 @@ require __DIR__ . '/../views/header.php';
     <div class="breadcrumb"><a href="<?= e(url('dashboard.php')) ?>">Projects</a><span>/</span><span><?= e($project['name']) ?></span></div>
     <div class="project-heading">
         <div><span class="status <?= e($project['status']) ?>"><?= e($project['status']) ?></span><h1><?= e($project['name']) ?></h1><p><?= e($project['overview'] ?? 'The first scan is still being prepared.') ?></p></div>
-        <div class="heading-actions"><a class="button button-secondary" href="<?= e(url('compare.php?id=' . (int) $project['id'])) ?>">Review Git changes</a><form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><button class="button button-quiet" type="submit">Rescan</button></form></div>
+        <div class="heading-actions"><a class="button button-secondary" href="<?= e(url('compare.php?id=' . (int) $project['id'])) ?>">Review Git changes</a><form method="post" class="rescan-profile"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><label><span class="sr-only">Analysis profile</span><select name="profile"><?php foreach ([AnalysisProfile::QUICK => 'Quick', AnalysisProfile::DEEP => 'Deep', AnalysisProfile::SECURITY => 'Security', AnalysisProfile::MAXIMUM => 'Maximum'] as $value => $label): ?><option value="<?= e($value) ?>"><?= e($label) ?></option><?php endforeach; ?></select></label><button class="button button-quiet" type="submit">Rescan</button></form></div>
     </div>
     <?php if ($stack !== []): ?><div class="stack-line"><span>Detected stack</span><?php foreach ($stack as $item): ?><b><?= e($item) ?></b><?php endforeach; ?></div><?php endif; ?>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
@@ -40,6 +41,7 @@ require __DIR__ . '/../views/header.php';
         <div><span>Data refs</span><strong><?= (int) ($symbolCounts['table_count'] ?? 0) ?></strong></div>
         <div><span>Learned</span><strong><?= $progress['percentage'] ?>%</strong></div>
     </section>
+    <?php if ($latestJob !== null): ?><section class="node-evidence-strip"><strong>Latest <?= e($latestJob['analysis_profile']) ?> job: <?= e($latestJob['state']) ?></strong><?php foreach ($latestJob['steps'] as $step): ?><a href="<?= e(url('analyzers.php?id=' . (int) $project['id'])) ?>"><?= e($step['provider_id']) ?> · <?= e($step['state']) ?><?= $step['cache_hit'] ? ' · cached' : '' ?><?= $step['incremental'] ? ' · incremental' : '' ?></a><?php endforeach; ?></section><?php endif; ?>
     <section class="project-tools" aria-label="Project tools"><a href="<?= e(url('understand.php?id=' . (int) $project['id'])) ?>"><strong>Understand this app</strong><span>Architecture, features, data, deployment</span></a><a href="<?= e(url('change.php?id=' . (int) $project['id'])) ?>"><strong>Plan a safe change</strong><span>Blast radius, risks, tests, prompt</span></a><a href="<?= e(url('learn.php?id=' . (int) $project['id'])) ?>"><strong>Learn this app</strong><span><?= $progress['percentage'] ?>% explored</span></a></section>
     <section class="content-grid">
         <article class="panel map-panel" id="architecture"><div class="section-row"><div><p class="landing-kicker">Architecture map</p><h2>What the scanner can support</h2></div><p>Cards are confirmed from matching repository evidence. Connections are explicitly labelled when inferred.</p></div>

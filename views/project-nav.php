@@ -18,6 +18,7 @@ $projectLinks = [
     'data' => ['tables.php?id=' . (int) $project['id'], 'Data and services'],
     'trace' => ['feature.php?id=' . (int) $project['id'], 'Trace'],
     'files' => ['files.php?id=' . (int) $project['id'], 'Files'],
+    'analyzers' => ['analyzers.php?id=' . (int) $project['id'], 'Analyzers'],
 ];
 ?>
 <nav class="project-nav project-nav-v2 mode-nav" aria-label="Product modes">

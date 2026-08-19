@@ -24,7 +24,7 @@ WTFCode is a plain-PHP codebase understanding tool for people who can build quic
 
 ## V3 implementation status
 
-V3 phases 1 through 9 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
+V3 phases 1 through 10 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
 
 Evidence is ranked conservatively: semantic resolution outranks direct syntax, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security profiles combine redacted Gitleaks results, optional Semgrep code findings, OSV dependency advisories, optional Syft inventory, and optional offline Grype confirmation without treating a finding as proof of exploitability. See `docs/V3-FOUNDATION.md`, `config/tool-manifest.json`, and `THIRD_PARTY.md` for boundaries and provenance.
 
@@ -37,6 +37,10 @@ Change intelligence compares Git text with declaration, route, schema, dependenc
 The project workspace is organized around five evidence-first modes: Understand summarizes the app and boundaries, Change builds a target-specific blast-radius plan, Review compares semantic Git evidence, Secure consolidates security providers and critical paths, and Learn teaches from the actual scan rather than generic tutorials.
 
 Explanations use an `ExplanationProviderInterface`. The deterministic provider is the default and requires no AI service. Optional OpenAI-compatible and local Ollama providers receive only a bounded, recursively redacted evidence packet; responses are citation-validated and unsupported sentences are labeled as inference. Provider failure falls back to deterministic output.
+
+Provider output is cached by repository revision, provider ID/version, analysis version, and configuration hash. Small Git changes reanalyze eligible providers on changed files plus their known graph neighborhood; large or unsafe deltas fall back to full analysis. Every scan creates an `analysis_jobs` record with independent provider steps, cache/incremental labels, and terminal state. The registry UI previews Quick, Deep, Security, and Maximum provider sets and exposes live health. Confidence/resolution disagreements are retained as internal diagnostics instead of silently disappearing during fusion.
+
+The fact-level fusion benchmark and its limits are recorded in `tests/reports/v3-fusion-2026-08-19.md`.
 
 ## Intentional MVP boundaries
 
@@ -117,6 +121,9 @@ php tests/V3FeatureTest.php
 php tests/V3ChangeTest.php
 php tests/V3ModesTest.php
 php tests/V3ExplanationTest.php
+php tests/V3PerformanceTest.php
+php tests/V3FailureIsolationTest.php
+php tests/V3FalsePositiveTest.php
 php tests/V3IntegrationTest.php
 php tests/Benchmark.php --group=core
 ```

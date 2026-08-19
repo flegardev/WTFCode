@@ -333,7 +333,7 @@ final class ProductIntelligence
     private function runtimeEvidencePath(string $path): bool
     {
         $normalized = strtolower(str_replace('\\', '/', $path));
-        return !preg_match('#(^|/)(?:docs?|tests?|fixtures?|examples?|vendor|node_modules)(/|$)|(?:readme|changelog|license)\.(?:md|txt)$#', $normalized);
+        return !preg_match('#(^|/)(?:docs?|tests?|fixtures?|examples?|vendor|node_modules)(/|$)|(^|/)(?:analysis|analyzers?|scanners?|detectors?)(/|$)|(?:reposcanner|analyzer|detector)\.[^/]+$|(?:readme|changelog|license)\.(?:md|txt)$|\.(?:md|css|scss|html|blade\.php)$#', $normalized);
     }
 
     private function firstLine(string $content, string $needle): int

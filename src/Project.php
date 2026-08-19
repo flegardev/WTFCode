@@ -36,13 +36,13 @@ final class Project
         return ['project' => self::findForUser($projectId, $userId)];
     }
 
-    public static function rescan(array $project, int $userId): ?string
+    public static function rescan(array $project, int $userId, string $profile = AnalysisProfile::QUICK): ?string
     {
         if ((int) $project['user_id'] !== $userId) return 'Project not found.';
         try {
             @set_time_limit(120);
             self::setStatus((int) $project['id'], 'scanning');
-            (new RepoScanner())->scan((int) $project['id'], (string) $project['local_path']);
+            (new RepoScanner())->scan((int) $project['id'], (string) $project['local_path'], AnalysisProfile::normalize($profile));
         } catch (Throwable $exception) {
             Logger::error('Repository rescan failed', ['project_id' => $project['id'], 'type' => get_class($exception), 'message' => $exception->getMessage()]);
             Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($exception->getMessage(), 0, 500), 'id' => $project['id']]);

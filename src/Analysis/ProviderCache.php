@@ -1,0 +1,72 @@
+<?php
+
+declare(strict_types=1);
+
+final class ProviderCache
+{
+    private string $root;
+
+    public function __construct(?string $root = null)
+    {
+        $this->root = $root ?? dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'providers';
+    }
+
+    public function key(AnalysisRequest $request, AnalyzerProviderInterface $provider, ?string $revision = null): string
+    {
+        return hash('sha256', implode('|', [$revision ?? $request->revision(), $provider->id(), $provider->version(), AnalysisEngine::VERSION, $this->configurationHash($request, $provider)]));
+    }
+
+    public function load(AnalysisRequest $request, AnalyzerProviderInterface $provider, ?string $revision = null): ?AnalyzerResult
+    {
+        $key = $this->key($request, $provider, $revision);
+        $path = $this->path($provider->id(), $key);
+        if (!is_file($path) || filesize($path) > 20_971_520) return null;
+        $decoded = json_decode((string) file_get_contents($path), true);
+        if (!is_array($decoded) || ($decoded['cache_key'] ?? '') !== $key) return null;
+        $result = $decoded['result'] ?? null;
+        if (!is_array($result) || !in_array($result['status'] ?? '', [AnalyzerResult::SUCCESS, AnalyzerResult::PARTIAL], true)) return null;
+        return new AnalyzerResult(
+            (string) $result['engine'], (string) $result['version'], (string) $result['status'],
+            is_array($result['graph'] ?? null) ? $result['graph'] : [], is_array($result['findings'] ?? null) ? $result['findings'] : [],
+            0, 'Reused content-addressed provider cache.', ['cache_hit' => true, 'incremental' => false, 'files_analyzed' => 0, 'cache_key' => $key],
+        );
+    }
+
+    public function save(AnalysisRequest $request, AnalyzerProviderInterface $provider, AnalyzerResult $result): ?string
+    {
+        if (!in_array($result->status, [AnalyzerResult::SUCCESS, AnalyzerResult::PARTIAL], true)) return null;
+        if (count($result->graph['relationships'] ?? []) > 8000 || count($result->graph['symbols'] ?? []) > 5000) return null;
+        $key = $this->key($request, $provider);
+        $directory = dirname($this->path($provider->id(), $key));
+        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) return null;
+        $payload = SensitiveDataSanitizer::scrub(['cache_key' => $key, 'created_at' => gmdate(DATE_ATOM), 'result' => ['engine' => $result->engine, 'version' => $result->engineVersion, 'status' => $result->status, 'graph' => $result->graph, 'findings' => $result->findings]]);
+        $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (!is_string($json) || strlen($json) > 16_777_216) return null;
+        $temporary = tempnam($directory, 'cache-');
+        if ($temporary === false) return null;
+        try {
+            if (file_put_contents($temporary, $json, LOCK_EX) === false) return null;
+            @chmod($temporary, 0600);
+            if (!@rename($temporary, $this->path($provider->id(), $key))) return null;
+        } finally {
+            if (is_file($temporary)) @unlink($temporary);
+        }
+        return $key;
+    }
+
+    private function configurationHash(AnalysisRequest $request, AnalyzerProviderInterface $provider): string
+    {
+        $reflection = new ReflectionClass($provider);
+        $classFile = $reflection->getFileName();
+        $configs = [dirname(__DIR__, 2) . '/config/tool-manifest.json', dirname(__DIR__, 2) . '/config/security/gitleaks.toml', dirname(__DIR__, 2) . '/config/security/semgrep.yml'];
+        $hashes = [];
+        foreach ($configs as $file) if (is_file($file)) $hashes[] = basename($file) . ':' . hash_file('sha256', $file);
+        return hash('sha256', json_encode(['profile' => $request->profile(), 'capabilities' => $provider->capabilities(), 'class' => is_string($classFile) && is_file($classFile) ? hash_file('sha256', $classFile) : '', 'configs' => $hashes], JSON_UNESCAPED_SLASHES));
+    }
+
+    private function path(string $provider, string $key): string
+    {
+        $safe = preg_replace('/[^a-z0-9._-]/i', '_', $provider) ?: 'unknown';
+        return $this->root . DIRECTORY_SEPARATOR . $safe . DIRECTORY_SEPARATOR . $key . '.json';
+    }
+}
