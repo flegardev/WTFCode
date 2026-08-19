@@ -38,7 +38,7 @@ foreach ($selected as $index => $repo) {
     $runPath = $root . '/tests/alpha/runs/' . $repo['name'] . '-' . $profile . '.json';
     if (isset($options['resume']) && is_file($runPath)) {
         $existing = json_decode((string) file_get_contents($runPath), true);
-        if (($existing['repository']['commit_sha'] ?? '') === $repo['commit_sha'] && ($existing['analysis_version'] ?? '') === AnalysisEngine::VERSION && ($existing['profile'] ?? '') === $profile) {
+        if (($existing['schema_version'] ?? 0) === ALPHA_SCHEMA_VERSION && ($existing['repository']['commit_sha'] ?? '') === $repo['commit_sha'] && ($existing['analysis_version'] ?? '') === AnalysisEngine::VERSION && ($existing['profile'] ?? '') === $profile) {
             echo 'SKIP ' . $repo['name'] . ' — unchanged result already exists.' . PHP_EOL;
             continue;
         }

@@ -8,6 +8,7 @@ require_once __DIR__ . '/alpha/AlphaSupport.php';
 function alpha_assert(bool $condition, string $message): void { if (!$condition) throw new RuntimeException($message); }
 
 $corpus = alpha_load_corpus(dirname(__DIR__));
+alpha_assert(ALPHA_SCHEMA_VERSION === 2, 'Alpha run schema changes must invalidate resumable summaries.');
 alpha_assert(count($corpus['repositories']) >= 25, 'Alpha corpus must contain at least 25 repositories.');
 $names = array_column($corpus['repositories'], 'name');
 alpha_assert(count($names) === count(array_unique($names)), 'Alpha repository names must be unique.');

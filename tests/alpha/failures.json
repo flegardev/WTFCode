@@ -143,6 +143,20 @@
       "fix_commit": null,
       "regression_test": "tests/V3FeatureEvidenceTest.php plus original Flask corpus rerun",
       "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-011",
+      "repo": "corpus",
+      "commit": "multiple pinned corpus commits",
+      "category": "MISSING_CONTEXT",
+      "severity": "P2",
+      "description": "Resume validity ignored the Alpha run schema, so old summaries could be reused after evidence fields changed.",
+      "expected": "Repository SHA, analyzer version, profile, and harness schema must all match before resume skips work.",
+      "actual": "Alpha.3 runs created before feature evidence was added qualified for reuse.",
+      "root_cause": "Resume identity omitted ALPHA_SCHEMA_VERSION.",
+      "fix_commit": null,
+      "regression_test": "tests/AlphaRunnerTest.php — run schema version is part of the resumable contract",
+      "status": "confirmed"
     }
   ]
 }

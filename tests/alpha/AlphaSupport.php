@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-const ALPHA_SCHEMA_VERSION = 1;
+const ALPHA_SCHEMA_VERSION = 2;
 const ALPHA_IGNORED_DIRECTORIES = ['.git', '.idea', '.vscode', '.playwright-cli', 'node_modules', 'vendor', '.next', 'dist', 'build', 'coverage', '.turbo', '.cache', 'storage', 'tmp', 'temp'];
 
 /** @return array<string, mixed> */
