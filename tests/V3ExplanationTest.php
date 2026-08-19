@@ -16,6 +16,8 @@ $token = bin2hex(random_bytes(6));
 $rawSecret = 'github_pat_' . str_repeat('A', 40) . $token;
 $directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wtfcode-explain-' . $token;
 mkdir($directory, 0700, true);
+mkdir($directory . DIRECTORY_SEPARATOR . 'auth', 0700, true);
+mkdir($directory . DIRECTORY_SEPARATOR . 'chat', 0700, true);
 $userId = null;
 $previousProvider = getenv('WTF_CODE_EXPLANATION_PROVIDER');
 try {
@@ -24,6 +26,9 @@ try {
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'UsedHelper.js', "export function usedHelper() { return true; }\n");
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'Consumer.js', "import { usedHelper } from './UsedHelper.js';\nexport const result = usedHelper();\n");
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'UnusedHelper.php', "<?php\nfunction unused_helper(): string { return 'maybe dynamic'; }\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'auth' . DIRECTORY_SEPARATOR . 'route.js', "export const route = 'auth';\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'chat' . DIRECTORY_SEPARATOR . 'route.js', "export const route = 'chat';\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'ChatConsumer.js', "import { route } from './chat/route.js';\nexport const selected = route;\n");
     $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'Explanation test', 'email' => 'explain-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
     $userId = (int) $pdo->lastInsertId();
     $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'Explanation fixture', 'repository_url' => 'https://github.com/wtfcode-explain/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
@@ -41,6 +46,8 @@ try {
     explanation_assert(str_starts_with($usedDeletion['answer'], 'Confirmed use:') && str_contains($usedDeletion['answer'], 'Do not delete'), 'Deletion answers must warn when confirmed dependents exist');
     $unusedDeletion = ExplanationService::deterministicAnswer($projectId, 'Can I delete UnusedHelper.php?');
     explanation_assert(str_starts_with($unusedDeletion['answer'], 'No detected use:') && str_contains($unusedDeletion['answer'], 'not proof'), 'No detected reference must never mean safe to delete');
+    $duplicateDeletion = ExplanationService::deterministicAnswer($projectId, 'Can I delete chat/route.js?');
+    explanation_assert(str_contains($duplicateDeletion['answer'], 'chat/route.js') && !str_contains($duplicateDeletion['answer'], 'auth/route.js'), 'A full-path deletion question must not resolve to a different file with the same basename');
 
     $packet = EvidencePacket::build($projectId, 'login');
     $normalized = CitationEnforcer::normalize('{"answer":"Auth is present [1]. Runtime behavior may vary.","citations":[1,999]}', $packet);
@@ -53,7 +60,8 @@ try {
 } finally {
     if ($previousProvider === false) putenv('WTF_CODE_EXPLANATION_PROVIDER'); else putenv('WTF_CODE_EXPLANATION_PROVIDER=' . $previousProvider);
     if ($userId !== null) $pdo->prepare('DELETE FROM users WHERE id = :id')->execute(['id' => $userId]);
-    foreach (glob($directory . DIRECTORY_SEPARATOR . '*') ?: [] as $file) @unlink($file);
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+    foreach ($iterator as $entry) $entry->isDir() ? @rmdir($entry->getPathname()) : @unlink($entry->getPathname());
     @rmdir($directory);
 }
 

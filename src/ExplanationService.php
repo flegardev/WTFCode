@@ -121,9 +121,11 @@ final class ExplanationService
         foreach ($matches[0] as $candidate) {
             $candidate = str_replace('\\', '/', trim($candidate, " \t\n\r\0\x0B.,;:!?\"'"));
             $basename = basename($candidate);
-            foreach (Project::files($projectId, $basename, 30) as $file) {
+            $files = Project::files($projectId, $basename, 30);
+            $exact = array_values(array_filter($files, static fn (array $file): bool => strcasecmp(str_replace('\\', '/', (string) ($file['path'] ?? '')), $candidate) === 0));
+            $candidates = $exact !== [] ? $exact : array_values(array_filter($files, static fn (array $file): bool => strcasecmp(basename(str_replace('\\', '/', (string) ($file['path'] ?? ''))), $basename) === 0));
+            foreach ($candidates as $file) {
                 $path = str_replace('\\', '/', (string) ($file['path'] ?? ''));
-                if (strcasecmp($path, $candidate) !== 0 && strcasecmp(basename($path), $basename) !== 0) continue;
                 $direct = Project::dependents((int) $file['id']);
                 $transitive = Project::transitiveDependents($projectId, (int) $file['id']);
                 $critical = in_array((string) ($file['role_name'] ?? ''), ['authentication','api endpoint','data model','configuration','route'], true)
