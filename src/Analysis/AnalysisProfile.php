@@ -16,4 +16,25 @@ final class AnalysisProfile
             ? $profile
             : self::QUICK;
     }
+
+    public static function includes(string $profile, string $providerId): bool
+    {
+        $profile = self::normalize($profile);
+        $groups = [
+            self::QUICK => ['wtfcode-native', 'php-parser', 'tree-sitter', 'typescript-semantic', 'ast-grep'],
+            self::DEEP => ['wtfcode-native', 'php-parser', 'tree-sitter', 'typescript-semantic', 'ast-grep', 'ripgrep', 'ctags'],
+            self::SECURITY => ['gitleaks', 'semgrep', 'osv-scanner', 'syft', 'grype'],
+        ];
+        $known = array_values(array_unique(array_merge(...array_values($groups))));
+        if (!in_array($providerId, $known, true)) return true;
+        if ($profile === self::MAXIMUM) return true;
+        return in_array($providerId, $groups[$profile] ?? [], true);
+    }
+
+    /** @return array<int, string> */
+    public static function providers(string $profile): array
+    {
+        $all = ['wtfcode-native', 'php-parser', 'tree-sitter', 'typescript-semantic', 'ast-grep', 'ripgrep', 'ctags', 'gitleaks', 'semgrep', 'osv-scanner', 'syft', 'grype'];
+        return array_values(array_filter($all, static fn (string $id): bool => self::includes($profile, $id)));
+    }
 }

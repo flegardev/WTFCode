@@ -1,0 +1,46 @@
+{
+  "verification_date": "2026-08-19",
+  "platform": "windows-amd64",
+  "policy": "Versions are pinned. Release artifacts were verified against the checksum asset published with the same GitHub release before extraction. Executable hashes identify the exact local binary used by WTFCode.",
+  "tools": [
+    {
+      "name": "Gitleaks",
+      "version": "8.30.1",
+      "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "artifact": "gitleaks_8.30.1_windows_x64.zip",
+      "artifact_sha256": "d29144deff3a68aa93ced33dddf84b7fdc26070add4aa0f4513094c8332afc4e",
+      "executable_sha256": "17157e2ee8b76fc8b1d8bee607a250e34b8a8023c8bc81822d4b5ee4d78fcb7c"
+    },
+    {
+      "name": "OSV-Scanner",
+      "version": "2.5.1",
+      "source": "https://github.com/google/osv-scanner/releases/tag/v2.5.1",
+      "artifact": "osv-scanner_windows_amd64.exe",
+      "artifact_sha256": "25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6",
+      "executable_sha256": "25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6"
+    },
+    {
+      "name": "Syft",
+      "version": "1.51.0",
+      "source": "https://github.com/anchore/syft/releases/tag/v1.51.0",
+      "artifact": "syft_1.51.0_windows_amd64.zip",
+      "artifact_sha256": "fc5ffaeffb993576ece9c791da5a688fb2c8969a1479bbfe58583672c64da336",
+      "executable_sha256": "75adfff66c266adac51fe8addeca97702f82b4d822d02bf70b79f556c84d3a46"
+    },
+    {
+      "name": "Grype",
+      "version": "0.117.0",
+      "source": "https://github.com/anchore/grype/releases/tag/v0.117.0",
+      "artifact": "grype_0.117.0_windows_amd64.zip",
+      "artifact_sha256": "7728ee9c06792e62444bd651274e4dd1e30eec02eee1266bb6c9c9d237d0f0cb",
+      "executable_sha256": "eb65f1c0a6a107fd80fe5bffa86df174a07a94980034b0c9bdd7468ead1b96ce"
+    }
+  ],
+  "trusted_configs": [
+    {
+      "name": "Gitleaks default configuration",
+      "source": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml",
+      "sha256": "e163e53b9e7e8a8511e77271e2b323ed057759542a6d988258afe3a1fa329caf"
+    }
+  ]
+}

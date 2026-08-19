@@ -12,6 +12,7 @@ $projectLinks = [
     'trace' => ['feature.php?id=' . (int) $project['id'], 'Trace'],
     'files' => ['files.php?id=' . (int) $project['id'], 'Files'],
     'review' => ['compare.php?id=' . (int) $project['id'], 'Review changes'],
+    'secure' => ['secure.php?id=' . (int) $project['id'], 'Secure'],
 ];
 ?>
 <nav class="project-nav project-nav-v2" aria-label="Project analysis">

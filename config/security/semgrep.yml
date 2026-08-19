@@ -1,0 +1,53 @@
+rules:
+  - id: wtfcode.security.php-command-injection
+    languages: [php]
+    severity: ERROR
+    message: External data may influence a system command.
+    metadata:
+      cwe: ["CWE-78: Improper Neutralization of Special Elements used in an OS Command"]
+      owasp: ["A03:2021 - Injection"]
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: exec($X)
+          - pattern: shell_exec($X)
+          - pattern: system($X)
+          - pattern: passthru($X)
+      - pattern-not: exec("...")
+      - pattern-not: shell_exec("...")
+      - pattern-not: system("...")
+      - pattern-not: passthru("...")
+  - id: wtfcode.security.js-command-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: External data may influence a child process command.
+    metadata:
+      cwe: ["CWE-78: Improper Neutralization of Special Elements used in an OS Command"]
+      owasp: ["A03:2021 - Injection"]
+      confidence: HIGH
+    pattern-either:
+      - pattern: child_process.exec($CMD, ...)
+      - pattern: exec($CMD, ...)
+      - pattern: execSync($CMD, ...)
+  - id: wtfcode.security.dynamic-eval
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: Text is evaluated as JavaScript code.
+    metadata:
+      cwe: ["CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"]
+      owasp: ["A03:2021 - Injection"]
+      confidence: HIGH
+    pattern: eval($CODE)
+  - id: wtfcode.security.python-shell-command
+    languages: [python]
+    severity: ERROR
+    message: A subprocess uses shell parsing with a non-literal command.
+    metadata:
+      cwe: ["CWE-78: Improper Neutralization of Special Elements used in an OS Command"]
+      owasp: ["A03:2021 - Injection"]
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: subprocess.$METHOD($CMD, shell=True, ...)
+          - pattern: os.system($CMD)
+      - pattern-not: os.system("...")

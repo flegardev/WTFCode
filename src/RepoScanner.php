@@ -11,13 +11,14 @@ final class RepoScanner
     private const TEXT_EXTENSIONS = ['php', 'js', 'jsx', 'ts', 'tsx', 'py', 'rb', 'go', 'java', 'cs', 'rs', 'vue', 'svelte', 'json', 'yml', 'yaml', 'toml', 'sql', 'md', 'html', 'css', 'scss', 'sh', 'env'];
     private array $discoveryLimits = [];
 
-    public function scan(int $projectId, string $root): array
+    public function scan(int $projectId, string $root, string $profile = AnalysisProfile::QUICK): array
     {
         if (!is_dir($root)) {
             throw new RuntimeException('The repository files are no longer available.');
         }
 
-        $inspection = $this->inspect($root);
+        $profile = AnalysisProfile::normalize($profile);
+        $inspection = $this->inspect($root, $profile);
         $files = $inspection['files'];
         unset($inspection['files']);
         $analysis = $inspection;
@@ -30,8 +31,23 @@ final class RepoScanner
             $this->persistDependencies($projectId, $files, $fileIds);
             $nodeIds = $this->persistNodes($projectId, $analysis['nodes']);
             $this->persistEdges($projectId, $analysis['edges'], $nodeIds);
-            $this->persistFindings($projectId, $analysis['findings']);
-
+            $commit = $this->currentCommit($root);
+            $pdo->prepare('INSERT INTO scan_runs (project_id, commit_sha, analysis_version, analysis_profile, files_scanned, findings_count, analyzer_stats_json, engine_status_json) VALUES (:project_id, :commit_sha, :analysis_version, :analysis_profile, :files_scanned, :findings_count, :analyzer_stats_json, :engine_status_json)')
+                ->execute([
+                    'project_id' => $projectId,
+                    'commit_sha' => $commit,
+                    'analysis_version' => AnalysisEngine::VERSION,
+                    'analysis_profile' => $profile,
+                    'files_scanned' => count($files),
+                    'findings_count' => count($analysis['findings']),
+                    'analyzer_stats_json' => json_encode($analysis['symbol_graph']['stats'], JSON_UNESCAPED_SLASHES),
+                    'engine_status_json' => json_encode($analysis['symbol_graph']['engine_runs'] ?? [], JSON_UNESCAPED_SLASHES),
+                ]);
+            $scanRunId = (int) $pdo->lastInsertId();
+            FindingStore::persist($projectId, $scanRunId, $analysis['findings']);
+            SymbolGraphStore::persist($projectId, $scanRunId, $fileIds, $analysis['symbol_graph']);
+            AnalyzerRunStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['engine_runs'] ?? []);
+            PackageInventoryStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['packages'] ?? []);
             $statement = $pdo->prepare('UPDATE projects SET status = :status, stack_json = :stack_json, overview = :overview, last_scan_at = NOW(), last_error = NULL WHERE id = :id');
             $statement->execute([
                 'status' => 'ready',
@@ -39,22 +55,6 @@ final class RepoScanner
                 'overview' => $analysis['overview'],
                 'id' => $projectId,
             ]);
-
-            $commit = $this->currentCommit($root);
-            $pdo->prepare('INSERT INTO scan_runs (project_id, commit_sha, analysis_version, analysis_profile, files_scanned, findings_count, analyzer_stats_json, engine_status_json) VALUES (:project_id, :commit_sha, :analysis_version, :analysis_profile, :files_scanned, :findings_count, :analyzer_stats_json, :engine_status_json)')
-                ->execute([
-                    'project_id' => $projectId,
-                    'commit_sha' => $commit,
-                    'analysis_version' => AnalysisEngine::VERSION,
-                    'analysis_profile' => AnalysisProfile::QUICK,
-                    'files_scanned' => count($files),
-                    'findings_count' => count($analysis['findings']),
-                    'analyzer_stats_json' => json_encode($analysis['symbol_graph']['stats'], JSON_UNESCAPED_SLASHES),
-                    'engine_status_json' => json_encode($analysis['symbol_graph']['engine_runs'] ?? [], JSON_UNESCAPED_SLASHES),
-                ]);
-            $scanRunId = (int) $pdo->lastInsertId();
-            SymbolGraphStore::persist($projectId, $scanRunId, $fileIds, $analysis['symbol_graph']);
-            AnalyzerRunStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['engine_runs'] ?? []);
             $pdo->commit();
         } catch (Throwable $exception) {
             $pdo->rollBack();
@@ -68,13 +68,13 @@ final class RepoScanner
      * Read-only inspection used by the scanner and lightweight unit checks.
      * Source contents only exist in this method's in-memory result.
      */
-    public function inspect(string $root): array
+    public function inspect(string $root, string $profile = AnalysisProfile::QUICK): array
     {
         if (!is_dir($root)) throw new RuntimeException('The repository files are no longer available.');
         $this->discoveryLimits = [];
         $files = $this->discoverFiles($root);
         $analysis = $this->analyse($files);
-        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files));
+        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files, $profile));
         $analysis['findings'] = array_merge($analysis['findings'], $analysis['symbol_graph']['findings'] ?? []);
         return $analysis + ['files' => $files];
     }
@@ -416,14 +416,6 @@ final class RepoScanner
         foreach ($edges as $edge) {
             if (!isset($nodeIds[$edge['from']], $nodeIds[$edge['to']])) continue;
             $statement->execute(['project_id' => $projectId, 'from_node_id' => $nodeIds[$edge['from']], 'to_node_id' => $nodeIds[$edge['to']], 'relationship_label' => $edge['label'], 'evidence_json' => json_encode($edge['evidence'])]);
-        }
-    }
-
-    private function persistFindings(int $projectId, array $findings): void
-    {
-        $statement = Database::connection()->prepare('INSERT INTO scan_findings (project_id, severity, finding_type, title, plain_explanation, file_path, evidence_json) VALUES (:project_id, :severity, :finding_type, :title, :plain_explanation, :file_path, :evidence_json)');
-        foreach ($findings as $finding) {
-            $statement->execute(['project_id' => $projectId, 'severity' => $finding['severity'], 'finding_type' => $finding['type'], 'title' => $finding['title'], 'plain_explanation' => $finding['explanation'], 'file_path' => $finding['path'], 'evidence_json' => json_encode($finding['evidence'])]);
         }
     }
 

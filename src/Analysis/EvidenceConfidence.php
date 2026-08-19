@@ -13,6 +13,11 @@ final class EvidenceConfidence
         'wtfcode-native' => 66,
         'ctags' => 52,
         'ripgrep' => 30,
+        'gitleaks' => 90,
+        'semgrep' => 90,
+        'osv-scanner' => 90,
+        'syft' => 76,
+        'grype' => 84,
     ];
 
     public static function rank(string $provider, bool $documentation = false): int

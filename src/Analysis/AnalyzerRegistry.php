@@ -17,6 +17,11 @@ final class AnalyzerRegistry
             new TypeScriptSemanticAnalyzerProvider(),
             new AstGrepAnalyzerProvider(),
             new RipgrepAnalyzerProvider(),
+            new GitleaksAnalyzerProvider(),
+            new SemgrepAnalyzerProvider(),
+            new OsvAnalyzerProvider(),
+            new SyftAnalyzerProvider(),
+            new GrypeAnalyzerProvider(),
             new CtagsAnalyzerProvider(),
         ] as $provider) {
             $this->register($provider);

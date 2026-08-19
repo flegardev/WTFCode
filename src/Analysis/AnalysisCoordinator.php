@@ -20,6 +20,7 @@ final class AnalysisCoordinator
             try {
                 $id = $provider->id();
                 $version = $provider->version();
+                if (!AnalysisProfile::includes($request->profile(), $id)) continue;
                 if (!$provider->isAvailable()) {
                     $results[] = AnalyzerResult::unavailable($id, $version, 'Analyzer is not installed or not supported on this machine.');
                     continue;
@@ -54,6 +55,7 @@ final class AnalysisCoordinator
         });
         $graph['relationships'] = array_slice(array_values($relationships), 0, $relationshipLimit);
         $graph['routes'] = array_slice($graph['routes'] ?? [], 0, $routeLimit);
+        $graph['packages'] = array_slice($graph['packages'] ?? [], 0, 10000);
         $limited = $original !== [count($graph['symbols']), count($graph['relationships']), count($graph['routes'])];
         if (!$limited) return $result;
         $graph['stats']['provider_output_limited'] = 1;

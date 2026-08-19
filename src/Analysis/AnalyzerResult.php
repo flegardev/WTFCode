@@ -44,6 +44,7 @@ final class AnalyzerResult
             'symbols' => count($this->graph['symbols'] ?? []),
             'relationships' => count($this->graph['relationships'] ?? []),
             'routes' => count($this->graph['routes'] ?? []),
+            'packages' => count($this->graph['packages'] ?? []),
             'findings' => count($this->findings),
         ];
     }

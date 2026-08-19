@@ -96,6 +96,7 @@ CREATE TABLE architecture_edges (
 CREATE TABLE scan_findings (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT UNSIGNED NOT NULL,
+    scan_run_id BIGINT UNSIGNED NULL,
     severity ENUM('info', 'attention', 'risk') NOT NULL DEFAULT 'info',
     finding_type VARCHAR(80) NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -104,7 +105,8 @@ CREATE TABLE scan_findings (
     evidence_json JSON NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT scan_findings_project_fk FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE,
-    KEY scan_findings_project_severity_index (project_id, severity)
+    KEY scan_findings_project_severity_index (project_id, severity),
+    KEY scan_findings_scan_type_index (scan_run_id, finding_type)
 ) ENGINE=InnoDB;
 
 CREATE TABLE scan_runs (
@@ -123,6 +125,9 @@ CREATE TABLE scan_runs (
     KEY scan_runs_project_version_index (project_id, analysis_version, created_at)
 ) ENGINE=InnoDB;
 
+ALTER TABLE scan_findings
+    ADD CONSTRAINT scan_findings_scan_run_fk FOREIGN KEY (scan_run_id) REFERENCES scan_runs (id) ON DELETE CASCADE;
+
 CREATE TABLE analysis_provider_runs (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT UNSIGNED NOT NULL,
@@ -134,6 +139,7 @@ CREATE TABLE analysis_provider_runs (
     symbols_count INT UNSIGNED NOT NULL DEFAULT 0,
     relationships_count INT UNSIGNED NOT NULL DEFAULT 0,
     routes_count INT UNSIGNED NOT NULL DEFAULT 0,
+    packages_count INT UNSIGNED NOT NULL DEFAULT 0,
     findings_count INT UNSIGNED NOT NULL DEFAULT 0,
     message VARCHAR(500) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -141,6 +147,25 @@ CREATE TABLE analysis_provider_runs (
     CONSTRAINT analysis_provider_runs_scan_fk FOREIGN KEY (scan_run_id) REFERENCES scan_runs (id) ON DELETE CASCADE,
     UNIQUE KEY analysis_provider_runs_scan_engine_unique (scan_run_id, engine_id),
     KEY analysis_provider_runs_project_status_index (project_id, status, created_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE package_inventory (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    project_id BIGINT UNSIGNED NOT NULL,
+    scan_run_id BIGINT UNSIGNED NOT NULL,
+    package_name VARCHAR(255) NOT NULL,
+    package_version VARCHAR(160) NOT NULL DEFAULT '',
+    ecosystem VARCHAR(80) NOT NULL DEFAULT 'unknown',
+    purl VARCHAR(700) NULL,
+    classification ENUM('declared', 'resolved', 'detected') NOT NULL DEFAULT 'detected',
+    licenses_json JSON NULL,
+    locations_json JSON NULL,
+    providers_json JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT package_inventory_project_fk FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE,
+    CONSTRAINT package_inventory_scan_run_fk FOREIGN KEY (scan_run_id) REFERENCES scan_runs (id) ON DELETE CASCADE,
+    UNIQUE KEY package_inventory_scan_identity_unique (scan_run_id, ecosystem, package_name, package_version),
+    KEY package_inventory_project_classification_index (project_id, classification, package_name)
 ) ENGINE=InnoDB;
 
 CREATE TABLE code_symbols (

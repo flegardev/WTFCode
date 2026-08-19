@@ -15,6 +15,8 @@ final class EvidenceFusion
         $relationships = [];
         $routes = [];
         $findings = [];
+        $packages = [];
+        $vulnerabilityIndex = [];
         $symbolIdentityToKey = [];
         $providerKeyMap = [];
 
@@ -45,6 +47,7 @@ final class EvidenceFusion
         foreach ($results as $result) {
             foreach ($result->findings as $finding) {
                 if (!is_array($finding)) continue;
+                $finding = SensitiveDataSanitizer::finding($finding);
                 $finding['evidence'] = is_array($finding['evidence'] ?? null) ? $finding['evidence'] : [];
                 $finding['evidence']['engine'] = $result->engine;
                 $finding['evidence']['engine_version'] = $result->engineVersion;
@@ -54,8 +57,27 @@ final class EvidenceFusion
                     1,
                     ($finding['evidence']['context'] ?? 'runtime') === 'documentation',
                 );
-                $identity = hash('sha256', implode('|', [(string) ($finding['type'] ?? ''), (string) ($finding['path'] ?? ''), (string) ($finding['evidence']['line'] ?? ''), (string) ($finding['evidence']['rule_id'] ?? '')]));
-                if (!isset($findings[$identity])) $findings[$identity] = $finding;
+                $finding['evidence']['confidence'] = $finding['confidence'];
+                $identity = $this->findingIdentity($finding, $vulnerabilityIndex);
+                if (!isset($findings[$identity])) {
+                    $findings[$identity] = $finding;
+                } else {
+                    $findings[$identity] = $this->mergeFinding($findings[$identity], $finding);
+                }
+                $this->indexVulnerability($identity, $findings[$identity], $vulnerabilityIndex);
+            }
+        }
+
+        foreach ($this->successful($results) as $result) {
+            foreach ($result->graph['packages'] ?? [] as $package) {
+                if (!is_array($package)) continue;
+                $identity = strtolower((string) ($package['purl'] ?? ''));
+                if ($identity === '') $identity = strtolower(implode('|', [(string) ($package['ecosystem'] ?? ''), (string) ($package['name'] ?? ''), (string) ($package['version'] ?? '')]));
+                if ($identity === '||') continue;
+                $package['providers'] = array_values(array_unique(array_merge($package['providers'] ?? [], [$result->engine])));
+                if (!isset($packages[$identity])) $packages[$identity] = $package;
+                else $packages[$identity] = $this->mergePackage($packages[$identity], $package);
+                if (count($packages) >= 10000) break 2;
             }
         }
 
@@ -105,10 +127,13 @@ final class EvidenceFusion
             'symbols' => array_values($symbols),
             'relationships' => array_values($relationships),
             'routes' => array_values($routes),
+            'packages' => array_values($packages),
             'stats' => [
                 'symbols' => count($symbols),
                 'relationships' => count($relationships),
                 'routes' => count($routes),
+                'packages' => count($packages),
+                'findings' => count($findings),
                 'files_with_symbols' => count(array_unique(array_column($symbols, 'path'))),
                 'symbol_limit_reached' => count($symbols) >= self::MAX_SYMBOLS ? 1 : $this->limitReached($results, 'symbol_limit_reached'),
                 'relationship_limit_reached' => count($relationships) >= self::MAX_RELATIONSHIPS ? 1 : $this->limitReached($results, 'relationship_limit_reached'),
@@ -236,6 +261,60 @@ final class EvidenceFusion
             $label = EvidenceConfidence::stronger($label, $candidate);
         }
         return $label;
+    }
+
+    /** @param array<string, string> $vulnerabilityIndex @param array<string, mixed> $finding */
+    private function findingIdentity(array $finding, array $vulnerabilityIndex): string
+    {
+        if (($finding['type'] ?? '') === 'dependency_vulnerability') {
+            $evidence = $finding['evidence'] ?? [];
+            $packageKey = strtolower(implode('|', [(string) ($evidence['ecosystem'] ?? ''), (string) ($evidence['package'] ?? ''), (string) ($evidence['installed_version'] ?? '')]));
+            $ids = array_values(array_unique(array_filter(array_merge([(string) ($evidence['vulnerability_id'] ?? '')], is_array($evidence['aliases'] ?? null) ? $evidence['aliases'] : []), 'is_string')));
+            foreach ($ids as $id) {
+                $known = $vulnerabilityIndex[$packageKey . '|' . strtolower($id)] ?? null;
+                if ($known !== null) return $known;
+            }
+            return hash('sha256', 'vulnerability|' . $packageKey . '|' . strtolower($ids[0] ?? 'unknown'));
+        }
+        return hash('sha256', implode('|', [(string) ($finding['type'] ?? ''), (string) ($finding['path'] ?? ''), (string) ($finding['evidence']['line'] ?? ''), (string) ($finding['evidence']['rule_id'] ?? '')]));
+    }
+
+    /** @param array<string, mixed> $finding @param array<string, string> $vulnerabilityIndex */
+    private function indexVulnerability(string $identity, array $finding, array &$vulnerabilityIndex): void
+    {
+        if (($finding['type'] ?? '') !== 'dependency_vulnerability') return;
+        $evidence = $finding['evidence'] ?? [];
+        $packageKey = strtolower(implode('|', [(string) ($evidence['ecosystem'] ?? ''), (string) ($evidence['package'] ?? ''), (string) ($evidence['installed_version'] ?? '')]));
+        $ids = array_merge([(string) ($evidence['vulnerability_id'] ?? '')], is_array($evidence['aliases'] ?? null) ? $evidence['aliases'] : []);
+        foreach (array_filter($ids, 'is_string') as $id) $vulnerabilityIndex[$packageKey . '|' . strtolower($id)] = $identity;
+    }
+
+    /** @param array<string, mixed> $current @param array<string, mixed> $incoming @return array<string, mixed> */
+    private function mergeFinding(array $current, array $incoming): array
+    {
+        $currentEvidence = is_array($current['evidence'] ?? null) ? $current['evidence'] : [];
+        $incomingEvidence = is_array($incoming['evidence'] ?? null) ? $incoming['evidence'] : [];
+        foreach (['aliases', 'fixed_versions', 'confirmation_sources'] as $key) {
+            $currentEvidence[$key] = array_values(array_unique(array_merge(is_array($currentEvidence[$key] ?? null) ? $currentEvidence[$key] : [], is_array($incomingEvidence[$key] ?? null) ? $incomingEvidence[$key] : [])));
+        }
+        $engines = array_values(array_unique(array_merge(is_array($currentEvidence['engines'] ?? null) ? $currentEvidence['engines'] : [(string) ($currentEvidence['engine'] ?? '')], [(string) ($incomingEvidence['engine'] ?? '')])));
+        $currentEvidence['engines'] = array_values(array_filter($engines));
+        $current['evidence'] = $currentEvidence;
+        $severity = ['info' => 1, 'attention' => 2, 'risk' => 3];
+        if (($severity[$incoming['severity'] ?? 'info'] ?? 1) > ($severity[$current['severity'] ?? 'info'] ?? 1)) $current['severity'] = $incoming['severity'];
+        if (count($currentEvidence['engines']) > 1) $current['confidence'] = 'confirmed';
+        $currentEvidence['confidence'] = $current['confidence'] ?? 'likely';
+        $current['evidence'] = $currentEvidence;
+        return $current;
+    }
+
+    /** @param array<string, mixed> $current @param array<string, mixed> $incoming @return array<string, mixed> */
+    private function mergePackage(array $current, array $incoming): array
+    {
+        foreach (['licenses', 'locations', 'providers'] as $key) $current[$key] = array_values(array_unique(array_merge($current[$key] ?? [], $incoming[$key] ?? [])));
+        $rank = ['detected' => 1, 'declared' => 2, 'resolved' => 3];
+        if (($rank[$incoming['classification'] ?? 'detected'] ?? 1) > ($rank[$current['classification'] ?? 'detected'] ?? 1)) $current['classification'] = $incoming['classification'];
+        return $current;
     }
 
     /** @param array<int, AnalyzerResult> $results */

@@ -184,6 +184,33 @@ final class Project
         return $statement->fetchAll();
     }
 
+    public static function securityFindings(int $projectId, int $limit = 300): array
+    {
+        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id AND finding_type IN ('possible_secret', 'possible_exposed_secret', 'dependency_vulnerability', 'code_security_finding', 'dynamic_code_execution', 'process_execution', 'process_or_dynamic_execution', 'authentication_boundary', 'destructive_database_operation', 'file_operation') ORDER BY FIELD(severity, 'risk', 'attention', 'info'), id DESC LIMIT " . max(1, min($limit, 500)));
+        $statement->execute(['project_id' => $projectId]);
+        $rows = $statement->fetchAll();
+        foreach ($rows as &$row) {
+            try { $row['evidence'] = json_decode((string) ($row['evidence_json'] ?? '{}'), true, flags: JSON_THROW_ON_ERROR); }
+            catch (Throwable) { $row['evidence'] = []; }
+        }
+        unset($row);
+        return $rows;
+    }
+
+    public static function packageInventory(int $projectId, int $limit = 500): array
+    {
+        $statement = Database::connection()->prepare('SELECT pi.* FROM package_inventory pi INNER JOIN (SELECT MAX(id) AS id FROM scan_runs WHERE project_id = :scan_project) latest ON latest.id = pi.scan_run_id WHERE pi.project_id = :project_id ORDER BY pi.classification, pi.ecosystem, pi.package_name LIMIT ' . max(1, min($limit, 1000)));
+        $statement->execute(['scan_project' => $projectId, 'project_id' => $projectId]);
+        return $statement->fetchAll();
+    }
+
+    public static function analyzerRuns(int $projectId): array
+    {
+        $statement = Database::connection()->prepare('SELECT apr.* FROM analysis_provider_runs apr INNER JOIN (SELECT MAX(id) AS id FROM scan_runs WHERE project_id = :scan_project) latest ON latest.id = apr.scan_run_id WHERE apr.project_id = :project_id ORDER BY apr.engine_id');
+        $statement->execute(['scan_project' => $projectId, 'project_id' => $projectId]);
+        return $statement->fetchAll();
+    }
+
     public static function filesByRole(int $projectId, string $role): array
     {
         $statement = Database::connection()->prepare('SELECT * FROM project_files WHERE project_id = :project_id AND role_name = :role ORDER BY path LIMIT 30');
