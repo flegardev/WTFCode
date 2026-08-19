@@ -8,7 +8,7 @@ require_once __DIR__ . '/alpha/AlphaSupport.php';
 function alpha_assert(bool $condition, string $message): void { if (!$condition) throw new RuntimeException($message); }
 
 $corpus = alpha_load_corpus(dirname(__DIR__));
-alpha_assert(ALPHA_SCHEMA_VERSION === 2, 'Alpha run schema changes must invalidate resumable summaries.');
+alpha_assert(ALPHA_SCHEMA_VERSION === 3, 'Alpha run schema changes must invalidate resumable summaries.');
 alpha_assert(count($corpus['repositories']) >= 25, 'Alpha corpus must contain at least 25 repositories.');
 $names = array_column($corpus['repositories'], 'name');
 alpha_assert(count($names) === count(array_unique($names)), 'Alpha repository names must be unique.');
@@ -25,6 +25,8 @@ $result = alpha_scan_repository($fixture, AnalysisProfile::QUICK, str_repeat('a'
 alpha_assert(in_array($result['status'], ['success','partial'], true), 'Fixture scan should complete.');
 alpha_assert(isset($result['files_discovered'], $result['files_analyzed'], $result['files_skipped'], $result['providers']), 'Machine scorecard must contain required accounting fields.');
 foreach ($result['feature_clusters'] as $feature) alpha_assert(array_key_exists('evidence', $feature), 'Machine feature summaries must retain bounded evidence for manual review.');
+alpha_assert($result['route_sample'] !== [], 'The Alpha fixture must retain route evidence.');
+foreach ($result['route_sample'] as $route) alpha_assert(isset($route['route_path'], $route['path'], $route['framework'], $route['line']), 'Route summaries must distinguish URL paths from source evidence.');
 alpha_assert($result['files_discovered'] >= $result['files_analyzed'], 'Skipped file accounting cannot be negative.');
 
 $failureDb = json_decode((string) file_get_contents(__DIR__ . '/alpha/failures.json'), true, 512, JSON_THROW_ON_ERROR);

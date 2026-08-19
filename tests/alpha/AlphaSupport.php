@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-const ALPHA_SCHEMA_VERSION = 2;
+const ALPHA_SCHEMA_VERSION = 3;
 const ALPHA_IGNORED_DIRECTORIES = ['.git', '.idea', '.vscode', '.playwright-cli', 'node_modules', 'vendor', '.next', 'dist', 'build', 'coverage', '.turbo', '.cache', 'storage', 'tmp', 'temp'];
 
 /** @return array<string, mixed> */
@@ -201,7 +201,7 @@ function alpha_scan_repository(string $path, string $profile, string $commit): a
         'symbols' => count($feature['symbols'] ?? []),
         'evidence' => array_map(static fn (array $evidence): array => array_intersect_key($evidence, array_flip(['path','line','signals','confidence'])), array_slice($feature['evidence'] ?? [], 0, 10)),
     ], $graph['features'] ?? []);
-    $routes = array_map(static fn (array $route): array => array_intersect_key($route, array_flip(['method','path','handler','source','confidence'])), array_slice($graph['routes'] ?? [], 0, 50));
+    $routes = array_map(static fn (array $route): array => array_intersect_key($route, array_flip(['method','route_path','path','handler_key','framework','line','confidence'])), array_slice($graph['routes'] ?? [], 0, 50));
     $nodes = array_map(static fn (array $node): array => array_intersect_key($node, array_flip(['key','type','label','explanation','evidence'])), $inspection['nodes'] ?? []);
     return SensitiveDataSanitizer::scrub([
         'status' => $partialReasons === [] ? 'success' : 'partial',
@@ -290,8 +290,10 @@ function alpha_generate_reports(string $root): void
         $key = (string) ($result['repository']['name'] ?? '') . ':' . (string) ($result['profile'] ?? '');
         if ($key !== '') $latest[$key] = $result;
     }
+    $quick = [];
+    foreach ($latest as $key => $result) if (($result['profile'] ?? '') === AnalysisProfile::QUICK) $quick[(string) ($result['repository']['name'] ?? $key)] = $result;
     $statusCounts = ['success' => 0, 'partial' => 0, 'failed' => 0];
-    foreach ($latest as $result) $statusCounts[$result['status'] ?? 'failed'] = ($statusCounts[$result['status'] ?? 'failed'] ?? 0) + 1;
+    foreach ($quick as $result) $statusCounts[$result['status'] ?? 'failed'] = ($statusCounts[$result['status'] ?? 'failed'] ?? 0) + 1;
     $failureData = json_decode((string) file_get_contents($root . '/tests/alpha/failures.json'), true) ?: [];
     $open = ['P0' => 0, 'P1' => 0, 'P2' => 0, 'P3' => 0];
     $fixed = 0;
@@ -301,8 +303,19 @@ function alpha_generate_reports(string $root): void
     }
     $reports = $root . '/tests/alpha/reports';
     if (!is_dir($reports)) mkdir($reports, 0700, true);
+    $reviews = ['completed' => 0, 'Yes' => 0, 'Somewhat' => 0, 'No' => 0];
+    foreach (glob($root . '/tests/alpha/scorecards/*.md') ?: [] as $scorecard) {
+        $text = (string) file_get_contents($scorecard);
+        if (!preg_match('/^- Reviewer:\s*(?!UNSCORED)(.+)$/mi', $text)) continue;
+        $reviews['completed']++;
+        if (preg_match('/Did WTFCode teach you something useful[^\n]*\*\*(Yes|Somewhat|No)\*\*/i', $text, $match)) {
+            $answer = ucfirst(strtolower($match[1]));
+            $reviews[$answer]++;
+        }
+    }
     $dashboard = [
         '# WTFCode Alpha dashboard', '',
+        '- Repositories tested (Quick): ' . count($quick),
         '- Repository/profile runs: ' . count($latest),
         '- Successful scans: ' . $statusCounts['success'],
         '- Partial scans: ' . $statusCounts['partial'],
@@ -311,17 +324,75 @@ function alpha_generate_reports(string $root): void
         '- P0: ' . $open['P0'], '- P1: ' . $open['P1'], '- P2: ' . $open['P2'], '- P3: ' . $open['P3'],
         '- Regression fixes: ' . $fixed, '',
         '## Human review', '',
-        '- Human reviews completed: 0 until scorecards are manually reviewed.',
-        '- Useful insight Yes / Somewhat / No: UNSCORED / UNSCORED / UNSCORED', '',
+        '- Human reviews completed: ' . $reviews['completed'],
+        '- Useful insight Yes / Somewhat / No: ' . $reviews['Yes'] . ' / ' . $reviews['Somewhat'] . ' / ' . $reviews['No'], '',
         'Machine scan success is not a human usefulness score.', ''
     ];
     file_put_contents($reports . '/dashboard.md', implode("\n", $dashboard));
-    $performance = ['# Alpha performance', '', 'Generated from isolated static-analysis runs. Cache hits are reported by providers; a partial run is not counted as complete.', '', '| Repository | Profile | Status | Files | Skipped | Duration | Peak MiB | Slowest provider | Truncation |', '|---|---:|---:|---:|---:|---:|---:|---|---|'];
+    $performance = ['# Alpha performance', '', 'Generated from isolated static-analysis runs. Cache hits are reported by providers; a partial run is not counted as complete.', ''];
+    foreach ([AnalysisProfile::QUICK, AnalysisProfile::DEEP, AnalysisProfile::MAXIMUM] as $profile) {
+        $profileResults = array_values(array_filter($latest, static fn (array $result): bool => ($result['profile'] ?? '') === $profile));
+        if ($profileResults === []) continue;
+        $durations = array_map(static fn (array $result): int => (int) ($result['machine']['scan_duration_ms'] ?? 0), $profileResults);
+        sort($durations);
+        $median = $durations[intdiv(count($durations), 2)] ?? 0;
+        $minimum = $durations[0] ?? 0;
+        $maximum = $durations[array_key_last($durations)] ?? 0;
+        $outliers = array_values(array_map(static fn (array $result): string => (string) ($result['repository']['name'] ?? '?'), array_filter($profileResults, static fn (array $result): bool => (int) ($result['machine']['scan_duration_ms'] ?? 0) > $median * 2)));
+        $nearMemory = array_values(array_map(static fn (array $result): string => (string) ($result['repository']['name'] ?? '?'), array_filter($profileResults, static fn (array $result): bool => (int) ($result['machine']['peak_php_memory_bytes'] ?? 0) >= 110 * 1048576)));
+        $truncated = count(array_filter($profileResults, static fn (array $result): bool => !empty($result['machine']['partial_reasons'])));
+        $performance[] = sprintf('## %s summary', ucfirst($profile));
+        $performance[] = '';
+        $performance[] = sprintf('- Runs: %d; median %.2fs; range %.2f–%.2fs.', count($profileResults), $median / 1000, $minimum / 1000, $maximum / 1000);
+        $performance[] = '- Duration outliers (>2× median): ' . ($outliers === [] ? 'none' : implode(', ', $outliers)) . '.';
+        $performance[] = '- Near the 128 MiB worker ceiling (>=110 MiB): ' . ($nearMemory === [] ? 'none' : implode(', ', $nearMemory)) . '.';
+        $performance[] = '- Runs with disclosed partial reasons: ' . $truncated . '.';
+        $performance[] = '';
+    }
+    $performance = array_merge($performance, ['## Per-run evidence', '', '| Repository | Profile | Status | Discovered | Analyzed | Skipped | Duration | Peak MiB | Slowest provider | Partial reason |', '|---|---:|---:|---:|---:|---:|---:|---:|---|---|']);
     usort($results, static fn (array $a, array $b): int => strcmp(($a['repository']['name'] ?? '') . ($a['profile'] ?? ''), ($b['repository']['name'] ?? '') . ($b['profile'] ?? '')));
     foreach ($results as $result) {
         $machine = $result['machine'] ?? [];
-        $performance[] = sprintf('| %s | %s | %s | %d | %d | %.2fs | %.1f | %s | %s |', $result['repository']['name'] ?? '?', $result['profile'] ?? '?', $result['status'] ?? 'failed', $machine['files_analyzed'] ?? 0, $machine['files_skipped'] ?? 0, ($machine['scan_duration_ms'] ?? 0) / 1000, ($machine['peak_php_memory_bytes'] ?? 0) / 1048576, $machine['slowest_provider']['engine'] ?? 'n/a', empty($machine['partial_reasons']) ? 'none' : 'partial');
+        $partial = empty($machine['partial_reasons']) ? 'none' : implode('; ', array_map(static fn (string $reason): string => str_replace('|', '\\|', $reason), $machine['partial_reasons']));
+        $performance[] = sprintf('| %s | %s | %s | %d | %d | %d | %.2fs | %.1f | %s | %s |', $result['repository']['name'] ?? '?', $result['profile'] ?? '?', $result['status'] ?? 'failed', $machine['files_discovered'] ?? 0, $machine['files_analyzed'] ?? 0, $machine['files_skipped'] ?? 0, ($machine['scan_duration_ms'] ?? 0) / 1000, ($machine['peak_php_memory_bytes'] ?? 0) / 1048576, $machine['slowest_provider']['engine'] ?? 'n/a', $partial);
     }
     file_put_contents($reports . '/performance.md', implode("\n", $performance) . "\n");
     if (!is_file($reports . '/confidence-calibration.md')) file_put_contents($reports . '/confidence-calibration.md', "# Confidence calibration\n\nNo relationships have been manually calibrated yet. Sample size: 0. No statistical claim is made.\n\n| Repository | Fact | Reported confidence | Manual truth | Classification |\n|---|---|---|---|---|\n");
+
+    $corpus = json_decode((string) file_get_contents($root . '/tests/alpha/corpus.json'), true);
+    $repositories = is_array($corpus['repositories'] ?? null) ? $corpus['repositories'] : [];
+    foreach (array_chunk($repositories, 5) as $index => $batch) {
+        $names = array_column($batch, 'name');
+        $batchFailures = array_values(array_filter($failureData['failures'] ?? [], static function (array $failure) use ($names): bool {
+            $repos = array_map('trim', explode(',', (string) ($failure['repo'] ?? '')));
+            return array_intersect($names, $repos) !== [] || ($failure['repo'] ?? '') === 'corpus';
+        }));
+        $severity = ['P0' => 0, 'P1' => 0, 'P2' => 0, 'P3' => 0];
+        foreach ($batchFailures as $failure) $severity[$failure['severity'] ?? 'P3']++;
+        $slowestName = 'not run'; $slowestMs = -1; $limitations = [];
+        foreach ($names as $name) {
+            $result = $quick[$name] ?? null;
+            if ($result === null) continue;
+            $duration = (int) ($result['machine']['scan_duration_ms'] ?? 0);
+            if ($duration > $slowestMs) { $slowestMs = $duration; $slowestName = $name . ' (' . number_format($duration / 1000, 2) . 's)'; }
+            foreach ($result['machine']['partial_reasons'] ?? [] as $reason) $limitations[] = $name . ': ' . $reason;
+        }
+        $worst = $batchFailures === [] ? 'None recorded.' : ($batchFailures[0]['id'] . ': ' . $batchFailures[0]['description']);
+        $fixedFailures = array_values(array_filter($batchFailures, static fn (array $failure): bool => ($failure['status'] ?? '') === 'fixed'));
+        $lines = [
+            '# Alpha batch ' . ($index + 1), '',
+            'Repositories tested: ' . implode(', ', $names) . '.', '',
+            '## Failure accounting', '',
+            sprintf('- Failures recorded: %d (P0 %d / P1 %d / P2 %d / P3 %d).', count($batchFailures), $severity['P0'], $severity['P1'], $severity['P2'], $severity['P3']),
+            '- Fixes made: ' . ($fixedFailures === [] ? 'none in this batch' : implode(', ', array_column($fixedFailures, 'id'))) . '.',
+            '- Regressions added: ' . ($fixedFailures === [] ? 'none' : implode('; ', array_column($fixedFailures, 'regression_test'))) . '.', '',
+            '## Product observations', '',
+            '- Best insight: UNSCORED until human review.',
+            '- Worst false positive: ' . $worst,
+            '- Performance outlier: ' . $slowestName . '.',
+            '- Unresolved limitation: ' . ($limitations === [] ? 'No Quick-profile limitation was recorded.' : implode(' ', array_slice(array_unique($limitations), 0, 3))), '',
+            'Machine output is evidence for review, not a human usefulness score.', ''
+        ];
+        file_put_contents($reports . '/batch-' . ($index + 1) . '.md', implode("\n", $lines));
+    }
 }
