@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 final class EvidenceFusion
 {
+    private const MAX_SYMBOLS = 8000;
+    private const MAX_RELATIONSHIPS = 16000;
+    private const MAX_ROUTES = 4000;
+
     /** @param array<int, AnalyzerResult> $results @return array<string, mixed> */
     public function fuse(array $results): array
     {
@@ -17,7 +21,11 @@ final class EvidenceFusion
             foreach ($result->graph['symbols'] ?? [] as $symbol) {
                 $identity = $this->symbolIdentity($symbol);
                 $existingKey = $symbolIdentityToKey[$identity] ?? null;
+                if ($existingKey === null && count($symbols) >= self::MAX_SYMBOLS) continue;
                 $key = $existingKey ?? (string) ($symbol['key'] ?? hash('sha256', $identity));
+                if ($existingKey === null && isset($symbols[$key])) {
+                    $key = hash('sha256', 'fused|' . $identity);
+                }
                 $providerKeyMap[$result->engine][(string) ($symbol['key'] ?? $key)] = $key;
                 $symbol['key'] = $key;
                 $symbol['metadata'] = $this->withProvenance(
@@ -53,6 +61,7 @@ final class EvidenceFusion
                     $this->provenance($result, $relationship, (string) ($relationship['type'] ?? 'relationship')),
                 );
                 $identity = $this->relationshipIdentity($relationship);
+                if (!isset($relationships[$identity]) && count($relationships) >= self::MAX_RELATIONSHIPS) continue;
                 $relationships[$identity] = isset($relationships[$identity])
                     ? $this->mergeFact($relationships[$identity], $relationship)
                     : $relationship;
@@ -66,6 +75,7 @@ final class EvidenceFusion
                     $this->provenance($result, $route, 'route'),
                 );
                 $identity = $this->routeIdentity($route);
+                if (!isset($routes[$identity]) && count($routes) >= self::MAX_ROUTES) continue;
                 $routes[$identity] = isset($routes[$identity])
                     ? $this->mergeFact($routes[$identity], $route)
                     : $route;
@@ -82,9 +92,9 @@ final class EvidenceFusion
                 'relationships' => count($relationships),
                 'routes' => count($routes),
                 'files_with_symbols' => count(array_unique(array_column($symbols, 'path'))),
-                'symbol_limit_reached' => $this->limitReached($results, 'symbol_limit_reached'),
-                'relationship_limit_reached' => $this->limitReached($results, 'relationship_limit_reached'),
-                'route_limit_reached' => $this->limitReached($results, 'route_limit_reached'),
+                'symbol_limit_reached' => count($symbols) >= self::MAX_SYMBOLS ? 1 : $this->limitReached($results, 'symbol_limit_reached'),
+                'relationship_limit_reached' => count($relationships) >= self::MAX_RELATIONSHIPS ? 1 : $this->limitReached($results, 'relationship_limit_reached'),
+                'route_limit_reached' => count($routes) >= self::MAX_ROUTES ? 1 : $this->limitReached($results, 'route_limit_reached'),
                 'engines_succeeded' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::SUCCESS)),
                 'engines_failed' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::FAILED)),
                 'engines_unavailable' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::UNAVAILABLE)),

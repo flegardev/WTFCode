@@ -7,13 +7,14 @@ WTFCode does not vendor third-party source. This inventory distinguishes require
 | PHP | Application runtime and native analyzer | PHP License 3.01 | Direct runtime | Required |
 | MySQL | Metadata and graph persistence | GPL-2.0 with MySQL licensing terms | PDO connection | Required |
 | Git | Restricted public-repository clone and history inspection | GPL-2.0-only | Argument-array subprocess | Required |
-| Node.js | Host for future isolated TypeScript/tree-sitter workers | MIT | Argument-array subprocess | Optional, installed |
+| Node.js | Host for isolated TypeScript and Tree-sitter workers | MIT | Argument-array subprocess | Required for semantic/syntax enhancement, installed 24.19.0 |
 | ripgrep | Fast bounded fallback search and tool discovery support | MIT OR Unlicense | Argument-array subprocess | Optional, installed; provider not yet implemented |
 | Playwright CLI | Development-only browser verification | Apache-2.0 | Test-time CLI | Development only |
-| nikic/PHP-Parser | PHP AST extraction | BSD-3-Clause | Composer library | Evaluated; not installed |
-| Tree-sitter | General syntax parsing | MIT | Isolated worker or CLI | Evaluated; not installed |
-| ts-morph | TypeScript semantic indexing | MIT | Isolated Node worker | Evaluated; not installed |
-| Universal Ctags | Broad-language symbol fallback | GPL-2.0-or-later | CLI JSON output | Evaluated; not installed |
+| nikic/PHP-Parser | PHP AST extraction | BSD-3-Clause | Composer library | Integrated, 5.8.0 |
+| web-tree-sitter | General syntax parsing runtime | MIT | Isolated Node worker | Integrated, 0.20.8 |
+| tree-sitter-wasms | Precompiled language grammars | Unlicense | Loaded by isolated Node worker | Integrated, 0.1.13 |
+| ts-morph | TypeScript semantic indexing | MIT | Isolated Node worker | Integrated, 28.0.0 with bundled TypeScript 6.0.2 |
+| Universal Ctags | Broad-language symbol fallback | GPL-2.0-or-later | CLI JSON output | Adapter integrated; binary not installed |
 | ast-grep | Structural pattern matching | MIT | CLI JSON output | Evaluated; not installed |
 | Semgrep | Optional static security analysis | LGPL-2.1-or-later for the open-source engine; rule licenses vary | CLI JSON output | Evaluated; not installed |
 | Gitleaks | Secret detection | MIT | CLI JSON output | Evaluated; not installed |

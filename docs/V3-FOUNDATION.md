@@ -16,7 +16,7 @@ RepoScanner safe file discovery
   -> SymbolGraphStore + AnalyzerRunStore
 ```
 
-The native V2 analyzer is retained as `wtfcode-native` version `2.0.0`. The platform scan version is `v3.0-foundation`. This separation lets WTFCode improve orchestration and combine engines without pretending that the native parser itself changed.
+The native V2 analyzer is retained as `wtfcode-native` version `2.0.0`. Phase 2 adds PHP-Parser, Tree-sitter, and TypeScript semantic providers while keeping their engine versions separate from the platform scan version. This lets WTFCode improve orchestration and combine engines without pretending that the native parser itself changed.
 
 ## Provider contract
 

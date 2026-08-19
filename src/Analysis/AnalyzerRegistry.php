@@ -10,7 +10,13 @@ final class AnalyzerRegistry
     /** @param array<int, AnalyzerProviderInterface>|null $providers */
     public function __construct(?array $providers = null)
     {
-        foreach ($providers ?? [new NativeAnalyzerProvider()] as $provider) {
+        foreach ($providers ?? [
+            new NativeAnalyzerProvider(),
+            new PhpAstAnalyzerProvider(),
+            new TreeSitterAnalyzerProvider(),
+            new TypeScriptSemanticAnalyzerProvider(),
+            new CtagsAnalyzerProvider(),
+        ] as $provider) {
             $this->register($provider);
         }
     }

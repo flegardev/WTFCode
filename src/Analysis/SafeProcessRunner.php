@@ -8,12 +8,17 @@ final class SafeProcessRunner
     {
         $stdoutFile = tempnam(sys_get_temp_dir(), 'wtfcode-stdout-');
         $stderrFile = tempnam(sys_get_temp_dir(), 'wtfcode-stderr-');
-        if ($stdoutFile === false || $stderrFile === false) {
+        $stdinFile = null;
+        if ($request->stdin !== null) {
+            $stdinFile = tempnam(sys_get_temp_dir(), 'wtfcode-stdin-');
+            if ($stdinFile !== false) file_put_contents($stdinFile, $request->stdin, LOCK_EX);
+        }
+        if ($stdoutFile === false || $stderrFile === false || ($request->stdin !== null && $stdinFile === false)) {
             throw new RuntimeException('Unable to allocate isolated analyzer output files.');
         }
         $nullDevice = PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null';
         $descriptors = [
-            0 => ['file', $nullDevice, 'r'],
+            0 => ['file', $stdinFile ?? $nullDevice, 'r'],
             1 => ['file', $stdoutFile, 'w'],
             2 => ['file', $stderrFile, 'w'],
         ];
@@ -29,6 +34,7 @@ final class SafeProcessRunner
         if (!is_resource($process)) {
             @unlink($stdoutFile);
             @unlink($stderrFile);
+            if ($stdinFile !== null) @unlink($stdinFile);
             throw new RuntimeException('Unable to start analyzer process.');
         }
 
@@ -77,6 +83,7 @@ final class SafeProcessRunner
         $closedExit = proc_close($process);
         @unlink($stdoutFile);
         @unlink($stderrFile);
+        if ($stdinFile !== null) @unlink($stdinFile);
         $exitCode = $reportedExit >= 0 ? $reportedExit : $closedExit;
         if ($timedOut) $exitCode = -1;
         return new ProcessRunResult(

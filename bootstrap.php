@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+$composerAutoload = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+if (is_file($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
 spl_autoload_register(static function (string $class): void {
     $relative = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
     foreach ([__DIR__ . DIRECTORY_SEPARATOR . 'src', __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Analysis'] as $root) {

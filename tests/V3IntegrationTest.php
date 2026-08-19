@@ -38,9 +38,10 @@ try {
     $engineStatus = json_decode((string) $scan['engine_status_json'], true, flags: JSON_THROW_ON_ERROR);
     v3_integration_assert(($engineStatus[0]['engine'] ?? '') === 'wtfcode-native', 'Scan run must retain provider status JSON');
 
-    $provider = $pdo->query('SELECT * FROM analysis_provider_runs WHERE scan_run_id = ' . (int) $scan['id'])->fetch(PDO::FETCH_ASSOC);
+    $provider = $pdo->query("SELECT * FROM analysis_provider_runs WHERE scan_run_id = " . (int) $scan['id'] . " AND engine_id = 'wtfcode-native'")->fetch(PDO::FETCH_ASSOC);
     v3_integration_assert(($provider['engine_id'] ?? '') === 'wtfcode-native' && ($provider['status'] ?? '') === 'success', 'Provider run must be queryable independently');
     v3_integration_assert((int) ($provider['symbols_count'] ?? 0) > 0, 'Provider run must retain output counts');
+    v3_integration_assert((int) $pdo->query('SELECT COUNT(*) FROM analysis_provider_runs WHERE scan_run_id = ' . (int) $scan['id'])->fetchColumn() >= 5, 'Every active or unavailable Phase 2 provider must persist an independent run status');
 
     $provenanceJson = $pdo->query('SELECT provenance_json FROM code_symbols WHERE project_id = ' . $projectId . ' ORDER BY id LIMIT 1')->fetchColumn();
     $provenance = json_decode((string) $provenanceJson, true, flags: JSON_THROW_ON_ERROR);

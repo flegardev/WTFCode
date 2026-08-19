@@ -25,6 +25,7 @@ final class ProcessRunRequest
         public readonly int $stdoutLimitBytes = 2_097_152,
         public readonly int $stderrLimitBytes = 524_288,
         array $environment = [],
+        public readonly ?string $stdin = null,
     ) {
         if ($command === [] || count(array_filter($command, 'is_string')) !== count($command)) {
             throw new InvalidArgumentException('Processes require a non-empty string argument array.');
@@ -43,6 +44,9 @@ final class ProcessRunRequest
         }
         if ($stdoutLimitBytes < 1024 || $stderrLimitBytes < 1024) {
             throw new InvalidArgumentException('Process output limits must be at least 1 KB.');
+        }
+        if ($stdin !== null && strlen($stdin) > 33_554_432) {
+            throw new InvalidArgumentException('Analyzer process input exceeds the 32 MB safety limit.');
         }
         foreach ($environment as $key => $value) {
             if (!in_array($key, self::ALLOWED_ENVIRONMENT, true) || !is_string($value) || str_contains($value, "\0")) {

@@ -1,0 +1,14 @@
+{
+  "name": "flegardev/wtfcode",
+  "description": "Evidence-fusing code intelligence for AI-built applications.",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.3",
+    "nikic/php-parser": "^5.0"
+  },
+  "config": {
+    "allow-plugins": {},
+    "sort-packages": true
+  }
+}

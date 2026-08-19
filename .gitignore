@@ -6,3 +6,6 @@ storage/logs/*
 !storage/logs/.gitkeep
 .playwright-cli/
 output/
+vendor/
+node_modules/
+tools/composer.phar
