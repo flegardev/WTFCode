@@ -14,6 +14,7 @@ final class EvidenceFusion
         $symbols = [];
         $relationships = [];
         $routes = [];
+        $findings = [];
         $symbolIdentityToKey = [];
         $providerKeyMap = [];
 
@@ -38,6 +39,23 @@ final class EvidenceFusion
                 } else {
                     $symbols[$key] = $this->mergeFact($symbols[$key], $symbol);
                 }
+            }
+        }
+
+        foreach ($results as $result) {
+            foreach ($result->findings as $finding) {
+                if (!is_array($finding)) continue;
+                $finding['evidence'] = is_array($finding['evidence'] ?? null) ? $finding['evidence'] : [];
+                $finding['evidence']['engine'] = $result->engine;
+                $finding['evidence']['engine_version'] = $result->engineVersion;
+                $finding['confidence'] = EvidenceConfidence::label(
+                    $result->engine,
+                    (string) ($finding['confidence'] ?? 'medium'),
+                    1,
+                    ($finding['evidence']['context'] ?? 'runtime') === 'documentation',
+                );
+                $identity = hash('sha256', implode('|', [(string) ($finding['type'] ?? ''), (string) ($finding['path'] ?? ''), (string) ($finding['evidence']['line'] ?? ''), (string) ($finding['evidence']['rule_id'] ?? '')]));
+                if (!isset($findings[$identity])) $findings[$identity] = $finding;
             }
         }
 
@@ -100,6 +118,7 @@ final class EvidenceFusion
                 'engines_unavailable' => count(array_filter($results, static fn (AnalyzerResult $result): bool => $result->status === AnalyzerResult::UNAVAILABLE)),
             ],
             'engine_runs' => $engineRuns,
+            'findings' => array_values($findings),
         ];
     }
 
@@ -161,6 +180,7 @@ final class EvidenceFusion
             'evidence_line' => $start,
             'evidence_range' => [$start, $end],
             'raw_evidence_type' => $rawType,
+            'evidence_rank' => EvidenceConfidence::rank($result->engine),
         ];
     }
 
@@ -180,7 +200,7 @@ final class EvidenceFusion
         $metadata['provenance'] = array_values($existing);
         $metadata['engines'] = array_values(array_unique(array_column($metadata['provenance'], 'engine')));
         $metadata['source_count'] = count($metadata['provenance']);
-        $metadata['confidence_label'] = $this->confidenceLabel((string) ($provenance['confidence'] ?? 'medium'), count($metadata['engines']));
+        $metadata['confidence_label'] = $this->confidenceLabel($metadata['provenance']);
         return $metadata;
     }
 
@@ -196,17 +216,26 @@ final class EvidenceFusion
         if (($rank[$incoming['confidence'] ?? 'medium'] ?? 2) > ($rank[$current['confidence'] ?? 'medium'] ?? 2)) {
             $current['confidence'] = $incoming['confidence'];
         }
-        $current['metadata']['confidence_label'] = $this->confidenceLabel(
-            (string) ($current['confidence'] ?? 'medium'),
-            count($current['metadata']['engines'] ?? []),
-        );
+        $current['metadata']['confidence_label'] = $this->confidenceLabel($current['metadata']['provenance'] ?? []);
         return $current;
     }
 
-    private function confidenceLabel(string $confidence, int $engines): string
+    /** @param array<int, array<string, mixed>> $provenance */
+    private function confidenceLabel(array $provenance): string
     {
-        if ($engines > 1 || $confidence === 'high') return 'confirmed';
-        return $confidence === 'low' ? 'possible' : 'likely';
+        $label = 'heuristic';
+        $sources = count(array_unique(array_column($provenance, 'engine')));
+        foreach ($provenance as $item) {
+            if (!is_array($item)) continue;
+            $candidate = EvidenceConfidence::label(
+                (string) ($item['engine'] ?? ''),
+                (string) ($item['confidence'] ?? 'medium'),
+                $sources,
+                ($item['context'] ?? 'runtime') === 'documentation',
+            );
+            $label = EvidenceConfidence::stronger($label, $candidate);
+        }
+        return $label;
     }
 
     /** @param array<int, AnalyzerResult> $results */

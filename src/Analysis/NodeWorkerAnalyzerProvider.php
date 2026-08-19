@@ -71,14 +71,16 @@ abstract class NodeWorkerAnalyzerProvider implements AnalyzerProviderInterface
                 throw new UnexpectedValueException('Worker returned an invalid graph envelope.');
             }
             $errors = is_array($graph['errors'] ?? null) ? $graph['errors'] : [];
+            $findings = is_array($graph['findings'] ?? null) ? $graph['findings'] : [];
             unset($graph['errors']);
+            unset($graph['findings']);
             $partial = $errors !== [] || $selectionLimited;
             $messages = [];
             if ($errors !== []) $messages[] = count($errors) . ' file(s) contained syntax the worker could not fully parse.';
             if ($selectionLimited) $messages[] = 'Worker input was capped at ' . $this->maxFiles() . ' files or ' . $this->maxInputBytes() . ' bytes.';
             return new AnalyzerResult(
                 $this->id(), $this->version(), $partial ? AnalyzerResult::PARTIAL : AnalyzerResult::SUCCESS,
-                $graph, [], $result->durationMs,
+                $graph, $findings, $result->durationMs,
                 $messages === [] ? null : implode(' ', $messages),
             );
         } catch (Throwable $exception) {

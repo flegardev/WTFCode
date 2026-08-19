@@ -9,3 +9,4 @@ output/
 vendor/
 node_modules/
 tools/composer.phar
+tools/bin/

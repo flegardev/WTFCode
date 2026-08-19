@@ -11,6 +11,11 @@ final class ToolDetector
             $resolved = realpath($name);
             return $resolved !== false && is_file($resolved) ? $resolved : null;
         }
+        $localBin = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'tools' . DIRECTORY_SEPARATOR . 'bin';
+        foreach (PHP_OS_FAMILY === 'Windows' ? [$name, $name . '.exe', $name . '.cmd'] : [$name] as $localName) {
+            $candidate = $localBin . DIRECTORY_SEPARATOR . $localName;
+            if (is_file($candidate)) return realpath($candidate) ?: $candidate;
+        }
         $path = getenv('PATH');
         if (!is_string($path) || $path === '') return null;
         $extensions = [''];

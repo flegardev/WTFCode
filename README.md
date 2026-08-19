@@ -24,9 +24,9 @@ WTFCode is a plain-PHP codebase understanding tool for people who can build quic
 
 ## V3 implementation status
 
-V3 phases 1 and 2 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, and routes. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, and an isolated ts-morph semantic worker. Universal Ctags is integrated as an optional fallback.
+V3 phases 1 through 3 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, and routes. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
 
-Structural-search and security providers remain later phases. See `docs/V3-FOUNDATION.md` for the provider boundary and `THIRD_PARTY.md` for the dependency inventory.
+Evidence is ranked conservatively: semantic resolution outranks direct syntax, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security providers remain a later phase. See `docs/V3-FOUNDATION.md` for the provider boundary and `THIRD_PARTY.md` for the dependency inventory.
 
 ## Intentional MVP boundaries
 
@@ -100,6 +100,7 @@ php tests/V2AnalysisTest.php
 php tests/V2IntegrationTest.php
 php tests/V3FoundationTest.php
 php tests/V3AstTest.php
+php tests/V3StructuralTest.php
 php tests/V3IntegrationTest.php
 php tests/Benchmark.php --group=core
 ```

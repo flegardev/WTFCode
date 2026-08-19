@@ -15,7 +15,6 @@ final class ToolDoctor
             ['name' => 'PHP', 'candidates' => [PHP_BINARY], 'args' => ['--version'], 'required' => true],
             ['name' => 'Git', 'candidates' => ['git'], 'args' => ['--version'], 'required' => true],
             ['name' => 'Node', 'candidates' => ['node'], 'args' => ['--version'], 'required' => false],
-            ['name' => 'ast-grep', 'candidates' => ['ast-grep', 'sg'], 'args' => ['--version'], 'required' => false],
             ['name' => 'Semgrep', 'candidates' => ['semgrep'], 'args' => ['--version'], 'required' => false],
             ['name' => 'ctags', 'candidates' => ['ctags'], 'args' => ['--version'], 'required' => false],
             ['name' => 'Gitleaks', 'candidates' => ['gitleaks'], 'args' => ['version'], 'required' => false],
@@ -31,6 +30,7 @@ final class ToolDoctor
             $this->libraryCheck('PHP Parser', class_exists(PhpParser\ParserFactory::class), '5.8.0', 'Composer library is available for read-only PHP AST analysis.'),
             $this->workerCheck('Tree-sitter', 'node_modules/web-tree-sitter/package.json', '0.20.8 + grammar bundle 0.1.13'),
             $this->workerCheck('TypeScript Semantic', 'node_modules/ts-morph/package.json', 'ts-morph 28.0.0 + TypeScript 6.0.2'),
+            $this->workerCheck('ast-grep', 'node_modules/@ast-grep/napi/package.json', '@ast-grep/napi 0.45.1'),
         ];
         foreach ($checks as $check) $results[] = $this->commandCheck($check, $workingDirectory);
         usort($results, static function (array $left, array $right): int {

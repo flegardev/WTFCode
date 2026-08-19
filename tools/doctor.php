@@ -18,7 +18,7 @@ echo 'WTFCode analyzer doctor (' . AnalysisEngine::VERSION . ')' . PHP_EOL;
 echo str_repeat('-', 72) . PHP_EOL;
 foreach ($checks as $check) {
     $version = $check['version'] ? ' — ' . $check['version'] : '';
-    printf("%-14s %-11s%s\n", $check['name'], $check['status'], $version);
+    printf("%-22s %-11s%s\n", $check['name'], $check['status'], $version);
     echo '  ' . $check['message'] . PHP_EOL;
 }
 

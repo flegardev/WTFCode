@@ -15,6 +15,8 @@ final class AnalyzerRegistry
             new PhpAstAnalyzerProvider(),
             new TreeSitterAnalyzerProvider(),
             new TypeScriptSemanticAnalyzerProvider(),
+            new AstGrepAnalyzerProvider(),
+            new RipgrepAnalyzerProvider(),
             new CtagsAnalyzerProvider(),
         ] as $provider) {
             $this->register($provider);
