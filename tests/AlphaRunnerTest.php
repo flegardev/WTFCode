@@ -23,6 +23,7 @@ $fixture = __DIR__ . '/fixtures/v2/next-react';
 $result = alpha_scan_repository($fixture, AnalysisProfile::QUICK, str_repeat('a', 40));
 alpha_assert(in_array($result['status'], ['success','partial'], true), 'Fixture scan should complete.');
 alpha_assert(isset($result['files_discovered'], $result['files_analyzed'], $result['files_skipped'], $result['providers']), 'Machine scorecard must contain required accounting fields.');
+foreach ($result['feature_clusters'] as $feature) alpha_assert(array_key_exists('evidence', $feature), 'Machine feature summaries must retain bounded evidence for manual review.');
 alpha_assert($result['files_discovered'] >= $result['files_analyzed'], 'Skipped file accounting cannot be negative.');
 
 $failureDb = json_decode((string) file_get_contents(__DIR__ . '/alpha/failures.json'), true, 512, JSON_THROW_ON_ERROR);

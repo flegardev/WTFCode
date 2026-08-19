@@ -1,7 +1,7 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-08-19T20:07:01+00:00",
-    "analysis_version": "alpha.2",
+    "generated_at": "2026-08-19T20:23:18+00:00",
+    "analysis_version": "alpha.3",
     "profile": "quick",
     "static_analysis_only": true,
     "repository": {
@@ -34,12 +34,12 @@
         "clone_duration_ms": 0,
         "workspace_reused": true
     },
-    "time_to_first_result_ms": 16142,
+    "time_to_first_result_ms": 14919,
     "time_to_first_useful_insight_ms": null,
     "machine": {
         "status": "partial",
-        "scan_duration_ms": 14466,
-        "peak_php_memory_bytes": 132120576,
+        "scan_duration_ms": 13146,
+        "peak_php_memory_bytes": 130023424,
         "files_discovered": 7002,
         "repository_bytes": 45538772,
         "files_analyzed": 3000,
@@ -77,8 +77,6 @@
                 "explanation": "This part decides who is signed in and which requests are allowed.",
                 "evidence": [
                     "django/conf/global_settings.py",
-                    "django/contrib/admin/templates/admin/auth/user/add_form.html",
-                    "django/contrib/admin/templates/admin/auth/user/change_password.html",
                     "django/contrib/auth/admin.py",
                     "django/contrib/auth/apps.py",
                     "django/contrib/auth/backends.py",
@@ -87,7 +85,9 @@
                     "django/contrib/auth/context_processors.py",
                     "django/contrib/auth/decorators.py",
                     "django/contrib/auth/forms.py",
-                    "django/contrib/auth/handlers/modwsgi.py"
+                    "django/contrib/auth/handlers/modwsgi.py",
+                    "django/contrib/auth/handlers/__init__.py",
+                    "django/contrib/auth/hashers.py"
                 ]
             },
             {
@@ -111,8 +111,8 @@
                 ]
             }
         ],
-        "symbols": 8021,
-        "relationships": 16400,
+        "symbols": 7729,
+        "relationships": 16152,
         "routes": 17,
         "route_sample": [
             {
@@ -201,110 +201,383 @@
                 "confidence": "high"
             }
         ],
-        "features": 7,
+        "features": 4,
         "feature_clusters": [
             {
                 "label": "Admin",
                 "confidence": "strong",
-                "score": 3846,
-                "symbols": 615
-            },
-            {
-                "label": "Login",
-                "confidence": "strong",
-                "score": 1139,
-                "symbols": 171
+                "score": 3828,
+                "symbols": 612,
+                "evidence": [
+                    {
+                        "path": "django/contrib/admin/actions.py",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "django/contrib/admin/actions.py",
+                        "line": 19,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/apps.py",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "django/contrib/admin/apps.py",
+                        "line": 7,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/apps.py",
+                        "line": 15,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/apps.py",
+                        "line": 20,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/apps.py",
+                        "line": 25,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/checks.py",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "django/contrib/admin/checks.py",
+                        "line": 19,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/checks.py",
+                        "line": 30,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
             },
             {
                 "label": "Search",
                 "confidence": "strong",
-                "score": 841,
-                "symbols": 125
+                "score": 510,
+                "symbols": 84,
+                "evidence": [
+                    {
+                        "path": "django/contrib/admin/checks.py",
+                        "line": 849,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/checks.py",
+                        "line": 1207,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/options.py",
+                        "line": 908,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/options.py",
+                        "line": 1294,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/options.py",
+                        "line": 1301,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "django/contrib/admin/options.py",
+                        "line": 1308,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/templatetags/admin_list.py",
+                        "line": 500,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/templatetags/admin_list.py",
+                        "line": 514,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/views/autocomplete.py",
+                        "line": 56,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/views/autocomplete.py",
+                        "line": 67,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
             },
             {
-                "label": "Registration",
+                "label": "Login",
                 "confidence": "strong",
-                "score": 222,
-                "symbols": 35
-            },
-            {
-                "label": "Notifications",
-                "confidence": "strong",
-                "score": 102,
-                "symbols": 16
+                "score": 508,
+                "symbols": 78,
+                "evidence": [
+                    {
+                        "path": "django/contrib/admin/forms.py",
+                        "line": 20,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 31,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 67,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 74,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 77,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 95,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 151,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 164,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/contrib/admin/sites.py",
+                        "line": 170,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
             },
             {
                 "label": "Upload",
-                "confidence": "strong",
+                "confidence": "likely",
                 "score": 44,
-                "symbols": 7
-            },
-            {
-                "label": "Billing",
-                "confidence": "strong",
-                "score": 36,
-                "symbols": 6
+                "symbols": 7,
+                "evidence": [
+                    {
+                        "path": "django/contrib/postgres/forms/array.py",
+                        "line": 178,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/core/checks/files.py",
+                        "line": 9,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/core/files/uploadhandler.py",
+                        "line": 147,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/core/files/uploadhandler.py",
+                        "line": 154,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/core/files/uploadhandler.py",
+                        "line": 184,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/core/mail/message.py",
+                        "line": 513,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "django/db/models/fields/files.py",
+                        "line": 293,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
             }
         ],
         "services": [
-            "bugs.mysql.com",
-            "bugs.python.org",
-            "cdn.jsdelivr.net",
-            "code.activestate.com",
-            "dev.maxmind.com",
-            "dev.mysql.com",
-            "docs.djangoproject.com",
-            "docs.oracle.com",
-            "docs.python.org",
-            "en.wikipedia.org",
-            "example.com",
-            "gdal.org",
-            "geoip2.readthedocs.io",
-            "geojson.org",
-            "georss.org",
-            "gist.github.com",
-            "github.com",
-            "groups.google.com",
-            "https://",
-            "jira.mariadb.org",
-            "libgeos.org",
-            "lists.gispython.org",
-            "lists.osgeo.org",
-            "mail.python.org",
-            "map1{a-c}.vis.earthdata.nasa.gov",
-            "maxmind.github.io",
-            "media.example.com",
             "MySQL",
-            "neopythonic.blogspot.com",
-            "opensource.org",
-            "oracle.github.io",
-            "password-hashing.net",
-            "postgis.net",
             "Postgres",
-            "pypi.org",
-            "python-oracledb.readthedocs.io",
-            "pyyaml.org",
-            "Redis",
-            "savannah.gnu.org",
-            "select2.org",
-            "sourceforge.net",
-            "static.aryehleib.com",
-            "static.example.com",
-            "superuser.com",
-            "test",
-            "trac.osgeo.org",
-            "www.fontspring.com",
-            "www.gaia-gis.it",
-            "www.georss.org",
-            "www.iana.org",
-            "www.postgresql.org",
-            "www.psycopg.org",
-            "www.quirksmode.org",
-            "www.sitemaps.org",
-            "www.sqlite.org",
-            "www.w3.org",
-            "youmightnotneedjquery.com",
-            "”"
+            "Redis"
         ],
         "tables": [
             "AbstractBaseSession",
@@ -327,19 +600,19 @@
         ],
         "packages": 0,
         "security_findings": 0,
-        "findings": 395,
+        "findings": 372,
         "finding_types": {
-            "duplicate_content": 13,
+            "duplicate_content": 4,
             "implementation_notes": 1,
-            "large_file": 92,
+            "large_file": 82,
             "possible_unused_dependency": 1,
             "scan_limit": 1,
-            "sensitive_system": 45,
-            "unresolved_local_import": 242
+            "sensitive_system": 42,
+            "unresolved_local_import": 241
         },
         "finding_severities": {
-            "attention": 379,
-            "info": 16
+            "attention": 365,
+            "info": 7
         },
         "finding_sample": [
             {
@@ -411,24 +684,6 @@
             {
                 "severity": "attention",
                 "type": "large_file",
-                "title": "base.css is large enough to be risky to edit",
-                "path": "django/contrib/admin/static/admin/css/base.css"
-            },
-            {
-                "severity": "attention",
-                "type": "large_file",
-                "title": "responsive.css is large enough to be risky to edit",
-                "path": "django/contrib/admin/static/admin/css/responsive.css"
-            },
-            {
-                "severity": "attention",
-                "type": "large_file",
-                "title": "widgets.css is large enough to be risky to edit",
-                "path": "django/contrib/admin/static/admin/css/widgets.css"
-            },
-            {
-                "severity": "attention",
-                "type": "large_file",
                 "title": "DateTimeShortcuts.js is large enough to be risky to edit",
                 "path": "django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js"
             },
@@ -446,21 +701,39 @@
             },
             {
                 "severity": "attention",
-                "type": "sensitive_system",
-                "title": "Authentication is present in django/contrib/admin/templates/admin/auth/user/add_form.html",
-                "path": "django/contrib/admin/templates/admin/auth/user/add_form.html"
+                "type": "large_file",
+                "title": "admin_list.py is large enough to be risky to edit",
+                "path": "django/contrib/admin/templatetags/admin_list.py"
             },
             {
                 "severity": "attention",
-                "type": "sensitive_system",
-                "title": "Authentication is present in django/contrib/admin/templates/admin/auth/user/change_password.html",
-                "path": "django/contrib/admin/templates/admin/auth/user/change_password.html"
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from django/contrib/admin/templatetags/admin_list.py",
+                "path": "django/contrib/admin/templatetags/admin_list.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from django/contrib/admin/templatetags/admin_modify.py",
+                "path": "django/contrib/admin/templatetags/admin_modify.py"
             },
             {
                 "severity": "attention",
                 "type": "large_file",
-                "title": "admin_list.py is large enough to be risky to edit",
-                "path": "django/contrib/admin/templatetags/admin_list.py"
+                "title": "utils.py is large enough to be risky to edit",
+                "path": "django/contrib/admin/utils.py"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "main.py is large enough to be risky to edit",
+                "path": "django/contrib/admin/views/main.py"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "widgets.py is large enough to be risky to edit",
+                "path": "django/contrib/admin/widgets.py"
             }
         ],
         "provider_failures": [
@@ -472,9 +745,9 @@
         "providers": [
             {
                 "engine": "wtfcode-native",
-                "engine_version": "2.0.0",
+                "engine_version": "2.1.0",
                 "status": "success",
-                "duration_ms": 5558,
+                "duration_ms": 5650,
                 "message": null,
                 "symbols": 8000,
                 "relationships": 16000,
@@ -489,37 +762,37 @@
                 "engine": "php-parser",
                 "engine_version": "5.8.0",
                 "status": "success",
-                "duration_ms": 16,
-                "message": null,
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
                 "symbols": 0,
                 "relationships": 0,
                 "routes": 0,
                 "packages": 0,
                 "findings": 0,
-                "cache_hit": false,
+                "cache_hit": true,
                 "incremental": false,
-                "files_analyzed": 3000
+                "files_analyzed": 0
             },
             {
                 "engine": "tree-sitter",
                 "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
                 "status": "partial",
-                "duration_ms": 844,
-                "message": "26 file(s) contained syntax the worker could not fully parse. Worker input was capped at 600 files or 6291456 bytes. Worker evidence reached the bounded fusion output budget.",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
                 "symbols": 2000,
                 "relationships": 4000,
                 "routes": 0,
                 "packages": 0,
                 "findings": 0,
-                "cache_hit": false,
+                "cache_hit": true,
                 "incremental": false,
-                "files_analyzed": 3000
+                "files_analyzed": 0
             },
             {
                 "engine": "typescript-semantic",
                 "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
                 "status": "failed",
-                "duration_ms": 1547,
+                "duration_ms": 1437,
                 "message": "Node worker exited with code 1.",
                 "symbols": 0,
                 "relationships": 0,
@@ -534,21 +807,21 @@
                 "engine": "ast-grep",
                 "engine_version": "napi-0.45.1",
                 "status": "success",
-                "duration_ms": 339,
-                "message": null,
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
                 "symbols": 0,
                 "relationships": 0,
                 "routes": 0,
                 "packages": 0,
                 "findings": 0,
-                "cache_hit": false,
+                "cache_hit": true,
                 "incremental": false,
-                "files_analyzed": 3000
+                "files_analyzed": 0
             }
         ],
         "slowest_provider": {
             "engine": "wtfcode-native",
-            "duration_ms": 5558
+            "duration_ms": 5650
         },
         "graph_truncation": {
             "symbol_limit_reached": 1,

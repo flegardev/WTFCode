@@ -56,12 +56,28 @@ final class ProviderCache
 
     private function configurationHash(AnalysisRequest $request, AnalyzerProviderInterface $provider): string
     {
-        $reflection = new ReflectionClass($provider);
-        $classFile = $reflection->getFileName();
         $configs = [dirname(__DIR__, 2) . '/config/tool-manifest.json', dirname(__DIR__, 2) . '/config/security/gitleaks.toml', dirname(__DIR__, 2) . '/config/security/semgrep.yml'];
         $hashes = [];
         foreach ($configs as $file) if (is_file($file)) $hashes[] = basename($file) . ':' . hash_file('sha256', $file);
-        return hash('sha256', json_encode(['profile' => $request->profile(), 'capabilities' => $provider->capabilities(), 'class' => is_string($classFile) && is_file($classFile) ? hash_file('sha256', $classFile) : '', 'configs' => $hashes], JSON_UNESCAPED_SLASHES));
+        $implementation = [];
+        foreach ($this->implementationFiles($provider) as $file) $implementation[str_replace('\\', '/', basename($file))] = hash_file('sha256', $file);
+        return hash('sha256', json_encode(['profile' => $request->profile(), 'capabilities' => $provider->capabilities(), 'implementation' => $implementation, 'configs' => $hashes], JSON_UNESCAPED_SLASHES));
+    }
+
+    /** @return array<int,string> */
+    private function implementationFiles(AnalyzerProviderInterface $provider): array
+    {
+        $reflection = new ReflectionClass($provider);
+        $classFile = $reflection->getFileName();
+        $files = is_string($classFile) && is_file($classFile) ? [$classFile] : [];
+        if ($provider->id() !== 'wtfcode-native') return $files;
+        $directory = __DIR__;
+        foreach (array_merge(glob($directory . '/*Adapter.php') ?: [], [$directory . '/AnalysisEngine.php', $directory . '/SymbolGraph.php', $directory . '/AbstractLanguageAdapter.php', $directory . '/AbstractFrameworkAdapter.php']) as $file) {
+            if (is_file($file)) $files[] = $file;
+        }
+        $files = array_values(array_unique($files));
+        sort($files, SORT_STRING);
+        return $files;
     }
 
     private function path(string $provider, string $key): string

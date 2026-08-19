@@ -239,7 +239,7 @@ final class RepoScanner
 
     private function analyse(array $files): array
     {
-        $primaryFiles = array_values(array_filter($files, static fn (array $file): bool => preg_match('#^(?:tests?|specs?|fixtures?)/#i', (string) $file['path']) !== 1));
+        $primaryFiles = array_values(array_filter($files, static fn (array $file): bool => RuntimeEvidencePolicy::isRuntimePath((string) $file['path'])));
         $paths = array_column($primaryFiles, 'path');
         $codeFiles = array_values(array_filter($primaryFiles, static fn (array $file): bool => $file['language'] !== 'Markdown'));
         $contents = implode("\n", array_column($codeFiles, 'content'));
@@ -268,18 +268,35 @@ final class RepoScanner
             }
             return false;
         };
+        $hasComposerDependency = static function (string $dependency) use ($codeFiles): bool {
+            foreach ($codeFiles as $file) {
+                if (basename($file['path']) !== 'composer.json') continue;
+                $manifest = json_decode($file['content'], true);
+                if (!is_array($manifest)) continue;
+                foreach (['require', 'require-dev'] as $group) if (isset($manifest[$group]) && is_array($manifest[$group]) && array_key_exists($dependency, $manifest[$group])) return true;
+            }
+            return false;
+        };
         $hasAuthPath = static fn (): bool => count(array_filter($paths, static fn (string $path): bool => preg_match('#(^|/)(?:auth|authentication)(?:[._/-]|$)#i', $path) === 1)) > 0;
         $authEvidence = array_slice(array_column(array_filter($codeFiles, static fn (array $file): bool => $file['role'] === 'authentication'), 'path'), 0, 12);
 
         if ($hasPath('next.config') || $hasPackageDependency('next') || $hasFrontendPattern('/(?:from\s+[\'\"]next(?:\/|[\'\"])|require\(\s*[\'\"]next(?:\/|[\'\"]))/i')) { $stack[] = 'Next.js'; $nodes[] = $this->node('frontend', 'frontend', 'Next.js frontend', 'This is the part of the project that renders screens in the browser.', $this->matchingPaths($paths, ['app/', 'pages/', 'next.config'])); }
+        elseif ($hasPath('nuxt.config') || $hasPackageDependency('nuxt')) { $stack[] = 'Nuxt'; $nodes[] = $this->node('frontend', 'frontend', 'Nuxt frontend', 'This part renders Vue screens and may also expose Nuxt server routes.', $this->matchingPaths($paths, ['pages/', 'components/', 'server/', 'nuxt.config'])); }
+        elseif ($hasPackageDependency('@sveltejs/kit') || $hasLanguage('Svelte')) { $stack[] = $hasPackageDependency('@sveltejs/kit') ? 'SvelteKit' : 'Svelte'; $nodes[] = $this->node('frontend', 'frontend', 'Svelte frontend', 'This part renders screens with Svelte components.', $this->matchingPaths($paths, ['src/routes/', 'src/lib/', '.svelte'])); }
         elseif ($hasPackageDependency('react') || $hasFrontendPattern('/(?:from\s+[\'\"]react(?:\/|[\'\"])|require\(\s*[\'\"]react(?:\/|[\'\"]))/i')) { $stack[] = 'React'; $nodes[] = $this->node('frontend', 'frontend', 'Frontend application', 'This is the part of the project that renders the user interface.', $this->matchingPaths($paths, ['components', 'src/'])); }
         elseif ($hasPackageDependency('vue') || $hasLanguage('Vue')) { $stack[] = 'Vue'; $nodes[] = $this->node('frontend', 'frontend', 'Vue frontend', 'This part of the project renders screens with Vue components.', $this->matchingPaths($paths, ['src/', 'components/', 'views/'])); }
-        if ($hasPythonPattern('/(?:from\s+fastapi\s+import|import\s+fastapi\b|[\'\"]fastapi[\'\"]\s*:)/i') || ($hasLanguage('Python') && $hasPythonPattern('/@(app|router)\.(get|post|put|patch|delete)\s*\(/i'))) { $stack[] = 'FastAPI'; $nodes[] = $this->node('api', 'api', 'FastAPI API', 'This server receives requests and runs backend rules.', $this->matchingPaths($paths, ['api/', 'routers/', 'main.py'])); }
+        if ($hasPythonPattern('/(?:from\s+fastapi\s+import|import\s+fastapi\b|[\'\"]fastapi[\'\"]\s*:)/i')) { $stack[] = 'FastAPI'; $nodes[] = $this->node('api', 'api', 'FastAPI API', 'This server receives requests and runs backend rules.', $this->matchingPaths($paths, ['api/', 'routers/', 'main.py'])); }
         elseif ($hasPath('manage.py') || $hasPythonPattern('/(?:from\s+django(?:\.|\s+import)|import\s+django\b)/i')) { $stack[] = 'Django'; $nodes[] = $this->node('api', 'server', 'Django application', 'This Python project uses Django to handle requests, routes, and server-side application behavior.', $this->matchingPaths($paths, ['manage.py', 'urls.py', 'views.py', 'settings.py'])); }
+        elseif ($hasPath('src/flask/') || $hasPythonPattern('/(?:from\s+flask\s+import|import\s+flask\b)/i')) { $stack[] = 'Flask'; $nodes[] = $this->node('api', 'api', 'Flask application', 'This Python project uses Flask to receive requests and run backend behavior.', $this->matchingPaths($paths, ['app.py', 'routes', 'views', 'src/flask/'])); }
+        elseif ($hasPackageDependency('@nestjs/core') || $hasFrontendPattern('/from\s+[\'\"]@nestjs\/(?:common|core)[\'\"]/i')) { $stack[] = 'NestJS'; $nodes[] = $this->node('api', 'api', 'NestJS API', 'This TypeScript server organizes request handlers into controllers and services.', $this->matchingPaths($paths, ['controller', 'module', 'service'])); }
         elseif ($hasPackageDependency('express') || $hasFrontendPattern('/(?:from\s+[\'\"]express[\'\"]|require\(\s*[\'\"]express[\'\"])/i')) { $stack[] = 'Node API'; $nodes[] = $this->node('api', 'api', 'Backend API', 'This server receives requests and runs backend rules.', $this->matchingPaths($paths, ['api/', 'routes/', 'server'])); }
+        elseif ($hasComposerDependency('laravel/framework') || $hasPath('artisan')) { $stack[] = 'PHP'; $stack[] = 'Laravel'; $nodes[] = $this->node('api', 'server', 'Laravel application', 'This PHP application uses Laravel for routes and server-side behavior.', $this->matchingPaths($paths, ['app/', 'routes/', 'artisan'])); }
         elseif ($hasLanguage('PHP')) { $stack[] = 'PHP'; $nodes[] = $this->node('api', 'server', 'PHP project', 'This PHP codebase contains server-side source and may handle pages, requests, or application rules.', $this->phpApplicationEvidence($primaryFiles)); }
         if ($hasRuntimePattern('/(?:@supabase\/|supabase\.auth|\bSUPABASE_(?:URL|ANON_KEY|SERVICE_ROLE_KEY)\b)/i')) { $stack[] = 'Supabase'; $nodes[] = $this->node('supabase', 'service', 'Supabase', 'Supabase is connected as an external service for data, authentication, or both.', $this->matchingPaths($paths, ['supabase', 'lib/'])); }
+        if ($hasRuntimePattern('/(?:from\s+[\'\"]firebase(?:\/|[\'\"])|initializeApp\s*\(|firebase\.auth\s*\()/i')) { $stack[] = 'Firebase'; $nodes[] = $this->node('firebase', 'service', 'Firebase', 'Firebase is connected for application services such as authentication, data, or storage.', $this->matchingPaths($paths, ['firebase', 'auth', 'firestore'])); }
         if ($hasAuthPath() || $authEvidence !== []) { $nodes[] = $this->node('auth', 'auth', 'Authentication', 'This part decides who is signed in and which requests are allowed.', $authEvidence); }
+        if ($hasPackageDependency('@prisma/client') || $hasPath('prisma/schema.prisma')) $stack[] = 'Prisma';
+        if ($hasPackageDependency('drizzle-orm') || $hasPath('packages/drizzle-orm/')) $stack[] = 'Drizzle';
         if ($hasPattern('/(?:\bpostgres(?:ql)?\b|\bprisma\b|\bmysql\b|\bmongoose\b|\bnew\s+PDO\b|@supabase\/)/i')) { $stack[] = 'Database'; $nodes[] = $this->node('database', 'database', 'Application data', 'This is where the application keeps durable information.', $this->matchingPaths($paths, ['schema', 'migrations', 'prisma', 'models', 'database'])); }
         if ($hasPath('vercel.json') || $hasPattern('/(?:@vercel\/|\bvercel\s*[:=])/i')) { $stack[] = 'Vercel'; $nodes[] = $this->node('deployment', 'deployment', 'Vercel deployment', 'This configuration tells Vercel how to build or serve the project.', $this->matchingPaths($paths, ['vercel'])); }
         if ($hasPath('dockerfile') || $hasPath('docker-compose')) { $stack[] = 'Docker'; $nodes[] = $this->node('docker', 'deployment', 'Docker environment', 'Docker files describe a repeatable way to run parts of this project.', $this->matchingPaths($paths, ['docker'])); }

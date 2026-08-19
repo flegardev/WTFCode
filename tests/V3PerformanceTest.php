@@ -18,6 +18,9 @@ function performance_git(string $root, array $arguments): void
 $plainRequest = new AnalysisRequest(__DIR__, [['path' => 'one.php', 'language' => 'PHP', 'content' => '<?php function one() {}', 'hash' => hash('sha256', 'one')]]);
 $otherRequest = new AnalysisRequest(__DIR__, [['path' => 'two.php', 'language' => 'PHP', 'content' => '<?php function two() {}', 'hash' => hash('sha256', 'two')]]);
 performance_assert($plainRequest->revision() !== $otherRequest->revision(), 'Non-Git cache revisions must include file paths and content hashes');
+$implementationFiles = new ReflectionMethod(ProviderCache::class, 'implementationFiles');
+$nativeImplementation = $implementationFiles->invoke(new ProviderCache(), new NativeAnalyzerProvider());
+performance_assert(in_array(str_replace('\\', '/', (string) realpath(__DIR__ . '/../src/Analysis/FlaskAdapter.php')), array_map(static fn (string $path): string => str_replace('\\', '/', $path), $nativeImplementation), true), 'Native provider cache identity must include transitive framework adapters');
 
 $pdo = Database::connection();
 $token = bin2hex(random_bytes(6));

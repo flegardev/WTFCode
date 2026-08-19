@@ -103,4 +103,34 @@ rmdir($frameworkFixture . DIRECTORY_SEPARATOR . 'vue' . DIRECTORY_SEPARATOR . 's
 rmdir($frameworkFixture . DIRECTORY_SEPARATOR . 'vue');
 rmdir($frameworkFixture);
 
+$alphaFrameworkFixture = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wtfcode-alpha-frameworks-' . bin2hex(random_bytes(4));
+$cases = [
+    'flask' => ['app.py' => "from flask import Flask\napp = Flask(__name__)\n@app.get('/health')\ndef health(): return 'ok'\n", 'expected' => 'Flask'],
+    'fastapi-lookalike' => ['app.py' => "class App:\n    def get(self, path): return path\napp = App()\n@app.get('/not-fastapi')\ndef handler(): return 'ok'\n", 'expected' => null],
+    'nest' => ['package.json' => '{"dependencies":{"@nestjs/core":"^11.0.0"}}', 'main.ts' => "import { NestFactory } from '@nestjs/core';\n", 'expected' => 'NestJS'],
+    'svelte' => ['package.json' => '{"dependencies":{"@sveltejs/kit":"^2.0.0"}}', 'src/routes/+page.svelte' => '<h1>Hello</h1>', 'expected' => 'SvelteKit'],
+    'nuxt' => ['package.json' => '{"dependencies":{"nuxt":"^4.0.0"}}', 'nuxt.config.ts' => 'export default defineNuxtConfig({})', 'expected' => 'Nuxt'],
+    'laravel' => ['composer.json' => '{"require":{"laravel/framework":"^12.0"}}', 'artisan' => '<?php', 'expected' => 'Laravel'],
+    'firebase' => ['package.json' => '{"dependencies":{"firebase":"^12.0.0"}}', 'src/app.ts' => "import { initializeApp } from 'firebase/app';\ninitializeApp({});", 'expected' => 'Firebase'],
+    'prisma' => ['package.json' => '{"dependencies":{"@prisma/client":"^6.0.0"}}', 'src/app.ts' => 'export const app = true;', 'expected' => 'Prisma'],
+    'drizzle' => ['package.json' => '{"dependencies":{"drizzle-orm":"^0.40.0"}}', 'src/app.ts' => 'export const app = true;', 'expected' => 'Drizzle'],
+];
+foreach ($cases as $name => $case) {
+    $directory = $alphaFrameworkFixture . DIRECTORY_SEPARATOR . $name;
+    mkdir($directory, 0700, true);
+    foreach ($case as $path => $content) {
+        if ($path === 'expected') continue;
+        $target = $directory . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
+        if (!is_dir(dirname($target))) mkdir(dirname($target), 0700, true);
+        file_put_contents($target, $content);
+    }
+    $detected = (new RepoScanner())->inspect($directory)['stack'];
+    if ($case['expected'] === null) assert_same(false, in_array('FastAPI', $detected, true), 'Generic Python route decorators must not prove FastAPI');
+    else assert_same(true, in_array($case['expected'], $detected, true), $case['expected'] . ' should be detected from explicit framework evidence');
+    if ($name === 'flask') assert_same(1, count((new RepoScanner())->inspect($directory)['symbol_graph']['routes']), 'Flask route decorators should become explicit routes');
+}
+$cleanup = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($alphaFrameworkFixture, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+foreach ($cleanup as $entry) $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname());
+rmdir($alphaFrameworkFixture);
+
 echo "WTFCode unit checks passed.\n";

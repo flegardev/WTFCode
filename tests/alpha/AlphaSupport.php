@@ -194,7 +194,13 @@ function alpha_scan_repository(string $path, string $profile, string $commit): a
     if ($partialProviders !== []) $partialReasons[] = 'Partial analyzer providers: ' . implode(', ', $partialProviders) . '.';
     if ($providerFailures !== []) $partialReasons[] = 'Failed analyzer providers: ' . implode(', ', $providerFailures) . '.';
     if ($limitFlags !== []) $partialReasons[] = 'Graph or enrichment limits: ' . implode(', ', array_keys($limitFlags)) . '.';
-    $features = array_map(static fn (array $feature): array => ['label' => (string) ($feature['label'] ?? ''), 'confidence' => (string) ($feature['confidence'] ?? 'unknown'), 'score' => (int) ($feature['score'] ?? 0), 'symbols' => count($feature['symbols'] ?? [])], $graph['features'] ?? []);
+    $features = array_map(static fn (array $feature): array => [
+        'label' => (string) ($feature['label'] ?? ''),
+        'confidence' => (string) ($feature['confidence'] ?? 'unknown'),
+        'score' => (int) ($feature['score'] ?? 0),
+        'symbols' => count($feature['symbols'] ?? []),
+        'evidence' => array_map(static fn (array $evidence): array => array_intersect_key($evidence, array_flip(['path','line','signals','confidence'])), array_slice($feature['evidence'] ?? [], 0, 10)),
+    ], $graph['features'] ?? []);
     $routes = array_map(static fn (array $route): array => array_intersect_key($route, array_flip(['method','path','handler','source','confidence'])), array_slice($graph['routes'] ?? [], 0, 50));
     $nodes = array_map(static fn (array $node): array => array_intersect_key($node, array_flip(['key','type','label','explanation','evidence'])), $inspection['nodes'] ?? []);
     return SensitiveDataSanitizer::scrub([

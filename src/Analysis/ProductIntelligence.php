@@ -9,16 +9,16 @@ declare(strict_types=1);
 final class ProductIntelligence
 {
     private const FEATURES = [
-        'Login' => ['login', 'sign in', 'signin', 'authenticate', 'session'],
-        'Registration' => ['register', 'sign up', 'signup', 'create account'],
+        'Login' => ['login', 'sign in', 'signin', 'authenticate'],
+        'Registration' => ['registration', 'sign up', 'signup', 'create account'],
         'Checkout' => ['checkout', 'cart', 'place order'],
         'Payments' => ['payment', 'stripe', 'invoice', 'billing portal'],
         'Upload' => ['upload', 'attachment', 'multipart', 'file storage'],
         'Profile' => ['profile', 'account settings', 'avatar'],
-        'Search' => ['search', 'query', 'filter results'],
+        'Search' => ['search', 'filter results'],
         'Admin' => ['admin', 'moderation', 'manage users'],
-        'Billing' => ['billing', 'subscription', 'plan', 'invoice'],
-        'Notifications' => ['notification', 'mailer', 'email', 'web push'],
+        'Billing' => ['billing', 'subscription', 'invoice'],
+        'Notifications' => ['notification', 'mailer', 'web push'],
         'AI chat' => ['chat', 'completion', 'openai', 'anthropic', 'ollama'],
         'Repository import' => ['repository import', 'repo import', 'clone repository', 'repositoryimporter'],
         'Repository scan' => ['repository scan', 'repo scan', 'reposcanner', 'repositoryscanner', 'analysis provider'],
@@ -51,7 +51,8 @@ final class ProductIntelligence
         $symbols = array_values(array_filter($symbols, function (array $symbol) use (&$excludedServiceKeys, $fileMap): bool {
             $path = (string) ($symbol['path'] ?? '');
             $content = (string) ($fileMap[$path]['content'] ?? '');
-            if (($symbol['type'] ?? '') !== 'external_service' || RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) return true;
+            if (($symbol['type'] ?? '') !== 'external_service') return true;
+            if (RuntimeEvidencePolicy::isRuntimeServiceReference($path, $content, (int) ($symbol['start_line'] ?? 1), (string) ($symbol['name'] ?? ''))) return true;
             $excludedServiceKeys[(string) ($symbol['key'] ?? '')] = true;
             return false;
         }));
@@ -243,7 +244,10 @@ final class ProductIntelligence
             $content = (string) ($file['content'] ?? '');
             if (!RuntimeEvidencePolicy::isRuntimeBehaviorPath($path) || !RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) continue;
             foreach (self::FEATURES as $feature => $needles) {
-                foreach ($needles as $needle) if (RuntimeEvidencePolicy::containsTerm($content, $needle)) $fileFeatureSignals[$path][$feature][] = $needle;
+                if ($feature === 'Registration' && preg_match('/(?:navigator\.)?serviceWorker|registerValidSW|service worker registration/i', $content)) continue;
+                foreach ($needles as $needle) {
+                    if (RuntimeEvidencePolicy::containsTerm($content, $needle)) $fileFeatureSignals[$path][$feature][] = $needle;
+                }
             }
         }
         $clusters = [];
@@ -255,6 +259,7 @@ final class ProductIntelligence
             $routeText = '';
             foreach ($routes as $route) if (($route['path'] ?? '') === $path || ($route['handler_key'] ?? null) === $symbol['key']) $routeText .= ' ' . strtolower((string) $route['route_path']);
             foreach (self::FEATURES as $feature => $needles) {
+                if ($feature === 'Registration' && preg_match('/(?:navigator\.)?serviceWorker|registerValidSW|service worker registration/i', (string) ($fileMap[$path]['content'] ?? ''))) continue;
                 $signals = [];
                 foreach ($needles as $needle) {
                     if (RuntimeEvidencePolicy::containsTerm($identity, $needle)) $signals['identity'][] = $needle;
@@ -276,7 +281,8 @@ final class ProductIntelligence
         foreach ($clusters as &$cluster) {
             $cluster['symbols'] = array_values(array_unique($cluster['symbols']));
             $cluster['evidence'] = array_slice(array_values(array_unique($cluster['evidence'], SORT_REGULAR)), 0, 20);
-            $cluster['confidence'] = count($cluster['symbols']) >= 2 || count($cluster['evidence']) >= 3 ? 'strong' : 'likely';
+            $corroborated = count(array_filter($cluster['evidence'], static fn (array $evidence): bool => in_array('graph', $evidence['signals'] ?? [], true) || in_array('route', $evidence['signals'] ?? [], true))) > 0;
+            $cluster['confidence'] = $corroborated && (count($cluster['symbols']) >= 2 || count($cluster['evidence']) >= 3) ? 'strong' : 'likely';
             $cluster['partial'] = true;
         }
         unset($cluster);

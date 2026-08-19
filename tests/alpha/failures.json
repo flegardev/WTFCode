@@ -28,9 +28,9 @@
       "expected": "Use the final proc_get_status exit code and preserve the partial scan result.",
       "actual": "The corpus record said failed with an empty crash reason.",
       "root_cause": "Alpha child-process orchestration discarded the final non-negative exit code on Windows.",
-      "fix_commit": null,
-      "regression_test": null,
-      "status": "confirmed"
+      "fix_commit": "9248120af2477baee587332eaff14459a7bc19db",
+      "regression_test": "tests/AlphaRunnerTest.php — successful child exit codes survive delayed Windows process polling",
+      "status": "fixed"
     },
     {
       "id": "ALPHA-003",
@@ -42,9 +42,9 @@
       "expected": "Bound worker output, disclose partial evidence, and finish below the memory ceiling.",
       "actual": "PHP exhausted memory in NodeWorkerAnalyzerProvider while decoding the worker graph.",
       "root_cause": "Node workers emitted unbounded symbol and relationship arrays while PHP retained duplicate input buffers.",
-      "fix_commit": null,
+      "fix_commit": "436b7f1d3022b5c87d09eccd4e9fcf39b759de79",
       "regression_test": "tests/V3AstTest.php — semantic output is capped before PHP graph decoding",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-004",
@@ -53,11 +53,95 @@
       "category": "UNSUPPORTED_PATTERN",
       "severity": "P2",
       "description": "Self-dogfood attempted an authentication-gated remote despite an explicitly authorized local repository being available.",
-      "expected": "Use a static exact-commit archive from the authorized local repository.",
+      "expected": "Use a static exact-commit detached clone from the authorized local repository.",
       "actual": "Safe Git import failed because terminal authentication was disabled.",
       "root_cause": "The initial corpus importer only supported anonymous public HTTPS repositories.",
+      "fix_commit": "9248120af2477baee587332eaff14459a7bc19db",
+      "regression_test": "tests/AlphaRunnerTest.php plus WTFCode exact-commit corpus rerun",
+      "status": "fixed"
+    },
+    {
+      "id": "ALPHA-005",
+      "repo": "django-framework",
+      "commit": "cccc004b46f71b4e54d87b376be691a17de6b903",
+      "category": "FALSE_POSITIVE",
+      "severity": "P1",
+      "description": "Documentation and reference URLs inside executable files were reported as runtime external services.",
+      "expected": "Require endpoint configuration or network-call evidence at the exact source line.",
+      "actual": "Dozens of documentation sites, placeholders, and malformed hosts appeared as services.",
+      "root_cause": "Language adapters promoted every URL-shaped string in a runtime-path file without checking line-level execution context.",
       "fix_commit": null,
-      "regression_test": null,
+      "regression_test": "tests/V3FalsePositiveTest.php — comments and website strings do not prove services while API_BASE_URL does",
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-006",
+      "repo": "flask-framework",
+      "commit": "d318b683471101618febed18996405ad26462110",
+      "category": "FALSE_POSITIVE",
+      "severity": "P1",
+      "description": "Flask was confidently identified as FastAPI because both frameworks support app.get decorators.",
+      "expected": "Framework identity requires framework-specific import, manifest, or package-path evidence.",
+      "actual": "The Flask repository stack was FastAPI.",
+      "root_cause": "A generic Python route decorator was accepted as FastAPI identity evidence.",
+      "fix_commit": null,
+      "regression_test": "tests/UnitTest.php — generic decorators do not prove FastAPI and explicit Flask evidence does",
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-007",
+      "repo": "django-framework, react-crud",
+      "commit": "multiple pinned corpus commits",
+      "category": "FALSE_POSITIVE",
+      "severity": "P1",
+      "description": "Generic migration plan and service-worker register symbols became Billing and user Registration features.",
+      "expected": "Feature terms must distinguish product behavior from unrelated technical meanings.",
+      "actual": "Django showed Billing and a CRUD client showed Registration with strong confidence.",
+      "root_cause": "Standalone plan and register terms were semantically ambiguous despite multi-signal scoring.",
+      "fix_commit": null,
+      "regression_test": "tests/V3FeatureEvidenceTest.php — migration plans and service-worker registration stay outside product features",
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-008",
+      "repo": "corpus",
+      "commit": "multiple pinned corpus commits",
+      "category": "MISSING_CONTEXT",
+      "severity": "P2",
+      "description": "Alpha run summaries retained feature labels but omitted the evidence needed for manual truth review.",
+      "expected": "Store bounded feature paths, lines, signal classes, and confidence without storing source content.",
+      "actual": "Reviewers had to rerun or grep repositories to understand feature claims.",
+      "root_cause": "The harness summarized feature counts too aggressively.",
+      "fix_commit": null,
+      "regression_test": "tests/AlphaRunnerTest.php — every feature summary carries bounded evidence metadata",
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-009",
+      "repo": "flask-framework",
+      "commit": "d318b683471101618febed18996405ad26462110",
+      "category": "WRONG_CONFIDENCE",
+      "severity": "P1",
+      "description": "A native detector change reused a pre-change provider cache entry because only the aggregate analysis version changed.",
+      "expected": "Every native extraction behavior change invalidates native provider cache keys.",
+      "actual": "The Flask route regression saw a stale graph with zero routes after the adapter was added.",
+      "root_cause": "AnalysisEngine::NATIVE_VERSION remained unchanged across native detector behavior changes.",
+      "fix_commit": null,
+      "regression_test": "tests/UnitTest.php plus provider-version cache invalidation coverage",
+      "status": "confirmed"
+    },
+    {
+      "id": "ALPHA-010",
+      "repo": "flask-framework",
+      "commit": "d318b683471101618febed18996405ad26462110",
+      "category": "WRONG_CONFIDENCE",
+      "severity": "P1",
+      "description": "Repeated identity and source-text matches promoted framework internals to strong product features without graph or route corroboration.",
+      "expected": "Strong feature confidence requires an independent graph or route signal; ambiguous technical terms do not establish features.",
+      "actual": "Flask internals appeared as strong Login and Registration features.",
+      "root_cause": "Cluster confidence counted repeated symbols as corroboration and feature vocabulary included generic session, register, query, and email terms.",
+      "fix_commit": null,
+      "regression_test": "tests/V3FeatureEvidenceTest.php plus original Flask corpus rerun",
       "status": "confirmed"
     }
   ]

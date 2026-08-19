@@ -31,6 +31,23 @@ final class RuntimeEvidencePolicy
         return self::isRuntimePath($path) && !self::isAnalysisImplementation($content);
     }
 
+    public static function isRuntimeServiceReference(string $path, string $content, int $lineNumber, string $service): bool
+    {
+        if (!self::isRuntimeBehaviorPath($path) || !self::isRuntimeSourceEvidence($path, $content)) return false;
+        $normalizedService = strtolower(trim($service));
+        if ($normalizedService === '' || preg_match('/[{}$“”]/u', $normalizedService)) return false;
+        if (in_array($normalizedService, ['example.com', 'example.org', 'example.net', 'test', 'https://'], true)) return false;
+        $lines = preg_split('/\R/', $content) ?: [];
+        $line = (string) ($lines[max(0, $lineNumber - 1)] ?? '');
+        $trimmed = trim($line);
+        if ($trimmed === '' || preg_match('#^(?://|/\*|\*|\#|<!--)#', $trimmed) || self::isDetectorDefinition($line)) return false;
+        $before = implode("\n", array_slice($lines, 0, max(0, $lineNumber - 1)));
+        if (preg_match('/\.py$/i', $path) && (substr_count($before, '"""') + substr_count($before, "'''")) % 2 === 1) return false;
+        if (!preg_match('/\.py$/i', $path) && substr_count($before, '/*') > substr_count($before, '*/')) return false;
+        if (preg_match('/\b(?:fetch|axios(?:\.[a-z]+)?|requests?\.[a-z]+|httpx\.[a-z]+|aiohttp|curl_[a-z]+|new\s+URL|openConnection|Http::(?:get|post|put|patch|delete)|->(?:get|post|put|patch|delete|request|send))\b/i', $line)) return true;
+        return preg_match('/(?:\b[A-Za-z_][A-Za-z0-9_]*(?:api|endpoint|base[_-]?(?:url|uri)|webhook|dsn|origin|service[_-]?url|host)[A-Za-z0-9_]*\b|\burl\b)[^\r\n]{0,80}(?:=>|:=|=|:)\s*[\'\"]https?:\/\//i', $line) === 1;
+    }
+
     public static function isAnalysisImplementation(string $content): bool
     {
         $families = 0;

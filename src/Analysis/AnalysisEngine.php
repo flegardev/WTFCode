@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 final class AnalysisEngine
 {
-    public const VERSION = 'alpha.2';
-    public const NATIVE_VERSION = '2.0.0';
+    public const VERSION = 'alpha.3';
+    public const NATIVE_VERSION = '2.1.0';
 
     /** @var array<int, LanguageAdapterInterface> */
     private array $languageAdapters;
@@ -28,6 +28,7 @@ final class AnalysisEngine
             new VueAdapter(),
             new FastApiAdapter(),
             new DjangoAdapter(),
+            new FlaskAdapter(),
         ];
     }
 

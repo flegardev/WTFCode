@@ -1,0 +1,299 @@
+{
+    "schema_version": 1,
+    "generated_at": "2026-08-19T20:24:28+00:00",
+    "analysis_version": "alpha.3",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "react-crud",
+        "url": "https://github.com/bezkoder/react-crud-web-api.git",
+        "commit_sha": "8498b60d12cdbd7d3ada076fc5bb70a3eedc55e0",
+        "size": "tiny",
+        "primary_language": "JavaScript",
+        "known_frameworks": [
+            "React"
+        ],
+        "architecture_type": "single-page client",
+        "repository_shape": [
+            "tiny",
+            "old",
+            "tutorial",
+            "limited-tests"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "API client",
+            "CRUD UI"
+        ],
+        "why_selected": "Small, older React CRUD client suitable for end-to-end button tracing.",
+        "candidate_kind": "application"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 1172,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 850,
+        "peak_php_memory_bytes": 6291456,
+        "files_discovered": 24,
+        "repository_bytes": 488567,
+        "files_analyzed": 16,
+        "files_skipped": 8,
+        "stack": [
+            "React"
+        ],
+        "overview": "This repository has 16 readable project files and appears to use React. It found 1 connected system to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Frontend application",
+                "explanation": "This is the part of the project that renders the user interface.",
+                "evidence": [
+                    "src/App.js",
+                    "src/common/with-router.js",
+                    "src/components/add-tutorial.component.js",
+                    "src/components/tutorial.component.js",
+                    "src/components/tutorials-list.component.js",
+                    "src/http-common.js",
+                    "src/index.js",
+                    "src/services/tutorial.service.js",
+                    "src/serviceWorker.js",
+                    "src/setupTests.js"
+                ]
+            }
+        ],
+        "symbols": 70,
+        "relationships": 379,
+        "routes": 4,
+        "route_sample": [
+            {
+                "path": "src/App.js",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "src/App.js",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "src/App.js",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "src/App.js",
+                "method": "GET",
+                "confidence": "high"
+            }
+        ],
+        "features": 0,
+        "feature_clusters": [],
+        "services": [],
+        "tables": [],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 15,
+        "finding_types": {
+            "database_operation": 5,
+            "environment_access": 3,
+            "http_call": 2,
+            "possible_unused_dependency": 3,
+            "ui_handler": 1,
+            "unresolved_local_import": 1
+        },
+        "finding_severities": {
+            "attention": 6,
+            "info": 9
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/App.js",
+                "path": "src/App.js"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@testing-library/react has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@testing-library/user-event has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "react-scripts has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "ui_handler",
+                "title": "User click handler",
+                "path": "src/components/add-tutorial.component.js"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/components/tutorial.component.js"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/components/tutorial.component.js"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/components/tutorial.component.js"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Axios HTTP request",
+                "path": "src/http-common.js"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/services/tutorial.service.js"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/services/tutorial.service.js"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Browser or server HTTP request",
+                "path": "src/serviceWorker.js"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "src/serviceWorker.js"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "src/serviceWorker.js"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "src/serviceWorker.js"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 30,
+                "relationships": 213,
+                "routes": 4,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 56,
+                "relationships": 153,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 725,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 16
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 11,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 725
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Failed analyzer providers: typescript-semantic."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

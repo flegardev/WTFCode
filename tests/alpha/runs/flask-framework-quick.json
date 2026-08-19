@@ -1,0 +1,347 @@
+{
+    "schema_version": 1,
+    "generated_at": "2026-08-19T20:23:03+00:00",
+    "analysis_version": "alpha.3",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "flask-framework",
+        "url": "https://github.com/pallets/flask.git",
+        "commit_sha": "d318b683471101618febed18996405ad26462110",
+        "size": "medium",
+        "primary_language": "Python",
+        "known_frameworks": [
+            "Flask"
+        ],
+        "architecture_type": "framework repository",
+        "repository_shape": [
+            "medium",
+            "old",
+            "well-tested",
+            "well-documented"
+        ],
+        "expected_high_level_systems": [
+            "HTTP framework",
+            "routing",
+            "sessions"
+        ],
+        "why_selected": "Mature Python framework with examples, tests, and documentation noise.",
+        "candidate_kind": "noisy-framework"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 1068,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 711,
+        "peak_php_memory_bytes": 56623104,
+        "files_discovered": 236,
+        "repository_bytes": 1870682,
+        "files_analyzed": 131,
+        "files_skipped": 105,
+        "stack": [
+            "Flask"
+        ],
+        "overview": "This repository has 131 readable project files and appears to use Flask. It found 1 connected system to explain.",
+        "architecture_nodes": [
+            {
+                "key": "api",
+                "type": "api",
+                "label": "Flask application",
+                "explanation": "This Python project uses Flask to receive requests and run backend behavior.",
+                "evidence": [
+                    "src/flask/app.py",
+                    "src/flask/blueprints.py",
+                    "src/flask/cli.py",
+                    "src/flask/config.py",
+                    "src/flask/ctx.py",
+                    "src/flask/debughelpers.py",
+                    "src/flask/globals.py",
+                    "src/flask/helpers.py",
+                    "src/flask/json/provider.py",
+                    "src/flask/json/tag.py",
+                    "src/flask/json/__init__.py",
+                    "src/flask/logging.py"
+                ]
+            }
+        ],
+        "symbols": 3293,
+        "relationships": 9343,
+        "routes": 7,
+        "route_sample": [
+            {
+                "path": "src/flask/ctx.py",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "src/flask/ctx.py",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "src/flask/helpers.py",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "src/flask/helpers.py",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "src/flask/helpers.py",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "src/flask/sansio/scaffold.py",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "src/flask/sansio/scaffold.py",
+                "method": "ANY",
+                "confidence": "high"
+            }
+        ],
+        "features": 0,
+        "feature_clusters": [],
+        "services": [],
+        "tables": [
+            "post",
+            "user"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 103,
+        "finding_types": {
+            "large_file": 7,
+            "unresolved_local_import": 96
+        },
+        "finding_severities": {
+            "attention": 103
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "app.py is large enough to be risky to edit",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/app.py",
+                "path": "src/flask/app.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/blueprints.py",
+                "path": "src/flask/blueprints.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/blueprints.py",
+                "path": "src/flask/blueprints.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/blueprints.py",
+                "path": "src/flask/blueprints.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/blueprints.py",
+                "path": "src/flask/blueprints.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/blueprints.py",
+                "path": "src/flask/blueprints.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/flask/blueprints.py",
+                "path": "src/flask/blueprints.py"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "cli.py is large enough to be risky to edit",
+                "path": "src/flask/cli.py"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 72,
+                "message": null,
+                "symbols": 1720,
+                "relationships": 4748,
+                "routes": 7,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 131
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 1737,
+                "relationships": 4000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "wtfcode-native",
+            "duration_ms": 72
+        },
+        "graph_truncation": {
+            "relationship_limit_reached": 1
+        },
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Graph or enrichment limits: relationship_limit_reached, product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

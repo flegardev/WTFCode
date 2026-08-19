@@ -39,6 +39,22 @@ $catalogGraph = [
 $catalogGraph = (new ProductIntelligence())->enrich($catalogGraph, $catalogFiles);
 feature_evidence_assert(!in_array('AI chat', array_column($catalogGraph['features'] ?? [], 'label'), true), 'Catalogue JSON named chat must not become a runtime AI feature');
 
+$serviceWorkerGraph = feature_evidence_graph([
+    ['path' => 'src/serviceWorker.js', 'language' => 'JavaScript', 'content' => "export function registration() { return navigator.serviceWorker.register('/sw.js'); }", 'lines' => 1],
+]);
+feature_evidence_assert(!in_array('Registration', array_column($serviceWorkerGraph['features'] ?? [], 'label'), true), 'Service-worker registration must not become user Registration');
+
+$planningGraph = feature_evidence_graph([
+    ['path' => 'src/migrations.py', 'language' => 'Python', 'content' => "def migration_plan():\n    plan = []\n    return plan", 'lines' => 3],
+]);
+feature_evidence_assert(!in_array('Billing', array_column($planningGraph['features'] ?? [], 'label'), true), 'Generic planning code must not become Billing');
+
+$technicalTermsGraph = feature_evidence_graph([
+    ['path' => 'src/TechnicalUtilities.ts', 'language' => 'TypeScript', 'content' => "export function session() { return query('email'); }", 'lines' => 1],
+]);
+$technicalLabels = array_column($technicalTermsGraph['features'] ?? [], 'label');
+feature_evidence_assert(!in_array('Login', $technicalLabels, true) && !in_array('Search', $technicalLabels, true) && !in_array('Notifications', $technicalLabels, true), 'Generic session, query, and email terms must not become product features');
+
 $runtime = [
     ['path' => 'routes/billing.ts', 'language' => 'TypeScript', 'content' => "import { BillingService } from '../src/BillingService';\nrouter.post('/billing/invoices', BillingService.createInvoice);", 'lines' => 2],
     ['path' => 'src/BillingService.ts', 'language' => 'TypeScript', 'content' => "export class BillingService {\n  createInvoice() {\n    const stripe = new StripeClient();\n    return stripe.invoices.create({ customer: 'runtime' });\n  }\n}", 'lines' => 6],
