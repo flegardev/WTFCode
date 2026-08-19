@@ -8,10 +8,10 @@
 ## Open failures
 
 - P0: 0
-- P1: 1
+- P1: 0
 - P2: 0
 - P3: 0
-- Regression fixes: 0
+- Regression fixes: 1
 
 ## Human review
 

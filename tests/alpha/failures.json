@@ -14,9 +14,9 @@
       "expected": "Catalogue JSON may be described as metadata but must not establish a runtime feature.",
       "actual": "AI chat was reported as a strong feature with two symbols.",
       "root_cause": "Feature source signals accepted non-executable JSON catalogue content as runtime behavior evidence.",
-      "fix_commit": null,
-      "regression_test": null,
-      "status": "confirmed"
+      "fix_commit": "8ead5bc492fdc892df030c4cc3506fba97478d73",
+      "regression_test": "tests/V3FeatureEvidenceTest.php — catalogue JSON named chat cannot create AI chat",
+      "status": "fixed"
     }
   ]
 }
