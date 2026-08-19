@@ -24,8 +24,8 @@ try {
     file_put_contents($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Analysis' . DIRECTORY_SEPARATOR . 'Detector.php', '<?php $patterns = ["Stripe", "Supabase", "OpenAI"];');
     file_put_contents($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'SymbolRepository.php', '<?php $signals = "client stripe supabase firebase openai";');
     file_put_contents($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'RuntimeLinks.js', "// See https://docs.example.dev/runtime\nconst WEBSITE = 'https://www.example.dev';\nconst API_BASE_URL = 'https://api.real-service.dev/v1';\nfetch(API_BASE_URL + '/items');\n");
-    file_put_contents($root . DIRECTORY_SEPARATOR . 'package.json', '{"name":"generic-next-key","config":{"next":"not-a-framework"}}');
-    file_put_contents($root . DIRECTORY_SEPARATOR . 'package-lock.json', '{"lockfileVersion":3,"packages":{}}');
+    file_put_contents($root . DIRECTORY_SEPARATOR . 'package.json', '{"name":"generic-next-key","config":{"next":"not-a-framework"},"dependencies":{"@aws-sdk/client-s3":"1.0.0"}}');
+    file_put_contents($root . DIRECTORY_SEPARATOR . 'package-lock.json', '{"lockfileVersion":3,"packages":{"node_modules/aws-transitive":{"name":"aws-sdk"}}}');
     file_put_contents($root . DIRECTORY_SEPARATOR . '.playwright-cli' . DIRECTORY_SEPARATOR . 'page.yml', 'snapshot: generated browser evidence');
     $result = (new RepoScanner())->inspect($root, AnalysisProfile::QUICK);
     false_positive_assert(!in_array('.playwright-cli/page.yml', array_column($result['files'], 'path'), true), 'Generated Playwright artifacts must not enter repository analysis');
@@ -33,6 +33,7 @@ try {
     false_positive_assert(!in_array('Docker', $result['stack'], true), 'README Docker prose must not prove Docker use');
     $services = array_values(array_filter($result['symbol_graph']['symbols'], static fn (array $symbol): bool => ($symbol['type'] ?? '') === 'external_service'));
     false_positive_assert(array_column($services, 'name') === ['api.real-service.dev'], 'Only runtime endpoint configuration or network calls may prove external services');
+    false_positive_assert(!in_array('AWS', array_column($services, 'name'), true), 'Manifest or lockfile package presence alone must not prove runtime AWS use');
     false_positive_assert(($result['symbol_graph']['features'] ?? []) === [], 'Docs, CSS, Blade prose, tests, and detector source must not prove product features');
     $runtimeFindings = array_values(array_filter($result['findings'], static fn (array $finding): bool => in_array($finding['path'] ?? '', ['README.md', 'styles.css', 'views/copy.blade.php', 'tests/fixture.php'], true) && in_array($finding['severity'] ?? '', ['attention', 'risk'], true)));
     false_positive_assert($runtimeFindings === [], 'Non-runtime prose must not become risk findings');

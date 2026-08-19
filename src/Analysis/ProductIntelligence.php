@@ -354,21 +354,21 @@ final class ProductIntelligence
         if (!RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) return [];
         $matches = [];
         $basename = strtolower(basename($path));
+        if (preg_match('/(?:^|[-.])lock(?:\.|$)|^composer\.lock$/i', $basename)) return [];
+        $runtimeBehavior = RuntimeEvidencePolicy::isRuntimeBehaviorPath($path);
         foreach ($needles as $needle) {
             $quoted = preg_quote($needle, '/');
             if (!preg_match('/' . $quoted . '/i', $content)) continue;
             $explicitEndpoint = str_contains($needle, '://') || str_contains($needle, '.') || str_ends_with($needle, ':');
             $runtimeContext = false;
-            foreach (preg_split('/\R/', $content) ?: [] as $line) {
+            foreach ($runtimeBehavior ? (preg_split('/\R/', $content) ?: []) : [] as $line) {
                 if (!RuntimeEvidencePolicy::containsTerm($line, $needle) || RuntimeEvidencePolicy::isDetectorDefinition($line)) continue;
                 if (preg_match('/(?:import|require|from|use|new|client|sdk|endpoint|base[_-]?url|dsn|connect|request|fetch|axios|curl|->(?:get|post|put|patch|delete))[^\r\n]{0,140}' . $quoted . '|' . $quoted . '[^\r\n]{0,140}(?:client|sdk|endpoint|connect|request|fetch|axios|curl)/i', $line) === 1) { $runtimeContext = true; break; }
             }
-            $manifestDependency = in_array($basename, ['package.json', 'composer.json', 'pyproject.toml', 'requirements.txt', 'gemfile', 'go.mod'], true)
-                && preg_match('/["\']' . $quoted . '(?:\/[^"\']+)?["\']\s*[:=]?/i', $content) === 1;
             $deploymentFile = ($needle === 'vercel.json' && $basename === 'vercel.json')
                 || ($needle === 'dockerfile' && ($basename === 'dockerfile' || str_starts_with($basename, 'docker-compose')))
                 || ($needle === 'apiversion:' && preg_match('/\.ya?ml$/', $basename) === 1);
-            if ($explicitEndpoint || $runtimeContext || $manifestDependency || $deploymentFile) $matches[] = $needle;
+            if ($explicitEndpoint || $runtimeContext || $deploymentFile) $matches[] = $needle;
         }
         return array_values(array_unique($matches));
     }
