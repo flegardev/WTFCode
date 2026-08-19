@@ -1,0 +1,459 @@
+{
+    "schema_version": 1,
+    "generated_at": "2026-08-19T20:07:22+00:00",
+    "analysis_version": "alpha.2",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "drizzle-orm",
+        "url": "https://github.com/drizzle-team/drizzle-orm.git",
+        "commit_sha": "b7862528fd8fc39bc2653a6c18dad7c1f4e68d10",
+        "size": "large",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Drizzle ORM"
+        ],
+        "architecture_type": "library monorepo",
+        "repository_shape": [
+            "large",
+            "new",
+            "many-packages",
+            "well-tested"
+        ],
+        "expected_high_level_systems": [
+            "ORM packages",
+            "database adapters",
+            "integration tests"
+        ],
+        "why_selected": "Large database library should not be misrepresented as a single end-user application.",
+        "candidate_kind": "cursed"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 21171,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 20687,
+        "peak_php_memory_bytes": 119537664,
+        "files_discovered": 1389,
+        "repository_bytes": 18292744,
+        "files_analyzed": 1339,
+        "files_skipped": 50,
+        "stack": [
+            "React",
+            "Database",
+            "Vercel"
+        ],
+        "overview": "This repository has 1339 readable project files and appears to use React, Database, Vercel. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Frontend application",
+                "explanation": "This is the part of the project that renders the user interface.",
+                "evidence": [
+                    "drizzle-arktype/src/column.ts",
+                    "drizzle-arktype/src/column.types.ts",
+                    "drizzle-arktype/src/constants.ts",
+                    "drizzle-arktype/src/index.ts",
+                    "drizzle-arktype/src/schema.ts",
+                    "drizzle-arktype/src/schema.types.internal.ts",
+                    "drizzle-arktype/src/schema.types.ts",
+                    "drizzle-arktype/src/utils.ts",
+                    "drizzle-kit/src/@types/utils.ts",
+                    "drizzle-kit/src/api.ts",
+                    "drizzle-kit/src/cli/commands/check.ts",
+                    "drizzle-kit/src/cli/commands/drop.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "drizzle-kit/src/cli/connections.ts",
+                    "drizzle-orm/src/neon/neon-auth.ts",
+                    "drizzle-orm/type-tests/utils/neon-auth-token.ts"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "drizzle-arktype/src/schema.ts",
+                    "drizzle-arktype/src/schema.types.internal.ts",
+                    "drizzle-arktype/src/schema.types.ts",
+                    "drizzle-kit/src/cli/schema.ts",
+                    "drizzle-kit/src/schemaValidator.ts",
+                    "drizzle-kit/src/serializer/gelSchema.ts",
+                    "drizzle-kit/src/serializer/mysqlSchema.ts",
+                    "drizzle-kit/src/serializer/pgSchema.ts",
+                    "drizzle-kit/src/serializer/singlestoreSchema.ts",
+                    "drizzle-kit/src/serializer/sqliteSchema.ts",
+                    "drizzle-kit/tests/cli/schema.ts",
+                    "drizzle-kit/tests/migrate/libsq-schema.ts"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": [
+                    "drizzle-orm/src/vercel-postgres/driver.ts",
+                    "drizzle-orm/src/vercel-postgres/index.ts",
+                    "drizzle-orm/src/vercel-postgres/migrator.ts",
+                    "drizzle-orm/src/vercel-postgres/session.ts",
+                    "integration-tests/tests/pg/vercel-pg.test.ts",
+                    "integration-tests/tests/relational/vercel.test.ts"
+                ]
+            }
+        ],
+        "symbols": 6714,
+        "relationships": 16400,
+        "routes": 1,
+        "route_sample": [
+            {
+                "path": "drizzle-kit/src/serializer/studio.ts",
+                "method": "POST",
+                "confidence": "high"
+            }
+        ],
+        "features": 3,
+        "feature_clusters": [
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 5229,
+                "symbols": 870
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 2808,
+                "symbols": 468
+            },
+            {
+                "label": "Registration",
+                "confidence": "likely",
+                "score": 6,
+                "symbols": 1
+            }
+        ],
+        "services": [
+            "${credentials.accountid}",
+            "api.cloudflare.com",
+            "AWS",
+            "blog.yo1.dog",
+            "Cloudflare",
+            "dev.mysql.com",
+            "discord.gg",
+            "docs.geldata.com",
+            "docs.singlestore.com",
+            "github.com",
+            "local.drizzle.studio${querystring",
+            "MySQL",
+            "orm.drizzle.team",
+            "Postgres",
+            "Redis",
+            "stackoverflow.com",
+            "Supabase",
+            "wicg.github.io",
+            "www.kaggle.com",
+            "www.lipsum.com",
+            "www.npmjs.com",
+            "www.postgresql.org",
+            "www.sqlite.org",
+            "www.techonthenet.com"
+        ],
+        "tables": [
+            "all_columns",
+            "another_users",
+            "auth_otp",
+            "average_amount",
+            "child1",
+            "child2",
+            "child3",
+            "child4",
+            "child5",
+            "child6",
+            "child7",
+            "cities_migration",
+            "constraint",
+            "custom_schema",
+            "drizzle_tests_cities_migration",
+            "drizzle_tests_users12",
+            "drizzle_tests_users_migration",
+            "generate_series",
+            "items",
+            "joined",
+            "one",
+            "orders",
+            "parent",
+            "sal_emp",
+            "table",
+            "the",
+            "tictactoe",
+            "timestamp",
+            "users",
+            "users12",
+            "userstest",
+            "users_migration",
+            "worker",
+            "__new_users",
+            "__new_worker"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 2212,
+        "finding_types": {
+            "database_operation": 1960,
+            "destructive_database_operation": 2,
+            "duplicate_content": 27,
+            "environment_access": 9,
+            "file_operation": 26,
+            "http_call": 2,
+            "implementation_notes": 14,
+            "large_file": 144,
+            "possible_unused_dependency": 5,
+            "process_execution": 1,
+            "repeated_client_setup": 1,
+            "sensitive_system": 3,
+            "unresolved_local_import": 18
+        },
+        "finding_severities": {
+            "attention": 2153,
+            "info": 58,
+            "risk": 1
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "release-latest.yaml is large enough to be risky to edit",
+                "path": ".github/workflows/release-latest.yaml"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "mysql.test.ts is large enough to be risky to edit",
+                "path": "drizzle-arktype/tests/mysql.test.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "pg.test.ts is large enough to be risky to edit",
+                "path": "drizzle-arktype/tests/pg.test.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "singlestore.test.ts is large enough to be risky to edit",
+                "path": "drizzle-arktype/tests/singlestore.test.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "grammar.ohm-bundle.js is large enough to be risky to edit",
+                "path": "drizzle-kit/imports-checker/grammar/grammar.ohm-bundle.js"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "api.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/api.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "introspect.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/commands/introspect.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from drizzle-kit/src/cli/commands/introspect.ts",
+                "path": "drizzle-kit/src/cli/commands/introspect.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "migrate.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/commands/migrate.ts"
+            },
+            {
+                "severity": "info",
+                "type": "implementation_notes",
+                "title": "migrate.ts contains several implementation notes",
+                "path": "drizzle-kit/src/cli/commands/migrate.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from drizzle-kit/src/cli/commands/migrate.ts",
+                "path": "drizzle-kit/src/cli/commands/migrate.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from drizzle-kit/src/cli/commands/migrate.ts",
+                "path": "drizzle-kit/src/cli/commands/migrate.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "push.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/commands/push.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "utils.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/commands/utils.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "connections.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/connections.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in drizzle-kit/src/cli/connections.ts",
+                "path": "drizzle-kit/src/cli/connections.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "schema.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/schema.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "views.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/cli/views.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "introspect-gel.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/introspect-gel.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "introspect-mysql.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/introspect-mysql.ts"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [
+            "tree-sitter",
+            "ast-grep"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.0.0",
+                "status": "success",
+                "duration_ms": 1570,
+                "message": null,
+                "symbols": 4913,
+                "relationships": 16000,
+                "routes": 1,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1339
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1339
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 1816,
+                "message": "10 file(s) contained syntax the worker could not fully parse. Worker input was capped at 600 files or 6291456 bytes. Worker evidence reached the bounded fusion output budget.",
+                "symbols": 2000,
+                "relationships": 4000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1339
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 4083,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1339
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "partial",
+                "duration_ms": 8743,
+                "message": "Worker input was capped at 1000 files or 8388608 bytes.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 2000,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1339
+            }
+        ],
+        "slowest_provider": {
+            "engine": "ast-grep",
+            "duration_ms": 8743
+        },
+        "graph_truncation": {
+            "symbol_limit_reached": 1,
+            "relationship_limit_reached": 1
+        },
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter, ast-grep.",
+            "Failed analyzer providers: typescript-semantic.",
+            "Graph or enrichment limits: symbol_limit_reached, relationship_limit_reached, product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

@@ -1,0 +1,512 @@
+{
+    "schema_version": 1,
+    "generated_at": "2026-08-19T20:06:44+00:00",
+    "analysis_version": "alpha.2",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "wtfcode",
+        "url": "https://github.com/flegardev/WTFCode.git",
+        "source": "explicit_local_repository",
+        "local_path": ".",
+        "commit_sha": "3cece8a96d12badeac609cf84497a35c086fa86b",
+        "size": "medium",
+        "primary_language": "PHP",
+        "known_frameworks": [
+            "plain PHP",
+            "MySQL"
+        ],
+        "architecture_type": "server-rendered monolith with analyzer workers",
+        "repository_shape": [
+            "medium",
+            "new",
+            "analyzer-heavy",
+            "documented"
+        ],
+        "expected_high_level_systems": [
+            "web application",
+            "analysis engine",
+            "database",
+            "Git integration"
+        ],
+        "why_selected": "Self-dogfood control; kept in the corpus without making it the primary optimization target.",
+        "candidate_kind": "self-dogfood"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 1010,
+        "workspace_reused": false
+    },
+    "time_to_first_result_ms": 9727,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 8477,
+        "peak_php_memory_bytes": 77594624,
+        "files_discovered": 193,
+        "repository_bytes": 1336712,
+        "files_analyzed": 182,
+        "files_skipped": 11,
+        "stack": [
+            "PHP",
+            "Database",
+            "Vercel"
+        ],
+        "overview": "This repository has 182 readable project files and appears to use PHP, Database, Vercel. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "api",
+                "type": "server",
+                "label": "PHP project",
+                "explanation": "This PHP codebase contains server-side source and may handle pages, requests, or application rules.",
+                "evidence": [
+                    "public/index.php",
+                    "src/Analysis/AbstractFrameworkAdapter.php",
+                    "src/Analysis/AbstractLanguageAdapter.php",
+                    "src/Analysis/AnalysisCoordinator.php",
+                    "src/Analysis/AnalysisEngine.php",
+                    "src/Analysis/AnalysisJobStore.php",
+                    "src/Analysis/AnalysisProfile.php",
+                    "src/Analysis/AnalysisRequest.php",
+                    "src/Analysis/AnalyzerHealth.php",
+                    "src/Analysis/AnalyzerProviderInterface.php",
+                    "src/Analysis/AnalyzerRegistry.php",
+                    "src/Analysis/AnalyzerResult.php"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "bootstrap.php",
+                    "src/Auth.php",
+                    "src/GitDiffService.php",
+                    "src/OpenAiCompatibleExplanationProvider.php",
+                    "tools/dogfood-v3.php"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "config/database.php",
+                    "database/migrations/001_learning_and_symbols.sql",
+                    "database/migrations/002_symbol_graph_v2.sql",
+                    "database/migrations/003_multi_engine_foundation.sql",
+                    "database/migrations/004_security_intelligence.sql",
+                    "database/migrations/005_change_intelligence.sql",
+                    "database/migrations/006_performance_jobs.sql",
+                    "database/schema.sql",
+                    "src/Database.php"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": []
+            }
+        ],
+        "symbols": 2466,
+        "relationships": 13331,
+        "routes": 26,
+        "route_sample": [
+            {
+                "path": "public/analyzers.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/ask.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/change.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/compare.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/dashboard.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/feature.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/file.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/files.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/index.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/learn.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/login.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/logout.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/map.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/privacy.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/project-create.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/project.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/prompt.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/register.php",
+                "method": "ANY",
+                "confidence": "high"
+            },
+            {
+                "path": "public/routes.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/secure.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/security.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/symbol.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/symbols.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/tables.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/terms.php",
+                "method": "GET",
+                "confidence": "high"
+            },
+            {
+                "path": "public/understand.php",
+                "method": "GET",
+                "confidence": "high"
+            }
+        ],
+        "features": 9,
+        "feature_clusters": [
+            {
+                "label": "Git comparison",
+                "confidence": "strong",
+                "score": 413,
+                "symbols": 59
+            },
+            {
+                "label": "Repository import",
+                "confidence": "strong",
+                "score": 163,
+                "symbols": 27
+            },
+            {
+                "label": "Feature tracing",
+                "confidence": "strong",
+                "score": 142,
+                "symbols": 19
+            },
+            {
+                "label": "Safe prompt generation",
+                "confidence": "strong",
+                "score": 109,
+                "symbols": 18
+            },
+            {
+                "label": "AI chat",
+                "confidence": "strong",
+                "score": 91,
+                "symbols": 13
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 57,
+                "symbols": 8
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 35,
+                "symbols": 5
+            },
+            {
+                "label": "Registration",
+                "confidence": "strong",
+                "score": 30,
+                "symbols": 4
+            },
+            {
+                "label": "Repository scan",
+                "confidence": "strong",
+                "score": 24,
+                "symbols": 4
+            }
+        ],
+        "services": [
+            "127.0.0.1",
+            "api.openai.com",
+            "github.com",
+            "MySQL",
+            "OpenAI"
+        ],
+        "tables": [
+            "accounts",
+            "analysis_jobs",
+            "analysis_job_steps",
+            "analysis_provider_runs",
+            "architecture_edges",
+            "architecture_nodes",
+            "audit_log",
+            "change_guard_snapshots",
+            "code_routes",
+            "code_symbols",
+            "customers",
+            "dependency_tree",
+            "engine_disagreements",
+            "learning_progress",
+            "orders",
+            "package_inventory",
+            "projects",
+            "project_dependencies",
+            "project_files",
+            "scan_findings",
+            "scan_runs",
+            "symbol_relationships",
+            "users"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 10,
+        "finding_types": {
+            "database_operation": 1,
+            "environment_access": 1,
+            "environment_surface": 1,
+            "implementation_notes": 1,
+            "large_file": 1,
+            "sensitive_system": 5
+        },
+        "finding_severities": {
+            "attention": 7,
+            "info": 3
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in bootstrap.php",
+                "path": "bootstrap.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "gitleaks.toml is large enough to be risky to edit",
+                "path": "config/security/gitleaks.toml"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in src/Auth.php",
+                "path": "src/Auth.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in src/GitDiffService.php",
+                "path": "src/GitDiffService.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in src/OpenAiCompatibleExplanationProvider.php",
+                "path": "src/OpenAiCompatibleExplanationProvider.php"
+            },
+            {
+                "severity": "info",
+                "type": "implementation_notes",
+                "title": "RepoScanner.php contains several implementation notes",
+                "path": "src/RepoScanner.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in tools/dogfood-v3.php",
+                "path": "tools/dogfood-v3.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_surface",
+                "title": "This project relies on many environment variables",
+                "path": null
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "public/assets/js/symbol-map.js"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "tests/fixtures/v2/next-react/hooks/useAccount.ts"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.0.0",
+                "status": "success",
+                "duration_ms": 104,
+                "message": null,
+                "symbols": 1375,
+                "relationships": 6099,
+                "routes": 26,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 576,
+                "message": null,
+                "symbols": 921,
+                "relationships": 4921,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 2079,
+                "message": "1 file(s) contained syntax the worker could not fully parse. Worker evidence reached the bounded fusion output budget.",
+                "symbols": 760,
+                "relationships": 4000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 942,
+                "message": null,
+                "symbols": 22,
+                "relationships": 210,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 116,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 2,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            }
+        ],
+        "slowest_provider": {
+            "engine": "tree-sitter",
+            "duration_ms": 2079
+        },
+        "graph_truncation": {
+            "relationship_limit_reached": 1
+        },
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Graph or enrichment limits: relationship_limit_reached, product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

@@ -1,15 +1,15 @@
 # WTFCode Alpha dashboard
 
-- Repository/profile runs: 1
-- Successful scans: 1
-- Partial scans: 0
+- Repository/profile runs: 27
+- Successful scans: 8
+- Partial scans: 19
 - Failed scans: 0
 
 ## Open failures
 
 - P0: 0
-- P1: 0
-- P2: 0
+- P1: 1
+- P2: 2
 - P3: 0
 - Regression fixes: 1
 

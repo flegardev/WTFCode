@@ -29,7 +29,10 @@ function alpha_process(array $command, string $cwd, int $timeoutSeconds, int $ma
     stream_set_blocking($pipes[2], false);
     $stdout = $stderr = '';
     $timedOut = false;
-    while (($status = proc_get_status($process))['running']) {
+    $reportedExit = -1;
+    while (true) {
+        $status = proc_get_status($process);
+        if (!$status['running']) { $reportedExit = (int) ($status['exitcode'] ?? -1); break; }
         $stdout .= stream_get_contents($pipes[1]);
         $stderr .= stream_get_contents($pipes[2]);
         if (strlen($stdout) + strlen($stderr) > $maxOutputBytes) {
@@ -48,7 +51,8 @@ function alpha_process(array $command, string $cwd, int $timeoutSeconds, int $ma
     $stderr .= stream_get_contents($pipes[2]);
     fclose($pipes[1]);
     fclose($pipes[2]);
-    $exitCode = proc_close($process);
+    $closedExit = proc_close($process);
+    $exitCode = $reportedExit >= 0 ? $reportedExit : $closedExit;
     return [
         'exit_code' => $timedOut ? 124 : $exitCode,
         'stdout' => substr($stdout, 0, $maxOutputBytes),
@@ -81,6 +85,20 @@ function alpha_prepare_repository(string $root, array $repo): array
     if (!is_dir($emptyHooks) && !mkdir($emptyHooks, 0700, true) && !is_dir($emptyHooks)) throw new RuntimeException('Could not create empty Git hooks directory.');
     $workspace = $base . '/' . $repo['name'];
     $expected = strtolower((string) $repo['commit_sha']);
+    $marker = $workspace . '/.alpha-pinned-commit';
+    if (($repo['source'] ?? 'public_github') === 'explicit_local_repository') {
+        if (is_file($marker) && trim((string) file_get_contents($marker)) === $expected) return ['path' => $workspace, 'clone_duration_ms' => 0, 'reused' => true];
+        if (is_dir($workspace)) alpha_delete_workspace($workspace, $base);
+        $localPath = realpath($root . '/' . (string) ($repo['local_path'] ?? ''));
+        if ($localPath === false || !is_dir($localPath . '/.git')) throw new RuntimeException('Explicitly authorized local repository is unavailable.');
+        $started = hrtime(true);
+        $verify = alpha_process(['git', '-C', $localPath, 'cat-file', '-e', $expected . '^{commit}'], $root, 15);
+        $clone = $verify['exit_code'] === 0 ? alpha_process(['git', '-c', 'protocol.file.allow=always', '-c', 'core.hooksPath=' . $emptyHooks, 'clone', '--quiet', '--no-local', '--no-checkout', '--no-tags', '--no-recurse-submodules', $localPath, $workspace], $root, 120, 524_288) : $verify;
+        $checkout = $clone['exit_code'] === 0 ? alpha_process(['git', '-c', 'core.hooksPath=' . $emptyHooks, '-C', $workspace, 'checkout', '--quiet', '--detach', $expected], $root, 30, 524_288) : $clone;
+        if ($checkout['exit_code'] !== 0 || !is_dir($workspace . '/.git')) { if (is_dir($workspace)) alpha_delete_workspace($workspace, $base); throw new RuntimeException('Authorized local exact-commit clone failed.'); }
+        file_put_contents($marker, $expected, LOCK_EX);
+        return ['path' => $workspace, 'clone_duration_ms' => (int) round((hrtime(true) - $started) / 1_000_000), 'reused' => false];
+    }
     if (is_dir($workspace . '/.git')) {
         $head = alpha_process(['git', '-c', 'core.hooksPath=' . $emptyHooks, '-C', $workspace, 'rev-parse', 'HEAD'], $root, 10);
         if ($head['exit_code'] === 0 && strtolower(trim($head['stdout'])) === $expected) return ['path' => $workspace, 'clone_duration_ms' => 0, 'reused' => true];

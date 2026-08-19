@@ -48,9 +48,10 @@ foreach ($selected as $index => $repo) {
     try {
         $prepared = alpha_prepare_repository($root, $repo);
         echo 'SCAN ' . $repo['name'] . ' [' . $profile . ']' . PHP_EOL;
-        $worker = alpha_process([PHP_BINARY, '-d', 'memory_limit=128M', __FILE__, '--worker=' . $repo['name'], '--path=' . $prepared['path'], '--commit=' . $repo['commit_sha'], '--profile=' . $profile], $root, 600, 4_194_304);
+        $worker = alpha_process([PHP_BINARY, '-d', 'display_errors=stderr', '-d', 'log_errors=0', '-d', 'memory_limit=128M', __FILE__, '--worker=' . $repo['name'], '--path=' . $prepared['path'], '--commit=' . $repo['commit_sha'], '--profile=' . $profile], $root, 600, 4_194_304);
         if ($worker['exit_code'] !== 0) {
-            $machine = ['failure_kind' => $worker['timed_out'] ? 'timeout' : (str_contains(strtolower($worker['stderr']), 'allowed memory') ? 'memory' : 'crash'), 'error' => substr(trim($worker['stderr']), 0, 1000), 'scan_duration_ms' => $worker['duration_ms']];
+            $errorOutput = trim($worker['stderr'] !== '' ? $worker['stderr'] : $worker['stdout']);
+            $machine = ['failure_kind' => $worker['timed_out'] ? 'timeout' : (str_contains(strtolower($errorOutput), 'allowed memory') ? 'memory' : 'crash'), 'error' => substr($errorOutput, 0, 1000), 'scan_duration_ms' => $worker['duration_ms']];
             $status = 'failed';
             $exitCode = 1;
         } else {
