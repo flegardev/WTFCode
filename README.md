@@ -24,7 +24,7 @@ WTFCode is a plain-PHP codebase understanding tool for people who can build quic
 
 ## V3 implementation status
 
-V3 phases 1 through 7 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
+V3 phases 1 through 8 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
 
 Evidence is ranked conservatively: semantic resolution outranks direct syntax, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security profiles combine redacted Gitleaks results, optional Semgrep code findings, OSV dependency advisories, optional Syft inventory, and optional offline Grype confirmation without treating a finding as proof of exploitability. See `docs/V3-FOUNDATION.md`, `config/tool-manifest.json`, and `THIRD_PARTY.md` for boundaries and provenance.
 
@@ -33,6 +33,8 @@ The Cytoscape graph starts at architecture level and drills through subsystems, 
 The product-intelligence pass enriches fused evidence with multi-signal feature clusters, partial UI/HTTP/control-flow paths, classified database operations, endpoint effects, and runtime-backed service boundaries. It labels partial traces explicitly and never treats README text alone as proof that an integration is active.
 
 Change intelligence compares Git text with declaration, route, schema, dependency, security-boundary, environment, and architecture evidence. Optional intended-change text produces a carefully labeled scope-drift review. AI Change Guard stores redacted normalized Before/After snapshots and recommends targeted verification without claiming runtime behavior.
+
+The project workspace is organized around five evidence-first modes: Understand summarizes the app and boundaries, Change builds a target-specific blast-radius plan, Review compares semantic Git evidence, Secure consolidates security providers and critical paths, and Learn teaches from the actual scan rather than generic tutorials.
 
 ## Intentional MVP boundaries
 
@@ -111,6 +113,7 @@ php tests/V3SecurityTest.php
 php tests/V3GraphTest.php
 php tests/V3FeatureTest.php
 php tests/V3ChangeTest.php
+php tests/V3ModesTest.php
 php tests/V3IntegrationTest.php
 php tests/Benchmark.php --group=core
 ```
