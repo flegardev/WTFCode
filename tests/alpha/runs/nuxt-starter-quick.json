@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-08-19T19:50:26+00:00",
+    "generated_at": "2026-08-19T19:51:17+00:00",
     "analysis_version": "v3.10-jobs",
     "profile": "quick",
     "static_analysis_only": true,
@@ -32,11 +32,11 @@
         "clone_duration_ms": 0,
         "workspace_reused": true
     },
-    "time_to_first_result_ms": 424,
+    "time_to_first_result_ms": 408,
     "time_to_first_useful_insight_ms": null,
     "machine": {
         "status": "success",
-        "scan_duration_ms": 97,
+        "scan_duration_ms": 82,
         "peak_php_memory_bytes": 4194304,
         "files_discovered": 35,
         "repository_bytes": 22536,
@@ -49,15 +49,8 @@
         "relationships": 3,
         "routes": 0,
         "route_sample": [],
-        "features": 1,
-        "feature_clusters": [
-            {
-                "label": "AI chat",
-                "confidence": "strong",
-                "score": 12,
-                "symbols": 2
-            }
-        ],
+        "features": 0,
+        "feature_clusters": [],
         "services": [],
         "tables": [],
         "packages": 0,

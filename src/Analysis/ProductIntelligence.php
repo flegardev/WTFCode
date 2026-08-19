@@ -241,7 +241,7 @@ final class ProductIntelligence
         $fileFeatureSignals = [];
         foreach ($fileMap as $path => $file) {
             $content = (string) ($file['content'] ?? '');
-            if (!RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) continue;
+            if (!RuntimeEvidencePolicy::isRuntimeBehaviorPath($path) || !RuntimeEvidencePolicy::isRuntimeSourceEvidence($path, $content)) continue;
             foreach (self::FEATURES as $feature => $needles) {
                 foreach ($needles as $needle) if (RuntimeEvidencePolicy::containsTerm($content, $needle)) $fileFeatureSignals[$path][$feature][] = $needle;
             }
@@ -249,7 +249,7 @@ final class ProductIntelligence
         $clusters = [];
         foreach ($symbols as &$symbol) {
             $path = (string) $symbol['path'];
-            if (!RuntimeEvidencePolicy::isRuntimePath($path)) continue;
+            if (!RuntimeEvidencePolicy::isRuntimeBehaviorPath($path)) continue;
             $identity = strtolower(implode(' ', [(string) $symbol['name'], (string) $symbol['qualified_name'], $path]));
             $edgeText = $edgeSignals[$symbol['key']] ?? '';
             $routeText = '';

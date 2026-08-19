@@ -29,6 +29,16 @@ feature_evidence_assert(!in_array('Payments', $nonRuntimeLabels, true), 'A detec
 feature_evidence_assert(!in_array('Login', $nonRuntimeLabels, true), 'README authentication prose must not create runtime Login evidence');
 feature_evidence_assert(array_filter($nonRuntimeGraph['symbols'], static fn (array $symbol): bool => ($symbol['type'] ?? '') === 'external_service') === [], 'Non-runtime Stripe examples must not create a service boundary');
 
+$catalogFiles = [
+    ['path' => 'templates/ui/chat.json', 'language' => 'JSON', 'content' => '{"name":"ui-chat","repo":"templates/chat"}', 'lines' => 1],
+];
+$catalogGraph = [
+    'symbols' => [['key' => 'catalog-module', 'path' => 'templates/ui/chat.json', 'language' => 'JSON', 'type' => 'module', 'name' => 'chat', 'qualified_name' => 'templates/ui/chat.json', 'parent_key' => null, 'signature' => null, 'visibility' => 'unknown', 'exported' => false, 'start_line' => 1, 'end_line' => 1, 'confidence' => 'high', 'metadata' => []]],
+    'relationships' => [], 'routes' => [], 'stats' => [],
+];
+$catalogGraph = (new ProductIntelligence())->enrich($catalogGraph, $catalogFiles);
+feature_evidence_assert(!in_array('AI chat', array_column($catalogGraph['features'] ?? [], 'label'), true), 'Catalogue JSON named chat must not become a runtime AI feature');
+
 $runtime = [
     ['path' => 'routes/billing.ts', 'language' => 'TypeScript', 'content' => "import { BillingService } from '../src/BillingService';\nrouter.post('/billing/invoices', BillingService.createInvoice);", 'lines' => 2],
     ['path' => 'src/BillingService.ts', 'language' => 'TypeScript', 'content' => "export class BillingService {\n  createInvoice() {\n    const stripe = new StripeClient();\n    return stripe.invoices.create({ customer: 'runtime' });\n  }\n}", 'lines' => 6],

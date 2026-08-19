@@ -19,6 +19,13 @@ final class RuntimeEvidencePolicy
         return preg_match('/(?<![\pL\pN])' . preg_quote($term, '/') . '(?![\pL\pN])/iu', $text) === 1;
     }
 
+    /** Runtime behavior requires executable source, not catalogues or declarative metadata. */
+    public static function isRuntimeBehaviorPath(string $path): bool
+    {
+        if (!self::isRuntimePath($path)) return false;
+        return preg_match('/\.(?:php|js|jsx|mjs|cjs|ts|tsx|py|rb|go|java|cs|rs|vue|svelte)$/i', str_replace('\\', '/', $path)) === 1;
+    }
+
     public static function isRuntimeSourceEvidence(string $path, string $content): bool
     {
         return self::isRuntimePath($path) && !self::isAnalysisImplementation($content);
