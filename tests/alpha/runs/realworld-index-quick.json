@@ -1,0 +1,201 @@
+{
+    "schema_version": 2,
+    "generated_at": "2026-08-19T20:32:33+00:00",
+    "analysis_version": "alpha.4",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "realworld-index",
+        "url": "https://github.com/gothinkster/realworld.git",
+        "commit_sha": "5d510ce6ec41bb97723e92fbd8d3e3458a381c09",
+        "size": "medium",
+        "primary_language": "Markdown",
+        "known_frameworks": [],
+        "architecture_type": "implementation index and specification",
+        "repository_shape": [
+            "medium",
+            "old",
+            "documentation-heavy",
+            "many-examples"
+        ],
+        "expected_high_level_systems": [
+            "specification",
+            "implementation references"
+        ],
+        "why_selected": "Noisy documentation-oriented repository that should not fabricate a runtime application.",
+        "candidate_kind": "noisy"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 3269,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 2916,
+        "peak_php_memory_bytes": 39845888,
+        "files_discovered": 328,
+        "repository_bytes": 2533557,
+        "files_analyzed": 75,
+        "files_skipped": 253,
+        "stack": [],
+        "overview": "This repository has 75 readable project files and appears to use a project with no confidently identified framework. WTFCode found source files but not enough clear integration evidence yet.",
+        "architecture_nodes": [],
+        "symbols": 177,
+        "relationships": 6314,
+        "routes": 0,
+        "route_sample": [],
+        "features": 0,
+        "feature_clusters": [],
+        "services": [],
+        "tables": [],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 7,
+        "finding_types": {
+            "environment_access": 6,
+            "http_call": 1
+        },
+        "finding_severities": {
+            "info": 7
+        },
+        "finding_sample": [
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Browser or server HTTP request",
+                "path": "assets/media/conduit-logo.svg.generate.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "specs/e2e/helpers/config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "specs/e2e/helpers/config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "specs/e2e/helpers/config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "specs/e2e/helpers/config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "specs/e2e/playwright.base.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "specs/e2e/playwright.base.ts"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 32,
+                "message": null,
+                "symbols": 119,
+                "relationships": 3331,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 75
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 18,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 75
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 629,
+                "message": "1 file(s) contained syntax the worker could not fully parse.",
+                "symbols": 110,
+                "relationships": 2888,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 75
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 1502,
+                "message": null,
+                "symbols": 79,
+                "relationships": 2643,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 75
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 312,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 7,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 75
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 1502
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

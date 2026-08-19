@@ -21,12 +21,15 @@ $nonRuntime = [
     ['path' => 'tests/fixtures/fake-billing.ts', 'language' => 'TypeScript', 'content' => "router.post('/billing', fakeBilling);\nnew StripeClient().invoices.create();", 'lines' => 2],
     ['path' => 'src/Detector.php', 'language' => 'PHP', 'content' => '<?php final class Detector implements AnalyzerProviderInterface { public function analyze(AnalysisRequest $request): AnalyzerResult { $patterns = ["client stripe", "payments", "billing"]; preg_match($patterns[0], $source); $graph->addSymbol([]); } }', 'lines' => 1],
     ['path' => 'README.md', 'language' => 'Markdown', 'content' => 'Authentication login sessions and Stripe billing are example capabilities.', 'lines' => 1],
+    ['path' => 'specs/e2e/auth.ts', 'language' => 'TypeScript', 'content' => "export function login() { return '/login'; }", 'lines' => 1],
+    ['path' => 'assets/generator/search.py', 'language' => 'Python', 'content' => "def search(): return 'generated asset'", 'lines' => 1],
 ];
 $nonRuntimeGraph = feature_evidence_graph($nonRuntime);
 $nonRuntimeLabels = array_column($nonRuntimeGraph['features'] ?? [], 'label');
 feature_evidence_assert(!in_array('Billing', $nonRuntimeLabels, true), 'A billing fixture must not create a production Billing feature');
 feature_evidence_assert(!in_array('Payments', $nonRuntimeLabels, true), 'A detector Stripe example must not create a production Payments feature');
 feature_evidence_assert(!in_array('Login', $nonRuntimeLabels, true), 'README authentication prose must not create runtime Login evidence');
+feature_evidence_assert(!in_array('Search', $nonRuntimeLabels, true), 'Spec suites and generator tooling must not create runtime Search evidence');
 feature_evidence_assert(array_filter($nonRuntimeGraph['symbols'], static fn (array $symbol): bool => ($symbol['type'] ?? '') === 'external_service') === [], 'Non-runtime Stripe examples must not create a service boundary');
 
 $catalogFiles = [

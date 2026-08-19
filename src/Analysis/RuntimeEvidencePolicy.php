@@ -8,7 +8,7 @@ final class RuntimeEvidencePolicy
     public static function isRuntimePath(string $path): bool
     {
         $normalized = strtolower(str_replace('\\', '/', $path));
-        if (preg_match('#(^|/)(?:tests?|fixtures?|benchmarks?|docs?|examples?|tools?|reports?|snapshots?|storage|vendor|node_modules|analysis|analyzers?|detectors?|\.playwright-cli)(/|$)#', $normalized)) return false;
+        if (preg_match('#(^|/)(?:tests?|specs?|fixtures?|benchmarks?|docs?|examples?|tools?|reports?|snapshots?|generators?|storage|vendor|node_modules|analysis|analyzers?|detectors?|\.playwright-cli)(/|$)#', $normalized)) return false;
         if (preg_match('#(^|/)config/(?:security|rules?)(/|$)|(^|/)(?:rules?|generated|output|artifacts?)(/|$)#', $normalized)) return false;
         if (preg_match('#(?:^|/)(?:readme|changelog|license)(?:\.[^/]+)?$|\.(?:md|css|scss|html|blade\.php|snap|snapshot|log)$#', $normalized)) return false;
         return true;

@@ -70,9 +70,9 @@
       "expected": "Require endpoint configuration or network-call evidence at the exact source line.",
       "actual": "Dozens of documentation sites, placeholders, and malformed hosts appeared as services.",
       "root_cause": "Language adapters promoted every URL-shaped string in a runtime-path file without checking line-level execution context.",
-      "fix_commit": null,
+      "fix_commit": "125cf077d54c5eb802c11a3a0093b0f55e5eef62",
       "regression_test": "tests/V3FalsePositiveTest.php — comments and website strings do not prove services while API_BASE_URL does",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-006",
@@ -84,9 +84,9 @@
       "expected": "Framework identity requires framework-specific import, manifest, or package-path evidence.",
       "actual": "The Flask repository stack was FastAPI.",
       "root_cause": "A generic Python route decorator was accepted as FastAPI identity evidence.",
-      "fix_commit": null,
+      "fix_commit": "125cf077d54c5eb802c11a3a0093b0f55e5eef62",
       "regression_test": "tests/UnitTest.php — generic decorators do not prove FastAPI and explicit Flask evidence does",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-007",
@@ -98,9 +98,9 @@
       "expected": "Feature terms must distinguish product behavior from unrelated technical meanings.",
       "actual": "Django showed Billing and a CRUD client showed Registration with strong confidence.",
       "root_cause": "Standalone plan and register terms were semantically ambiguous despite multi-signal scoring.",
-      "fix_commit": null,
+      "fix_commit": "125cf077d54c5eb802c11a3a0093b0f55e5eef62",
       "regression_test": "tests/V3FeatureEvidenceTest.php — migration plans and service-worker registration stay outside product features",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-008",
@@ -112,9 +112,9 @@
       "expected": "Store bounded feature paths, lines, signal classes, and confidence without storing source content.",
       "actual": "Reviewers had to rerun or grep repositories to understand feature claims.",
       "root_cause": "The harness summarized feature counts too aggressively.",
-      "fix_commit": null,
+      "fix_commit": "125cf077d54c5eb802c11a3a0093b0f55e5eef62",
       "regression_test": "tests/AlphaRunnerTest.php — every feature summary carries bounded evidence metadata",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-009",
@@ -126,9 +126,9 @@
       "expected": "Every native extraction behavior change invalidates native provider cache keys.",
       "actual": "The Flask route regression saw a stale graph with zero routes after the adapter was added.",
       "root_cause": "AnalysisEngine::NATIVE_VERSION remained unchanged across native detector behavior changes.",
-      "fix_commit": null,
+      "fix_commit": "125cf077d54c5eb802c11a3a0093b0f55e5eef62",
       "regression_test": "tests/UnitTest.php plus provider-version cache invalidation coverage",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-010",
@@ -140,9 +140,9 @@
       "expected": "Strong feature confidence requires an independent graph or route signal; ambiguous technical terms do not establish features.",
       "actual": "Flask internals appeared as strong Login and Registration features.",
       "root_cause": "Cluster confidence counted repeated symbols as corroboration and feature vocabulary included generic session, register, query, and email terms.",
-      "fix_commit": null,
+      "fix_commit": "125cf077d54c5eb802c11a3a0093b0f55e5eef62",
       "regression_test": "tests/V3FeatureEvidenceTest.php plus original Flask corpus rerun",
-      "status": "confirmed"
+      "status": "fixed"
     },
     {
       "id": "ALPHA-011",
@@ -154,8 +154,22 @@
       "expected": "Repository SHA, analyzer version, profile, and harness schema must all match before resume skips work.",
       "actual": "Alpha.3 runs created before feature evidence was added qualified for reuse.",
       "root_cause": "Resume identity omitted ALPHA_SCHEMA_VERSION.",
-      "fix_commit": null,
+      "fix_commit": "e3fc3e326918747c8627321d3fe34e5b0b47fd36",
       "regression_test": "tests/AlphaRunnerTest.php — run schema version is part of the resumable contract",
+      "status": "fixed"
+    },
+    {
+      "id": "ALPHA-012",
+      "repo": "realworld-index",
+      "commit": "5d510ce6ec41bb97723e92fbd8d3e3458a381c09",
+      "category": "FALSE_POSITIVE",
+      "severity": "P1",
+      "description": "A documentation/specification repository showed strong product features sourced from e2e specs and asset-generator tooling.",
+      "expected": "Specification suites and generators remain visible as files but cannot establish runtime product behavior.",
+      "actual": "Profile, Login, and Search appeared as strong features on a non-application repository.",
+      "root_cause": "RuntimeEvidencePolicy excluded tests and generated output but omitted specs and generator directories.",
+      "fix_commit": null,
+      "regression_test": "tests/V3FeatureEvidenceTest.php plus original RealWorld index rerun",
       "status": "confirmed"
     }
   ]
