@@ -20,6 +20,10 @@ $userId = null;
 $previousProvider = getenv('WTF_CODE_EXPLANATION_PROVIDER');
 try {
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'AuthService.php', "<?php\nfinal class AuthService { public function login(): bool { \$token = '" . $rawSecret . "'; return password_verify('x', 'y'); } }\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'LoginController.php', "<?php\nrequire_once __DIR__ . '/AuthService.php';\nfinal class LoginController { public function login(): bool { return (new AuthService())->login(); } }\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'UsedHelper.js', "export function usedHelper() { return true; }\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'Consumer.js', "import { usedHelper } from './UsedHelper.js';\nexport const result = usedHelper();\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'UnusedHelper.php', "<?php\nfunction unused_helper(): string { return 'maybe dynamic'; }\n");
     $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'Explanation test', 'email' => 'explain-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
     $userId = (int) $pdo->lastInsertId();
     $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'Explanation fixture', 'repository_url' => 'https://github.com/wtfcode-explain/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
@@ -33,6 +37,10 @@ try {
     $serialized = json_encode($answer['evidence_packet'], JSON_THROW_ON_ERROR);
     explanation_assert(!str_contains($serialized, $rawSecret), 'Raw secrets must never enter an explanation packet');
     explanation_assert(strlen($serialized) < 262144, 'Evidence packets must remain bounded');
+    $usedDeletion = ExplanationService::deterministicAnswer($projectId, 'Can I delete UsedHelper.js?');
+    explanation_assert(str_starts_with($usedDeletion['answer'], 'Confirmed use:') && str_contains($usedDeletion['answer'], 'Do not delete'), 'Deletion answers must warn when confirmed dependents exist');
+    $unusedDeletion = ExplanationService::deterministicAnswer($projectId, 'Can I delete UnusedHelper.php?');
+    explanation_assert(str_starts_with($unusedDeletion['answer'], 'No detected use:') && str_contains($unusedDeletion['answer'], 'not proof'), 'No detected reference must never mean safe to delete');
 
     $packet = EvidencePacket::build($projectId, 'login');
     $normalized = CitationEnforcer::normalize('{"answer":"Auth is present [1]. Runtime behavior may vary.","citations":[1,999]}', $packet);

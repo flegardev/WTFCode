@@ -61,6 +61,10 @@ final class ExplanationService
         $question = trim($question);
         $lower = strtolower($question);
         if ($question === '') return ['answer' => 'Ask about a file, authentication, Docker, routes, data, or how parts of this project connect.', 'evidence' => []];
+        if (preg_match('/\b(?:delete|remove)\b/i', $question)) {
+            $deletion = self::deletionAssessment($projectId, $question);
+            if ($deletion !== null) return $deletion;
+        }
         if (str_contains($lower, 'docker')) {
             $files = array_values(array_filter(Project::files($projectId, 'docker', 20), static fn (array $file): bool => str_contains(strtolower($file['path']), 'docker')));
             return $files === []
@@ -108,5 +112,33 @@ final class ExplanationService
             if ($files !== []) return ['answer' => 'I found repository evidence related to "' . $word . '". This answer is based on scanned file metadata and static relationships, not an external AI guess.', 'evidence' => $files];
         }
         return ['answer' => 'The scanner does not have enough direct evidence to answer that confidently. Try a file name, feature name, or a question about authentication, APIs, Docker, routes, or data.', 'evidence' => []];
+    }
+
+    /** @return array{answer:string,evidence:array<int,array<string,mixed>>}|null */
+    private static function deletionAssessment(int $projectId, string $question): ?array
+    {
+        if (!preg_match_all('/[A-Za-z0-9_@().-]+(?:[\/\\\\][A-Za-z0-9_@(). -]+)*\.[A-Za-z0-9]{1,12}/', $question, $matches)) return null;
+        foreach ($matches[0] as $candidate) {
+            $candidate = str_replace('\\', '/', trim($candidate, " \t\n\r\0\x0B.,;:!?\"'"));
+            $basename = basename($candidate);
+            foreach (Project::files($projectId, $basename, 30) as $file) {
+                $path = str_replace('\\', '/', (string) ($file['path'] ?? ''));
+                if (strcasecmp($path, $candidate) !== 0 && strcasecmp(basename($path), $basename) !== 0) continue;
+                $direct = Project::dependents((int) $file['id']);
+                $transitive = Project::transitiveDependents($projectId, (int) $file['id']);
+                $critical = in_array((string) ($file['role_name'] ?? ''), ['authentication','api endpoint','data model','configuration','route'], true)
+                    || preg_match('#(^|/)(?:\.env|config|middleware|migrations?)(?:[/.]|$)|(?:package|composer)\.json$#i', $path) === 1;
+                $evidencePaths = array_merge([$path], array_column($direct, 'path'), array_column($transitive, 'path'));
+                $evidence = Project::filesForPaths($projectId, array_slice(array_values(array_unique($evidencePaths)), 0, 16));
+                if ($direct !== []) {
+                    return ['answer' => sprintf('Confirmed use: %d file%s directly depend%s on %s, with %d additional transitive dependent%s detected. Do not delete it before replacing those uses and running the closest tests. Static analysis can still miss dynamic references.', count($direct), count($direct) === 1 ? '' : 's', count($direct) === 1 ? 's' : '', $path, count($transitive), count($transitive) === 1 ? '' : 's'), 'evidence' => $evidence];
+                }
+                if ($critical) {
+                    return ['answer' => 'Possible use: no direct importer was detected for ' . $path . ', but its role or location can be loaded by framework convention or configuration. WTFCode cannot prove it is safe to delete; inspect runtime configuration, Git history, and relevant tests first.', 'evidence' => $evidence];
+                }
+                return ['answer' => 'No detected use: the static graph found no direct dependent for ' . $path . '. That is not proof that it is safe to delete; dynamic imports, generated code, framework conventions, and runtime configuration may be invisible. Check Git history and run the nearest build and tests before removal.', 'evidence' => $evidence];
+            }
+        }
+        return null;
     }
 }
