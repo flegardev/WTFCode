@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class AnalysisEngine
 {
-    public const VERSION = 'v3.4-security';
+    public const VERSION = 'v3.5-graph';
     public const NATIVE_VERSION = '2.0.0';
 
     /** @var array<int, LanguageAdapterInterface> */

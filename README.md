@@ -24,9 +24,11 @@ WTFCode is a plain-PHP codebase understanding tool for people who can build quic
 
 ## V3 implementation status
 
-V3 phases 1 through 4 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
+V3 phases 1 through 5 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
 
 Evidence is ranked conservatively: semantic resolution outranks direct syntax, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security profiles combine redacted Gitleaks results, optional Semgrep code findings, OSV dependency advisories, optional Syft inventory, and optional offline Grype confirmation without treating a finding as proof of exploitability. See `docs/V3-FOUNDATION.md`, `config/tool-manifest.json`, and `THIRD_PARTY.md` for boundaries and provenance.
+
+The Cytoscape graph starts at architecture level and drills through subsystems, features, files, and symbols. It supports local search, confidence/relationship/risk/framework filters, neighbor focus, pan/zoom, and confidence-weighted strongest-path tracing without replacing the server-rendered PHP detail pages.
 
 ## Intentional MVP boundaries
 
@@ -102,6 +104,7 @@ php tests/V3FoundationTest.php
 php tests/V3AstTest.php
 php tests/V3StructuralTest.php
 php tests/V3SecurityTest.php
+php tests/V3GraphTest.php
 php tests/V3IntegrationTest.php
 php tests/Benchmark.php --group=core
 ```

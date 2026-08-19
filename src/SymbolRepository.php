@@ -119,15 +119,75 @@ final class SymbolRepository
     public static function graph(int $projectId, int $limit = 180): array
     {
         $limit = max(20, min(300, $limit));
-        $nodes = Database::connection()->prepare("SELECT cs.id, cs.name, cs.symbol_type, cs.confidence, cs.start_line, pf.id AS file_id, pf.path FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id ORDER BY (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id OR sr.target_symbol_id = cs.id) DESC, FIELD(cs.confidence, 'high', 'medium', 'low') LIMIT $limit");
+        $nodes = Database::connection()->prepare("SELECT cs.id, cs.name, cs.qualified_name, cs.symbol_type, cs.confidence, cs.start_line, cs.metadata_json, pf.id AS file_id, pf.path, pf.role_name, pf.language FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id ORDER BY (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id OR sr.target_symbol_id = cs.id) DESC, FIELD(cs.confidence, 'high', 'medium', 'low') LIMIT $limit");
         $nodes->execute(['project_id' => $projectId]);
         $nodeRows = $nodes->fetchAll();
+        foreach ($nodeRows as &$node) {
+            try { $metadata = json_decode((string) ($node['metadata_json'] ?? '{}'), true, flags: JSON_THROW_ON_ERROR); }
+            catch (Throwable) { $metadata = []; }
+            $node['subsystem'] = self::graphSubsystem((string) $node['symbol_type'], (string) $node['path'], (string) $node['role_name']);
+            $node['architecture'] = self::graphArchitecture((string) $node['subsystem']);
+            $node['feature'] = self::graphFeature((string) $node['name'], (string) $node['path'], (string) $node['symbol_type']);
+            $node['framework'] = (string) ($metadata['framework'] ?? 'Unspecified');
+            $node['risk'] = self::graphRisk((string) $node['symbol_type'], (string) $node['name'], (string) $node['path']);
+            unset($node['metadata_json']);
+        }
+        unset($node);
         if ($nodeRows === []) return ['nodes' => [], 'edges' => []];
         $ids = array_map('intval', array_column($nodeRows, 'id'));
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $edges = Database::connection()->prepare("SELECT sr.source_symbol_id, sr.target_symbol_id, sr.relationship_type, sr.confidence, sr.evidence_line_start, pf.path AS evidence_path FROM symbol_relationships sr INNER JOIN project_files pf ON pf.id = sr.evidence_file_id WHERE sr.project_id = ? AND sr.source_symbol_id IN ($placeholders) AND sr.target_symbol_id IN ($placeholders) AND sr.confidence IN ('high', 'medium') ORDER BY FIELD(sr.confidence, 'high', 'medium'), sr.id LIMIT 700");
+        $edges = Database::connection()->prepare("SELECT sr.id, sr.source_symbol_id, sr.target_symbol_id, sr.relationship_type, sr.confidence, sr.evidence_line_start, pf.path AS evidence_path FROM symbol_relationships sr INNER JOIN project_files pf ON pf.id = sr.evidence_file_id WHERE sr.project_id = ? AND sr.source_symbol_id IN ($placeholders) AND sr.target_symbol_id IN ($placeholders) AND sr.confidence IN ('high', 'medium') ORDER BY FIELD(sr.confidence, 'high', 'medium'), sr.id LIMIT 700");
         $edges->execute(array_merge([$projectId], $ids, $ids));
         return ['nodes' => $nodeRows, 'edges' => $edges->fetchAll()];
+    }
+
+    private static function graphSubsystem(string $type, string $path, string $role): string
+    {
+        $signal = strtolower($type . ' ' . $path . ' ' . $role);
+        return match (true) {
+            preg_match('/auth|session|login|permission|policy|guard/', $signal) === 1 => 'Identity and access',
+            preg_match('/component|hook|frontend|view|template|\.tsx|\.jsx|\.vue|\.svelte/', $signal) === 1 => 'Frontend',
+            preg_match('/route|controller|middleware|api|server.action|webhook|resolver/', $signal) === 1 => 'API and routing',
+            preg_match('/table|model|schema|column|migration|database|repository/', $signal) === 1 => 'Data',
+            preg_match('/external.service|service:|client|integration|stripe|supabase|firebase|openai/', $signal) === 1 => 'Integrations',
+            preg_match('/environment|config|deployment|docker|vercel|cloudflare/', $signal) === 1 => 'Configuration',
+            default => 'Application core',
+        };
+    }
+
+    private static function graphArchitecture(string $subsystem): string
+    {
+        return match ($subsystem) {
+            'Frontend' => 'Interface',
+            'Data' => 'Data layer',
+            'Integrations' => 'External systems',
+            'Configuration' => 'Operations',
+            default => 'Application',
+        };
+    }
+
+    private static function graphFeature(string $name, string $path, string $type): string
+    {
+        $signal = strtolower($name . ' ' . $path . ' ' . $type);
+        return match (true) {
+            preg_match('/login|sign.?in|register|auth|session/', $signal) === 1 => 'Authentication',
+            preg_match('/checkout|payment|stripe|billing|invoice/', $signal) === 1 => 'Payments',
+            preg_match('/upload|file|storage|attachment/', $signal) === 1 => 'Uploads',
+            preg_match('/search|query|filter/', $signal) === 1 => 'Search',
+            preg_match('/admin|dashboard|manage/', $signal) === 1 => 'Administration',
+            preg_match('/notification|email|message/', $signal) === 1 => 'Notifications',
+            preg_match('/route|controller|api|webhook/', $signal) === 1 => 'API',
+            preg_match('/table|model|schema|database/', $signal) === 1 => 'Data',
+            default => 'Core behavior',
+        };
+    }
+
+    private static function graphRisk(string $type, string $name, string $path): string
+    {
+        $signal = strtolower($type . ' ' . $name . ' ' . $path);
+        if (preg_match('/auth|password|session|secret|process|exec|delete|unlink|payment|webhook/', $signal) === 1) return 'high';
+        if (preg_match('/route|controller|table|model|schema|environment|external.service|upload|write/', $signal) === 1) return 'medium';
+        return 'low';
     }
 
     public static function impactForPaths(int $projectId, array $paths): array

@@ -1,6 +1,6 @@
 # Third-party inventory
 
-WTFCode does not vendor third-party source. This inventory distinguishes required runtime tools, optional tools already used by the foundation, and evaluated future analyzers. Exact installed versions come from `php tools/doctor.php`; missing optional tools do not block a basic scan.
+WTFCode does not vendor analyzer source. The browser ships Cytoscape's pinned minified distribution and license so the graph works without a runtime CDN. This inventory distinguishes required runtime tools, optional analyzers, and development-only tools. Exact installed versions come from `php tools/doctor.php`; missing optional tools do not block a basic scan.
 
 | Name | Purpose | License | Installation source | Invocation | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -16,6 +16,7 @@ WTFCode does not vendor third-party source. This inventory distinguishes require
 | ts-morph 28.0.0 / TypeScript 6.0.2 | TypeScript semantic indexing | MIT / Apache-2.0 | npm via pinned package lock | Isolated Node worker | Integrated |
 | Universal Ctags | Broad-language symbol fallback | GPL-2.0-or-later | Not installed | CLI JSON output | Adapter integrated; optional |
 | @ast-grep/napi 0.45.1 | Structural JavaScript/TypeScript/JSX/TSX matching | MIT | npm via pinned package lock | Isolated Node worker | Integrated, optional |
+| Cytoscape.js 3.34.1 | Interactive graph rendering and path queries | MIT | npm via pinned package lock; minified browser distribution and license copied to `public/assets/lib` | Vanilla browser script | Integrated, required for interactive graph; server-rendered fallback remains |
 | Semgrep CLI | Static security analysis | LGPL-2.1-or-later for the engine; rule licenses vary | Not installed | Fixed local high-signal rules via bounded CLI JSON | Adapter integrated; optional |
 | Gitleaks 8.30.1 | Filesystem and Maximum-profile Git-history secret detection | MIT | Official GitHub release, verified in tool manifest | Local executable; pinned upstream rules; 100% redacted JSON | Integrated, optional |
 | OSV-Scanner 2.5.1 | Lockfile vulnerability lookup | Apache-2.0 | Official GitHub release, verified in tool manifest | Local executable; bounded JSON; call analysis disabled | Integrated, optional |

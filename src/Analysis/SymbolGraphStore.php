@@ -17,11 +17,11 @@ final class SymbolGraphStore
                 'scan_run_id' => $scanRunId,
                 'file_id' => $fileIds[$symbol['path']],
                 'symbol_key' => $symbol['key'],
-                'symbol_type' => substr((string) $symbol['type'], 0, 50),
-                'language' => substr((string) $symbol['language'], 0, 40),
-                'name' => substr((string) $symbol['name'], 0, 255),
-                'qualified_name' => substr((string) $symbol['qualified_name'], 0, 700),
-                'signature_text' => $symbol['signature'] === null ? null : substr((string) $symbol['signature'], 0, 1000),
+                'symbol_type' => self::limit((string) $symbol['type'], 50),
+                'language' => self::limit((string) $symbol['language'], 40),
+                'name' => self::limit((string) $symbol['name'], 255),
+                'qualified_name' => self::limit((string) $symbol['qualified_name'], 700),
+                'signature_text' => $symbol['signature'] === null ? null : self::limit((string) $symbol['signature'], 1000),
                 'visibility' => $symbol['visibility'],
                 'is_exported' => $symbol['exported'] ? 1 : 0,
                 'start_line' => max(1, (int) $symbol['start_line']),
@@ -51,13 +51,13 @@ final class SymbolGraphStore
                 'scan_run_id' => $scanRunId,
                 'source_symbol_id' => $sourceId,
                 'target_symbol_id' => $targetId,
-                'target_external_name' => $external === null ? null : substr((string) $external, 0, 700),
+                'target_external_name' => $external === null ? null : self::limit((string) $external, 700),
                 'evidence_file_id' => $fileIds[$relationship['evidence_path']],
-                'relationship_type' => substr((string) $relationship['type'], 0, 50),
+                'relationship_type' => self::limit((string) $relationship['type'], 50),
                 'confidence' => $relationship['confidence'],
                 'evidence_line_start' => $relationship['line_start'],
                 'evidence_line_end' => $relationship['line_end'],
-                'evidence_excerpt' => $relationship['excerpt'] === null ? null : substr((string) $relationship['excerpt'], 0, 1000),
+                'evidence_excerpt' => $relationship['excerpt'] === null ? null : self::limit((string) $relationship['excerpt'], 1000),
                 'metadata_json' => self::json($relationship['metadata']),
                 'provenance_json' => self::json(is_array($relationship['metadata']['provenance'] ?? null) ? $relationship['metadata']['provenance'] : []),
             ]);
@@ -72,10 +72,10 @@ final class SymbolGraphStore
                 'file_id' => $fileIds[$route['path']],
                 'handler_symbol_id' => $route['handler_key'] === null ? null : ($symbolIds[$route['handler_key']] ?? null),
                 'route_key' => $route['key'],
-                'framework' => substr((string) $route['framework'], 0, 50),
-                'http_method' => substr((string) $route['method'], 0, 20),
-                'route_path' => substr((string) $route['route_path'], 0, 700),
-                'route_name' => $route['name'] === null ? null : substr((string) $route['name'], 0, 255),
+                'framework' => self::limit((string) $route['framework'], 50),
+                'http_method' => self::limit((string) $route['method'], 20),
+                'route_path' => self::limit((string) $route['route_path'], 700),
+                'route_name' => $route['name'] === null ? null : self::limit((string) $route['name'], 255),
                 'middleware_json' => self::json($route['middleware']),
                 'confidence' => $route['confidence'],
                 'evidence_line' => $route['line'],
@@ -88,5 +88,10 @@ final class SymbolGraphStore
     private static function json(array $value): ?string
     {
         return $value === [] ? null : json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    }
+
+    private static function limit(string $value, int $characters): string
+    {
+        return function_exists('mb_substr') ? mb_substr($value, 0, $characters, 'UTF-8') : preg_replace('/[^\x00-\x7F]/', '?', substr($value, 0, $characters)) ?? '';
     }
 }
