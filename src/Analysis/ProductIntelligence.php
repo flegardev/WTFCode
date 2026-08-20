@@ -157,6 +157,7 @@ final class ProductIntelligence
     /** @return array<int, array{operation: string, relationship: string, table: string}> */
     private function databaseOperations(string $line): array
     {
+        if (preg_match('/^\s*(?:import|export)\b/i', $line)) return [];
         $patterns = [
             ['READ', 'reads_table', '/\bSELECT\b.{0,500}?\b(?:FROM|JOIN)\s+[`"\[]?([A-Za-z_][A-Za-z0-9_.]*)/i'],
             ['CREATE', 'creates_in_table', '/\bINSERT\s+(?:IGNORE\s+)?INTO\s+[`"\[]?([A-Za-z_][A-Za-z0-9_.]*)/i'],

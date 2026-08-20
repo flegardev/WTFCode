@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class AnalysisEngine
 {
-    public const VERSION = 'alpha.9';
+    public const VERSION = 'alpha.10';
     public const NATIVE_VERSION = '2.1.0';
 
     /** @var array<int, LanguageAdapterInterface> */
