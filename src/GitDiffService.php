@@ -166,7 +166,7 @@ final class GitDiffService
         $expected = [];
         foreach ([
             'Authentication and access' => '/auth|login|oauth|session|password|permission/i', 'Data and schema' => '/database|schema|table|column|migration|data/i',
-            'Configuration and dependencies' => '/dependency|package|config|deploy|docker|environment/i', 'API and server behavior' => '/api|route|endpoint|webhook|server/i',
+            'Configuration and dependencies' => '/dependenc(?:y|ies)|package|config|deploy|docker|environment/i', 'API and server behavior' => '/api|route|endpoint|webhook|server/i',
             'User interface' => '/ui|frontend|component|page|button|form|style/i', 'Tests' => '/test|spec|coverage/i', 'Documentation' => '/readme|docs|documentation/i',
         ] as $area => $pattern) if (preg_match($pattern, $intendedChange)) $expected[] = $area;
         if ($expected === []) $expected[] = 'Application code';

@@ -22,6 +22,8 @@ change_assert($scopeResult['label'] === 'Potential scope drift', 'Unexpected dat
 change_assert(str_contains($scopeResult['note'], 'does not prove'), 'Scope drift must not claim an intent violation as fact');
 $alignedScope = $scope->invoke(null, 'Fix SQL table detection', ['Application code', 'Tests'], ['architecture' => []]);
 change_assert($alignedScope['label'] === 'No potential scope drift detected', 'Generic application code must not be treated as drift from a specific implementation intent');
+$dependencyScope = $scope->invoke(null, 'Update dependencies', ['Application code', 'Configuration and dependencies', 'Tests'], ['architecture' => []]);
+change_assert($dependencyScope['label'] === 'No potential scope drift detected', 'Plural dependency intent must map to configuration and dependencies');
 
 $pdo = Database::connection();
 $token = bin2hex(random_bytes(6));
