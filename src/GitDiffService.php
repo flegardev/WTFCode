@@ -171,7 +171,9 @@ final class GitDiffService
         ] as $area => $pattern) if (preg_match($pattern, $intendedChange)) $expected[] = $area;
         if ($expected === []) $expected[] = 'Application code';
         $actual = array_values(array_unique($actualGroups));
-        $also = array_values(array_diff($actual, $expected, ['Tests']));
+        $genericAreas = ['Tests'];
+        if ($expected !== ['Application code']) $genericAreas[] = 'Application code';
+        $also = array_values(array_diff($actual, $expected, $genericAreas));
         return ['assessed' => true, 'intended' => $intendedChange, 'expected_areas' => $expected, 'actual_areas' => $actual, 'also_changed' => $also, 'label' => $also === [] ? 'No potential scope drift detected' : 'Potential scope drift', 'note' => 'This compares declared intent with static change areas; it does not prove an intent violation.'];
     }
 

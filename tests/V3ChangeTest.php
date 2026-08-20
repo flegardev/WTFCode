@@ -20,6 +20,8 @@ $scope = new ReflectionMethod(GitDiffService::class, 'scopeDrift');
 $scopeResult = $scope->invoke(null, 'Add Google login', ['Authentication and access', 'Data and schema', 'Tests'], ['architecture' => []]);
 change_assert($scopeResult['label'] === 'Potential scope drift', 'Unexpected database changes must be labeled as potential scope drift');
 change_assert(str_contains($scopeResult['note'], 'does not prove'), 'Scope drift must not claim an intent violation as fact');
+$alignedScope = $scope->invoke(null, 'Fix SQL table detection', ['Application code', 'Tests'], ['architecture' => []]);
+change_assert($alignedScope['label'] === 'No potential scope drift detected', 'Generic application code must not be treated as drift from a specific implementation intent');
 
 $pdo = Database::connection();
 $token = bin2hex(random_bytes(6));
