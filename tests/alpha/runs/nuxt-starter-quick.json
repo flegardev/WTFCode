@@ -1,7 +1,7 @@
 {
-    "schema_version": 1,
-    "generated_at": "2026-08-19T19:52:56+00:00",
-    "analysis_version": "alpha.1-runtime-evidence",
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:24:04+00:00",
+    "analysis_version": "alpha.10",
     "profile": "quick",
     "static_analysis_only": true,
     "repository": {
@@ -32,11 +32,11 @@
         "clone_duration_ms": 0,
         "workspace_reused": true
     },
-    "time_to_first_result_ms": 718,
+    "time_to_first_result_ms": 699,
     "time_to_first_useful_insight_ms": null,
     "machine": {
         "status": "success",
-        "scan_duration_ms": 399,
+        "scan_duration_ms": 397,
         "peak_php_memory_bytes": 6291456,
         "files_discovered": 35,
         "repository_bytes": 22536,
@@ -46,7 +46,7 @@
         "overview": "This repository has 31 readable project files and appears to use a project with no confidently identified framework. WTFCode found source files but not enough clear integration evidence yet.",
         "architecture_nodes": [],
         "symbols": 30,
-        "relationships": 3,
+        "relationships": 0,
         "routes": 0,
         "route_sample": [],
         "features": 0,
@@ -64,7 +64,7 @@
         "providers": [
             {
                 "engine": "wtfcode-native",
-                "engine_version": "2.0.0",
+                "engine_version": "2.1.0",
                 "status": "success",
                 "duration_ms": 8,
                 "message": null,
@@ -81,7 +81,7 @@
                 "engine": "php-parser",
                 "engine_version": "5.8.0",
                 "status": "success",
-                "duration_ms": 18,
+                "duration_ms": 17,
                 "message": null,
                 "symbols": 0,
                 "relationships": 0,
@@ -96,7 +96,7 @@
                 "engine": "tree-sitter",
                 "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
                 "status": "success",
-                "duration_ms": 230,
+                "duration_ms": 232,
                 "message": null,
                 "symbols": 30,
                 "relationships": 0,
@@ -140,7 +140,7 @@
         ],
         "slowest_provider": {
             "engine": "tree-sitter",
-            "duration_ms": 230
+            "duration_ms": 232
         },
         "graph_truncation": [],
         "product_intelligence_truncation": false,

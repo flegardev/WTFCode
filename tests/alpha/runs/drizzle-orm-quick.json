@@ -1,7 +1,7 @@
 {
-    "schema_version": 1,
-    "generated_at": "2026-08-19T20:07:22+00:00",
-    "analysis_version": "alpha.2",
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:24:38+00:00",
+    "analysis_version": "alpha.10",
     "profile": "quick",
     "static_analysis_only": true,
     "repository": {
@@ -33,22 +33,24 @@
         "clone_duration_ms": 0,
         "workspace_reused": true
     },
-    "time_to_first_result_ms": 21171,
+    "time_to_first_result_ms": 20481,
     "time_to_first_useful_insight_ms": null,
     "machine": {
         "status": "partial",
-        "scan_duration_ms": 20687,
-        "peak_php_memory_bytes": 119537664,
+        "scan_duration_ms": 20033,
+        "peak_php_memory_bytes": 117440512,
         "files_discovered": 1389,
         "repository_bytes": 18292744,
         "files_analyzed": 1339,
         "files_skipped": 50,
         "stack": [
             "React",
+            "Prisma",
+            "Drizzle",
             "Database",
             "Vercel"
         ],
-        "overview": "This repository has 1339 readable project files and appears to use React, Database, Vercel. It found 4 connected systems to explain.",
+        "overview": "This repository has 1339 readable project files and appears to use React, Prisma, Drizzle, Database, Vercel. It found 4 connected systems to explain.",
         "architecture_nodes": [
             {
                 "key": "frontend",
@@ -97,8 +99,8 @@
                     "drizzle-kit/src/serializer/pgSchema.ts",
                     "drizzle-kit/src/serializer/singlestoreSchema.ts",
                     "drizzle-kit/src/serializer/sqliteSchema.ts",
-                    "drizzle-kit/tests/cli/schema.ts",
-                    "drizzle-kit/tests/migrate/libsq-schema.ts"
+                    "drizzle-orm/src/gel-core/schema.ts",
+                    "drizzle-orm/src/mysql-core/schema.ts"
                 ]
             },
             {
@@ -110,127 +112,68 @@
                     "drizzle-orm/src/vercel-postgres/driver.ts",
                     "drizzle-orm/src/vercel-postgres/index.ts",
                     "drizzle-orm/src/vercel-postgres/migrator.ts",
-                    "drizzle-orm/src/vercel-postgres/session.ts",
-                    "integration-tests/tests/pg/vercel-pg.test.ts",
-                    "integration-tests/tests/relational/vercel.test.ts"
+                    "drizzle-orm/src/vercel-postgres/session.ts"
                 ]
             }
         ],
-        "symbols": 6714,
-        "relationships": 16400,
+        "symbols": 6355,
+        "relationships": 16341,
         "routes": 1,
         "route_sample": [
             {
                 "path": "drizzle-kit/src/serializer/studio.ts",
+                "framework": "Express-style",
                 "method": "POST",
-                "confidence": "high"
+                "route_path": "/",
+                "confidence": "high",
+                "line": 744
             }
         ],
-        "features": 3,
-        "feature_clusters": [
-            {
-                "label": "Search",
-                "confidence": "strong",
-                "score": 5229,
-                "symbols": 870
-            },
-            {
-                "label": "Login",
-                "confidence": "strong",
-                "score": 2808,
-                "symbols": 468
-            },
-            {
-                "label": "Registration",
-                "confidence": "likely",
-                "score": 6,
-                "symbols": 1
-            }
-        ],
+        "features": 0,
+        "feature_clusters": [],
         "services": [
-            "${credentials.accountid}",
-            "api.cloudflare.com",
             "AWS",
-            "blog.yo1.dog",
             "Cloudflare",
-            "dev.mysql.com",
-            "discord.gg",
-            "docs.geldata.com",
-            "docs.singlestore.com",
-            "github.com",
-            "local.drizzle.studio${querystring",
             "MySQL",
-            "orm.drizzle.team",
             "Postgres",
             "Redis",
-            "stackoverflow.com",
-            "Supabase",
-            "wicg.github.io",
-            "www.kaggle.com",
-            "www.lipsum.com",
-            "www.npmjs.com",
-            "www.postgresql.org",
-            "www.sqlite.org",
-            "www.techonthenet.com"
+            "Supabase"
         ],
         "tables": [
             "all_columns",
             "another_users",
-            "auth_otp",
-            "average_amount",
-            "child1",
-            "child2",
-            "child3",
-            "child4",
-            "child5",
-            "child6",
-            "child7",
             "cities_migration",
-            "constraint",
-            "custom_schema",
             "drizzle_tests_cities_migration",
             "drizzle_tests_users12",
             "drizzle_tests_users_migration",
-            "generate_series",
-            "items",
-            "joined",
-            "one",
-            "orders",
-            "parent",
-            "sal_emp",
-            "table",
-            "the",
-            "tictactoe",
-            "timestamp",
+            "statement",
             "users",
             "users12",
             "userstest",
             "users_migration",
-            "worker",
-            "__new_users",
-            "__new_worker"
+            "__new_users"
         ],
         "packages": 0,
         "security_findings": 0,
-        "findings": 2212,
+        "findings": 2118,
         "finding_types": {
             "database_operation": 1960,
             "destructive_database_operation": 2,
-            "duplicate_content": 27,
+            "duplicate_content": 19,
             "environment_access": 9,
             "file_operation": 26,
             "http_call": 2,
-            "implementation_notes": 14,
-            "large_file": 144,
-            "possible_unused_dependency": 5,
+            "implementation_notes": 4,
+            "large_file": 68,
+            "possible_unused_dependency": 9,
             "process_execution": 1,
             "repeated_client_setup": 1,
             "sensitive_system": 3,
-            "unresolved_local_import": 18
+            "unresolved_local_import": 14
         },
         "finding_severities": {
-            "attention": 2153,
-            "info": 58,
+            "attention": 2073,
+            "info": 44,
             "risk": 1
         },
         "finding_sample": [
@@ -239,24 +182,6 @@
                 "type": "large_file",
                 "title": "release-latest.yaml is large enough to be risky to edit",
                 "path": ".github/workflows/release-latest.yaml"
-            },
-            {
-                "severity": "attention",
-                "type": "large_file",
-                "title": "mysql.test.ts is large enough to be risky to edit",
-                "path": "drizzle-arktype/tests/mysql.test.ts"
-            },
-            {
-                "severity": "attention",
-                "type": "large_file",
-                "title": "pg.test.ts is large enough to be risky to edit",
-                "path": "drizzle-arktype/tests/pg.test.ts"
-            },
-            {
-                "severity": "attention",
-                "type": "large_file",
-                "title": "singlestore.test.ts is large enough to be risky to edit",
-                "path": "drizzle-arktype/tests/singlestore.test.ts"
             },
             {
                 "severity": "attention",
@@ -353,6 +278,24 @@
                 "type": "large_file",
                 "title": "introspect-mysql.ts is large enough to be risky to edit",
                 "path": "drizzle-kit/src/introspect-mysql.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "introspect-pg.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/introspect-pg.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "introspect-singlestore.ts is large enough to be risky to edit",
+                "path": "drizzle-kit/src/introspect-singlestore.ts"
+            },
+            {
+                "severity": "info",
+                "type": "implementation_notes",
+                "title": "introspect-singlestore.ts contains several implementation notes",
+                "path": "drizzle-kit/src/introspect-singlestore.ts"
             }
         ],
         "provider_failures": [
@@ -365,9 +308,9 @@
         "providers": [
             {
                 "engine": "wtfcode-native",
-                "engine_version": "2.0.0",
+                "engine_version": "2.1.0",
                 "status": "success",
-                "duration_ms": 1570,
+                "duration_ms": 1612,
                 "message": null,
                 "symbols": 4913,
                 "relationships": 16000,
@@ -397,7 +340,7 @@
                 "engine": "tree-sitter",
                 "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
                 "status": "partial",
-                "duration_ms": 1816,
+                "duration_ms": 1797,
                 "message": "10 file(s) contained syntax the worker could not fully parse. Worker input was capped at 600 files or 6291456 bytes. Worker evidence reached the bounded fusion output budget.",
                 "symbols": 2000,
                 "relationships": 4000,
@@ -412,7 +355,7 @@
                 "engine": "typescript-semantic",
                 "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
                 "status": "failed",
-                "duration_ms": 4083,
+                "duration_ms": 3942,
                 "message": "Node worker exited with code 1.",
                 "symbols": 0,
                 "relationships": 0,
@@ -427,7 +370,7 @@
                 "engine": "ast-grep",
                 "engine_version": "napi-0.45.1",
                 "status": "partial",
-                "duration_ms": 8743,
+                "duration_ms": 8908,
                 "message": "Worker input was capped at 1000 files or 8388608 bytes.",
                 "symbols": 0,
                 "relationships": 0,
@@ -441,7 +384,7 @@
         ],
         "slowest_provider": {
             "engine": "ast-grep",
-            "duration_ms": 8743
+            "duration_ms": 8908
         },
         "graph_truncation": {
             "symbol_limit_reached": 1,

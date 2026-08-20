@@ -1,0 +1,1251 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:18:29+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "wtfcode",
+        "url": "https://github.com/flegardev/WTFCode.git",
+        "source": "explicit_local_repository",
+        "local_path": ".",
+        "commit_sha": "3cece8a96d12badeac609cf84497a35c086fa86b",
+        "size": "medium",
+        "primary_language": "PHP",
+        "known_frameworks": [
+            "plain PHP",
+            "MySQL"
+        ],
+        "architecture_type": "server-rendered monolith with analyzer workers",
+        "repository_shape": [
+            "medium",
+            "new",
+            "analyzer-heavy",
+            "documented"
+        ],
+        "expected_high_level_systems": [
+            "web application",
+            "analysis engine",
+            "database",
+            "Git integration"
+        ],
+        "why_selected": "Self-dogfood control; kept in the corpus without making it the primary optimization target.",
+        "candidate_kind": "self-dogfood"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 12595,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 12367,
+        "peak_php_memory_bytes": 77594624,
+        "files_discovered": 193,
+        "repository_bytes": 1336712,
+        "files_analyzed": 182,
+        "files_skipped": 11,
+        "stack": [
+            "PHP",
+            "Database"
+        ],
+        "overview": "This repository has 182 readable project files and appears to use PHP, Database. It found 3 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "api",
+                "type": "server",
+                "label": "PHP project",
+                "explanation": "This PHP codebase contains server-side source and may handle pages, requests, or application rules.",
+                "evidence": [
+                    "public/index.php",
+                    "src/Auth.php",
+                    "src/BlastRadiusService.php",
+                    "src/ChangeGuardService.php",
+                    "src/CitationEnforcer.php",
+                    "src/Database.php",
+                    "src/DeterministicExplanationProvider.php",
+                    "src/EvidencePacket.php",
+                    "src/ExplanationManager.php",
+                    "src/ExplanationProviderInterface.php",
+                    "src/ExplanationService.php",
+                    "src/ExplorationService.php"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "bootstrap.php",
+                    "src/Auth.php",
+                    "src/GitDiffService.php",
+                    "src/OpenAiCompatibleExplanationProvider.php"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "config/database.php",
+                    "database/migrations/001_learning_and_symbols.sql",
+                    "database/migrations/002_symbol_graph_v2.sql",
+                    "database/migrations/003_multi_engine_foundation.sql",
+                    "database/migrations/004_security_intelligence.sql",
+                    "database/migrations/005_change_intelligence.sql",
+                    "database/migrations/006_performance_jobs.sql",
+                    "database/schema.sql",
+                    "src/Database.php"
+                ]
+            }
+        ],
+        "symbols": 2463,
+        "relationships": 13330,
+        "routes": 26,
+        "route_sample": [
+            {
+                "path": "public/analyzers.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/analyzers.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/ask.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/ask.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/change.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/change.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/compare.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/compare.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/dashboard.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/dashboard.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/feature.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/feature.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/file.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/file.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/files.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/files.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/index.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/learn.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/learn.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/login.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/login.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/logout.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/logout.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/map.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/map.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/privacy.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/privacy.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/project-create.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/project-create.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/project.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/project.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/prompt.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/prompt.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/register.php",
+                "framework": "Plain PHP",
+                "method": "ANY",
+                "route_path": "/register.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/routes.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/routes.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/secure.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/secure.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/security.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/security.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/symbol.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/symbol.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/symbols.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/symbols.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/tables.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/tables.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/terms.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/terms.php",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "public/understand.php",
+                "framework": "Plain PHP",
+                "method": "GET",
+                "route_path": "/understand.php",
+                "confidence": "high",
+                "line": 1
+            }
+        ],
+        "features": 8,
+        "feature_clusters": [
+            {
+                "label": "Git comparison",
+                "confidence": "likely",
+                "score": 413,
+                "symbols": 59,
+                "evidence": [
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 7,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 18,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 48,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 67,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 106,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 125,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 138,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/GitDiffService.php",
+                        "line": 156,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Repository import",
+                "confidence": "strong",
+                "score": 163,
+                "symbols": 27,
+                "evidence": [
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 7,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 8,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 10,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 30,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 36,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 61,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 66,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/RepositoryImporter.php",
+                        "line": 79,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Feature tracing",
+                "confidence": "strong",
+                "score": 142,
+                "symbols": 19,
+                "evidence": [
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 5,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 8,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 169,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/EvidencePacket.php",
+                        "line": 16,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/ExplanationService.php",
+                        "line": 24,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/ExplanationService.php",
+                        "line": 34,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/ExplanationService.php",
+                        "line": 59,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 47,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 64,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Safe prompt generation",
+                "confidence": "strong",
+                "score": 109,
+                "symbols": 18,
+                "evidence": [
+                    {
+                        "path": "public/prompt.php",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 8,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 50,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 75,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 36,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 37,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 55,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/PromptSafetyService.php",
+                        "line": 86,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "AI chat",
+                "confidence": "strong",
+                "score": 91,
+                "symbols": 13,
+                "evidence": [
+                    {
+                        "path": "src/OllamaExplanationProvider.php",
+                        "line": 14,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OllamaExplanationProvider.php",
+                        "line": 29,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OpenAiCompatibleExplanationProvider.php",
+                        "line": 17,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OpenAiCompatibleExplanationProvider.php",
+                        "line": 32,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OpenAiCompatibleExplanationProvider.php",
+                        "line": 38,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OpenAiCompatibleExplanationProvider.php",
+                        "line": 38,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OllamaExplanationProvider.php",
+                        "line": 10,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OllamaExplanationProvider.php",
+                        "line": 27,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OpenAiCompatibleExplanationProvider.php",
+                        "line": 13,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/OpenAiCompatibleExplanationProvider.php",
+                        "line": 30,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 30,
+                "symbols": 5,
+                "evidence": [
+                    {
+                        "path": "src/FeatureTracer.php",
+                        "line": 8,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/SymbolRepository.php",
+                        "line": 74,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Repository scan",
+                "confidence": "strong",
+                "score": 24,
+                "symbols": 4,
+                "evidence": [
+                    {
+                        "path": "src/Project.php",
+                        "line": 8,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/Project.php",
+                        "line": 39,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "likely",
+                "score": 9,
+                "symbols": 1,
+                "evidence": [
+                    {
+                        "path": "public/login.php",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "127.0.0.1",
+            "api.openai.com",
+            "OpenAI"
+        ],
+        "tables": [
+            "accounts",
+            "analysis_jobs",
+            "analysis_job_steps",
+            "analysis_provider_runs",
+            "architecture_edges",
+            "architecture_nodes",
+            "audit_log",
+            "change_guard_snapshots",
+            "code_routes",
+            "code_symbols",
+            "customers",
+            "dependency_tree",
+            "engine_disagreements",
+            "learning_progress",
+            "orders",
+            "package_inventory",
+            "projects",
+            "project_dependencies",
+            "project_files",
+            "scan_findings",
+            "scan_runs",
+            "symbol_relationships",
+            "users"
+        ],
+        "packages": 27,
+        "security_findings": 2,
+        "findings": 30,
+        "finding_types": {
+            "database_operation": 1,
+            "environment_access": 21,
+            "environment_surface": 1,
+            "implementation_notes": 1,
+            "process_or_dynamic_execution": 2,
+            "sensitive_system": 4
+        },
+        "finding_severities": {
+            "attention": 5,
+            "info": 23,
+            "risk": 2
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in bootstrap.php",
+                "path": "bootstrap.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in src/Auth.php",
+                "path": "src/Auth.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in src/GitDiffService.php",
+                "path": "src/GitDiffService.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in src/OpenAiCompatibleExplanationProvider.php",
+                "path": "src/OpenAiCompatibleExplanationProvider.php"
+            },
+            {
+                "severity": "info",
+                "type": "implementation_notes",
+                "title": "RepoScanner.php contains several implementation notes",
+                "path": "src/RepoScanner.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_surface",
+                "title": "This project relies on many environment variables",
+                "path": null
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "public/assets/js/symbol-map.js"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "tests/fixtures/v2/next-react/hooks/useAccount.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "bootstrap.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "bootstrap.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "config/database.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "src/ExplanationManager.php"
+            },
+            {
+                "severity": "risk",
+                "type": "process_or_dynamic_execution",
+                "title": "Process or dynamic execution surface",
+                "path": "src/GitDiffService.php"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "src/helpers.php"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 107,
+                "message": null,
+                "symbols": 1375,
+                "relationships": 6099,
+                "routes": 26,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 1379,
+                "message": null,
+                "symbols": 921,
+                "relationships": 4921,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 2057,
+                "message": "1 file(s) contained syntax the worker could not fully parse. Worker evidence reached the bounded fusion output budget.",
+                "symbols": 760,
+                "relationships": 4000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 895,
+                "message": null,
+                "symbols": 22,
+                "relationships": 210,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 113,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 2,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 232,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 22,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 704,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 94,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 976,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 27,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 1475,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 182
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "tree-sitter",
+            "duration_ms": 2057
+        },
+        "graph_truncation": {
+            "relationship_limit_reached": 1
+        },
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Graph or enrichment limits: relationship_limit_reached, product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

@@ -1,0 +1,611 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:21:56+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "django-react",
+        "url": "https://github.com/vintasoftware/django-react-boilerplate.git",
+        "commit_sha": "340e19b11249b87c4d89afad423a447f279c4a1c",
+        "size": "medium",
+        "primary_language": "Python",
+        "known_frameworks": [
+            "Django",
+            "React",
+            "Docker"
+        ],
+        "architecture_type": "frontend and backend monorepo",
+        "repository_shape": [
+            "medium",
+            "old",
+            "well-tested",
+            "well-documented"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "API",
+            "authentication",
+            "database",
+            "background jobs"
+        ],
+        "why_selected": "Established Django/React combination with deployment and worker configuration.",
+        "candidate_kind": "application-template"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 546,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 233,
+        "peak_php_memory_bytes": 12582912,
+        "files_discovered": 96,
+        "repository_bytes": 504255,
+        "files_analyzed": 83,
+        "files_skipped": 13,
+        "stack": [
+            "React",
+            "Django",
+            "Database",
+            "Docker"
+        ],
+        "overview": "This repository has 83 readable project files and appears to use React, Django, Database, Docker. It found 5 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Frontend application",
+                "explanation": "This is the part of the project that renders the user interface.",
+                "evidence": [
+                    "frontend/js/components/index.ts",
+                    "frontend/js/components/TopNav.tsx"
+                ]
+            },
+            {
+                "key": "api",
+                "type": "server",
+                "label": "Django application",
+                "explanation": "This Python project uses Django to handle requests, routes, and server-side application behavior.",
+                "evidence": [
+                    "backend/common/urls.py",
+                    "backend/common/views.py",
+                    "backend/manage.py",
+                    "backend/project_name/urls.py",
+                    "backend/users/views.py"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "backend/project_name/settings/test.py"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "backend/common/models.py",
+                    "backend/users/migrations/__init__.py",
+                    "backend/users/models.py"
+                ]
+            },
+            {
+                "key": "docker",
+                "type": "deployment",
+                "label": "Docker environment",
+                "explanation": "Docker files describe a repeatable way to run parts of this project.",
+                "evidence": [
+                    "backend/Dockerfile",
+                    "docker-compose.yml",
+                    "frontend/Dockerfile"
+                ]
+            }
+        ],
+        "symbols": 200,
+        "relationships": 744,
+        "routes": 8,
+        "route_sample": [
+            {
+                "path": "backend/common/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 8
+            },
+            {
+                "path": "backend/common/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 9
+            },
+            {
+                "path": "backend/project_name/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 22
+            },
+            {
+                "path": "backend/project_name/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/admin/",
+                "confidence": "high",
+                "line": 23
+            },
+            {
+                "path": "backend/project_name/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/admin/defender/",
+                "confidence": "high",
+                "line": 24
+            },
+            {
+                "path": "backend/project_name/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/jsreverse/",
+                "confidence": "high",
+                "line": 25
+            },
+            {
+                "path": "backend/project_name/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/api/",
+                "confidence": "high",
+                "line": 26
+            },
+            {
+                "path": "backend/project_name/urls.py",
+                "framework": "Django",
+                "method": "ANY",
+                "route_path": "/api/schema/",
+                "confidence": "high",
+                "line": 28
+            }
+        ],
+        "features": 2,
+        "feature_clusters": [
+            {
+                "label": "Admin",
+                "confidence": "strong",
+                "score": 69,
+                "symbols": 10,
+                "evidence": [
+                    {
+                        "path": "backend/common/context_processors.py",
+                        "line": 10,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/common/context_processors.py",
+                        "line": 32,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/common/tests.py",
+                        "line": 28,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/project_name/urls.py",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/users/admin.py",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/users/admin.py",
+                        "line": 9,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 12,
+                "symbols": 2,
+                "evidence": [
+                    {
+                        "path": "backend/common/utils/tests.py",
+                        "line": 9,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "Docker",
+            "localhost",
+            "Redis",
+            "Sentry"
+        ],
+        "tables": [
+            "IndexedTimeStampedModel"
+        ],
+        "packages": 1159,
+        "security_findings": 152,
+        "findings": 177,
+        "finding_types": {
+            "dependency_vulnerability": 152,
+            "duplicate_content": 1,
+            "environment_access": 1,
+            "possible_unused_dependency": 8,
+            "sensitive_system": 1,
+            "unresolved_local_import": 14
+        },
+        "finding_severities": {
+            "attention": 80,
+            "info": 19,
+            "risk": 78
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/common/routes.py",
+                "path": "backend/common/routes.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/common/urls.py",
+                "path": "backend/common/urls.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/common/views.py",
+                "path": "backend/common/views.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/project_name/celery.py",
+                "path": "backend/project_name/celery.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/project_name/settings/local_base.py",
+                "path": "backend/project_name/settings/local_base.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/project_name/settings/production.py",
+                "path": "backend/project_name/settings/production.py"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in backend/project_name/settings/test.py",
+                "path": "backend/project_name/settings/test.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/project_name/settings/test.py",
+                "path": "backend/project_name/settings/test.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/project_name/__init__.py",
+                "path": "backend/project_name/__init__.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/users/admin.py",
+                "path": "backend/users/admin.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/users/models.py",
+                "path": "backend/users/models.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/users/routes.py",
+                "path": "backend/users/routes.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/users/serializers.py",
+                "path": "backend/users/serializers.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/users/views.py",
+                "path": "backend/users/views.py"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from backend/users/views.py",
+                "path": "backend/users/views.py"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "backend/common/utils/__init__.py"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@sentry-internal/browser-utils has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@sentry-internal/feedback has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@sentry-internal/replay has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@sentry-internal/replay-canvas has no obvious readable-file reference",
+                "path": "package.json"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 132,
+                "relationships": 448,
+                "routes": 8,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 126,
+                "relationships": 378,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 30,
+                "relationships": 114,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 1,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 1159,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 152,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "wtfcode-native",
+            "duration_ms": 0
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

@@ -1,0 +1,1040 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:24:17+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "prisma-examples",
+        "url": "https://github.com/prisma/prisma-examples.git",
+        "commit_sha": "65c284965dc6a0f6853de868a4be408bc48acf1d",
+        "size": "large",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Prisma",
+            "Next.js",
+            "Express"
+        ],
+        "architecture_type": "multi-framework examples monorepo",
+        "repository_shape": [
+            "large",
+            "many-examples",
+            "many-databases"
+        ],
+        "expected_high_level_systems": [
+            "ORM models",
+            "API examples",
+            "frontend examples"
+        ],
+        "why_selected": "Tests database understanding across many independent application examples.",
+        "candidate_kind": "cursed"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 7331,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 6782,
+        "peak_php_memory_bytes": 60817408,
+        "files_discovered": 1390,
+        "repository_bytes": 89782473,
+        "files_analyzed": 1061,
+        "files_skipped": 329,
+        "stack": [
+            "Next.js",
+            "NestJS",
+            "Auth.js",
+            "Prisma",
+            "Drizzle",
+            "Database",
+            "Vercel",
+            "Docker"
+        ],
+        "overview": "This repository has 1061 readable project files and appears to use Next.js, NestJS, Auth.js, Prisma, Drizzle, Database, Vercel, Docker. It found 6 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "accelerate/accelerate-hacker-news/app/actions/addVotes.ts",
+                    "accelerate/accelerate-hacker-news/app/layout.tsx",
+                    "accelerate/accelerate-hacker-news/app/page.tsx",
+                    "accelerate/accelerate-hacker-news/app/submit/actions/addPost.ts",
+                    "accelerate/accelerate-hacker-news/app/submit/page.tsx",
+                    "accelerate/astro-starter/src/pages/db.ts",
+                    "accelerate/astro-starter/src/pages/route.ts",
+                    "accelerate/nextjs-starter/app/api/route.ts",
+                    "accelerate/nextjs-starter/app/layout.tsx",
+                    "accelerate/nextjs-starter/app/page.tsx",
+                    "accelerate/nextjs-starter/next.config.js",
+                    "accelerate/nuxtjs-starter/pages/index.vue"
+                ]
+            },
+            {
+                "key": "api",
+                "type": "api",
+                "label": "NestJS API",
+                "explanation": "This TypeScript server organizes request handlers into controllers and services.",
+                "evidence": [
+                    "orm/nest/src/app.controller.ts",
+                    "orm/nest/src/app.module.ts",
+                    "orm/nest/src/prisma.service.ts",
+                    "orm/nest-graphql/src/app.module.ts",
+                    "orm/nest-graphql/src/prisma.service.ts",
+                    "orm/nest-graphql-sdl-first/src/app.module.ts",
+                    "orm/nuxt-prisma-module/.env.example",
+                    "orm/nuxt-prisma-module/app/app.vue",
+                    "orm/nuxt-prisma-module/app/components/FirstUser.server.vue",
+                    "orm/nuxt-prisma-module/lib/prisma.ts",
+                    "orm/nuxt-prisma-module/nuxt.config.ts",
+                    "orm/nuxt-prisma-module/package.json"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "orm/authjs-nextjs/.env.example",
+                    "orm/authjs-nextjs/app/layout.tsx",
+                    "orm/authjs-nextjs/app/page.tsx",
+                    "orm/authjs-nextjs/components/auth-components.tsx",
+                    "orm/authjs-nextjs/lib/auth.ts",
+                    "orm/authjs-nextjs/lib/prisma.ts",
+                    "orm/authjs-nextjs/next.config.ts",
+                    "orm/authjs-nextjs/package.json",
+                    "orm/authjs-nextjs/prisma.config.ts",
+                    "orm/authjs-nextjs/tsconfig.json",
+                    "orm/betterauth-astro/package.json",
+                    "orm/betterauth-astro/prisma.config.ts"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "accelerate/accelerate-hacker-news/prisma/seed.ts",
+                    "accelerate/accelerate-hacker-news/prisma.config.ts",
+                    "accelerate/astro-starter/prisma/migrations/20240708100736_init/migration.sql",
+                    "accelerate/astro-starter/prisma/migrations/migration_lock.toml",
+                    "accelerate/astro-starter/prisma/seed.ts",
+                    "accelerate/astro-starter/prisma.config.ts",
+                    "accelerate/nextjs-starter/prisma/migrations/20240515102404_init_project/migration.sql",
+                    "accelerate/nextjs-starter/prisma/migrations/migration_lock.toml",
+                    "accelerate/nextjs-starter/prisma/seed.ts",
+                    "accelerate/nextjs-starter/prisma.config.ts",
+                    "accelerate/nuxtjs-starter/lib/prisma.ts",
+                    "accelerate/nuxtjs-starter/prisma/seed.ts"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": [
+                    "accelerate/remix-starter/vercel.json"
+                ]
+            },
+            {
+                "key": "docker",
+                "type": "deployment",
+                "label": "Docker environment",
+                "explanation": "Docker files describe a repeatable way to run parts of this project.",
+                "evidence": [
+                    "databases/cockroachdb/docker-compose.yml",
+                    "databases/mongodb/docker-compose.yml",
+                    "databases/sql-server/docker-compose.yml",
+                    "deployment-platforms/rest-express-docker-aws-ec2/.env.example",
+                    "deployment-platforms/rest-express-docker-aws-ec2/.github/workflows/deploy.yml",
+                    "deployment-platforms/rest-express-docker-aws-ec2/docker-compose.yml",
+                    "deployment-platforms/rest-express-docker-aws-ec2/Dockerfile",
+                    "deployment-platforms/rest-express-docker-aws-ec2/package.json",
+                    "deployment-platforms/rest-express-docker-aws-ec2/prisma/migrations/20240101000000_init/migration.sql",
+                    "deployment-platforms/rest-express-docker-aws-ec2/prisma/migrations/migration_lock.toml",
+                    "deployment-platforms/rest-express-docker-aws-ec2/prisma.config.ts",
+                    "deployment-platforms/rest-express-docker-aws-ec2/src/index.ts"
+                ]
+            }
+        ],
+        "symbols": 2045,
+        "relationships": 9899,
+        "routes": 131,
+        "route_sample": [
+            {
+                "path": "compute/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 8
+            },
+            {
+                "path": "compute/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/users",
+                "confidence": "high",
+                "line": 43
+            },
+            {
+                "path": "deployment-platforms/heroku/src/index.js",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/api/publish/:id",
+                "confidence": "high",
+                "line": 83
+            },
+            {
+                "path": "deployment-platforms/heroku/src/index.js",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/feed",
+                "confidence": "high",
+                "line": 114
+            },
+            {
+                "path": "deployment-platforms/heroku/src/index.js",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/filterPosts",
+                "confidence": "high",
+                "line": 122
+            },
+            {
+                "path": "deployment-platforms/railway/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 9
+            },
+            {
+                "path": "deployment-platforms/railway/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api",
+                "confidence": "high",
+                "line": 63
+            },
+            {
+                "path": "deployment-platforms/railway/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/seed",
+                "confidence": "high",
+                "line": 67
+            },
+            {
+                "path": "deployment-platforms/railway/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/feed",
+                "confidence": "high",
+                "line": 112
+            },
+            {
+                "path": "deployment-platforms/render/src/index.js",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/api/publish/:id",
+                "confidence": "high",
+                "line": 37
+            },
+            {
+                "path": "deployment-platforms/render/src/index.js",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/feed",
+                "confidence": "high",
+                "line": 68
+            },
+            {
+                "path": "deployment-platforms/render/src/index.js",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/api/filterPosts",
+                "confidence": "high",
+                "line": 76
+            },
+            {
+                "path": "generator-prisma-client/esbuild-cjs/src/hono.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/quotes",
+                "confidence": "high",
+                "line": 17
+            },
+            {
+                "path": "orm/express/src/index.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/post/:id/views",
+                "confidence": "high",
+                "line": 44
+            },
+            {
+                "path": "orm/express/src/index.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/publish/:id",
+                "confidence": "high",
+                "line": 63
+            },
+            {
+                "path": "orm/express/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 94
+            },
+            {
+                "path": "orm/express/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/user/:id/drafts",
+                "confidence": "high",
+                "line": 99
+            },
+            {
+                "path": "orm/express/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/feed",
+                "confidence": "high",
+                "line": 121
+            },
+            {
+                "path": "orm/fastify/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 103
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/signup",
+                "confidence": "high",
+                "line": 17
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/post",
+                "confidence": "high",
+                "line": 44
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/post/:id/views",
+                "confidence": "high",
+                "line": 65
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/publish/:id",
+                "confidence": "high",
+                "line": 85
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "DELETE",
+                "route_path": "/post/:id",
+                "confidence": "high",
+                "line": 110
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 132
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/users/:id/drafts",
+                "confidence": "high",
+                "line": 140
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/post/:id",
+                "confidence": "high",
+                "line": 152
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/feed",
+                "confidence": "high",
+                "line": 163
+            },
+            {
+                "path": "orm/hono/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 185
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/signup",
+                "confidence": "high",
+                "line": 18
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/post",
+                "confidence": "high",
+                "line": 41
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/post/:id/views",
+                "confidence": "high",
+                "line": 54
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/publish/:id",
+                "confidence": "high",
+                "line": 76
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "DELETE",
+                "route_path": "/post/:id",
+                "confidence": "high",
+                "line": 102
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 118
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/user/:id/drafts",
+                "confidence": "high",
+                "line": 124
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/post/:id",
+                "confidence": "high",
+                "line": 137
+            },
+            {
+                "path": "orm/koa/src/index.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/feed",
+                "confidence": "high",
+                "line": 148
+            },
+            {
+                "path": "orm/postgis-express/src/server.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/user",
+                "confidence": "high",
+                "line": 13
+            },
+            {
+                "path": "orm/postgis-express/src/server.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/location",
+                "confidence": "high",
+                "line": 33
+            },
+            {
+                "path": "accelerate/accelerate-hacker-news/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/astro-starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/nextjs-starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/nuxtjs-starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/remix-starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/solidstart-starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "accelerate/svelte-starter/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "compute/hono/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "compute/nextjs/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            }
+        ],
+        "features": 4,
+        "feature_clusters": [
+            {
+                "label": "Registration",
+                "confidence": "strong",
+                "score": 76,
+                "symbols": 12,
+                "evidence": [
+                    {
+                        "path": "orm/hapi/src/plugins/users.ts",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/hapi/src/plugins/users.ts",
+                        "line": 41,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/hono/src/index.ts",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/hono/src/index.ts",
+                        "line": 6,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/koa/src/index.ts",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/koa/src/index.ts",
+                        "line": 13,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/nextjs-graphql/pages/signup.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/nextjs-graphql/pages/signup.tsx",
+                        "line": 17,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "orm/nuxt/app/pages/signup.vue",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/nuxt/app/pages/signup.vue",
+                        "line": 18,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "AI chat",
+                "confidence": "strong",
+                "score": 51,
+                "symbols": 6,
+                "evidence": [
+                    {
+                        "path": "orm/ai-sdk-nextjs/app/api/chat/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "orm/ai-sdk-nextjs/app/api/chat/route.ts",
+                        "line": 7,
+                        "signals": [
+                            "identity",
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "orm/ai-sdk-nextjs/app/page.tsx",
+                        "line": 6,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/ai-sdk-nextjs/app/api/chat/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 33,
+                "symbols": 4,
+                "evidence": [
+                    {
+                        "path": "orm/authjs-nextjs/app/page.tsx",
+                        "line": 5,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "orm/authjs-nextjs/components/auth-components.tsx",
+                        "line": 3,
+                        "signals": [
+                            "source",
+                            "identity",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "orm/betterauth-nextjs/src/app/sign-in/page.tsx",
+                        "line": 12,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Profile",
+                "confidence": "likely",
+                "score": 6,
+                "symbols": 1,
+                "evidence": [
+                    {
+                        "path": "deployment-platforms/aws-lambda/handlers/seed.js",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "api.quotable.io",
+            "Cloudflare",
+            "localhost",
+            "OpenAI",
+            "Postgres"
+        ],
+        "tables": [
+            "dbo",
+            "json_each",
+            "Location",
+            "Post",
+            "posts",
+            "public",
+            "Quote",
+            "Quotes",
+            "TrackingEvent",
+            "User",
+            "users"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 864,
+        "finding_types": {
+            "database_operation": 108,
+            "database_write": 214,
+            "destructive_database_operation": 32,
+            "duplicate_content": 75,
+            "environment_access": 161,
+            "environment_surface": 1,
+            "file_operation": 2,
+            "http_call": 8,
+            "implementation_notes": 6,
+            "navigation": 5,
+            "possible_unused_dependency": 24,
+            "process_execution": 1,
+            "repeated_client_setup": 1,
+            "sensitive_system": 36,
+            "ui_handler": 11,
+            "unresolved_local_import": 179
+        },
+        "finding_severities": {
+            "attention": 571,
+            "info": 292,
+            "risk": 1
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/accelerate-hacker-news/app/layout.tsx",
+                "path": "accelerate/accelerate-hacker-news/app/layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/accelerate-hacker-news/lib/db.ts",
+                "path": "accelerate/accelerate-hacker-news/lib/db.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/accelerate-hacker-news/prisma/seed.ts",
+                "path": "accelerate/accelerate-hacker-news/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/astro-starter/prisma/seed.ts",
+                "path": "accelerate/astro-starter/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/astro-starter/src/pages/db.ts",
+                "path": "accelerate/astro-starter/src/pages/db.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/nextjs-starter/app/layout.tsx",
+                "path": "accelerate/nextjs-starter/app/layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/nextjs-starter/lib/db.ts",
+                "path": "accelerate/nextjs-starter/lib/db.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/nextjs-starter/prisma/seed.ts",
+                "path": "accelerate/nextjs-starter/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/nuxtjs-starter/lib/prisma.ts",
+                "path": "accelerate/nuxtjs-starter/lib/prisma.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/nuxtjs-starter/prisma/seed.ts",
+                "path": "accelerate/nuxtjs-starter/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/remix-starter/app/data/utils/prisma.server.ts",
+                "path": "accelerate/remix-starter/app/data/utils/prisma.server.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/remix-starter/app/env/useFeatureFlags.tsx",
+                "path": "accelerate/remix-starter/app/env/useFeatureFlags.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/remix-starter/app/root.tsx",
+                "path": "accelerate/remix-starter/app/root.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/remix-starter/prisma/seed.ts",
+                "path": "accelerate/remix-starter/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/solidstart-starter/prisma/seed.ts",
+                "path": "accelerate/solidstart-starter/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/solidstart-starter/src/entry-client.tsx",
+                "path": "accelerate/solidstart-starter/src/entry-client.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/solidstart-starter/src/lib/prisma.ts",
+                "path": "accelerate/solidstart-starter/src/lib/prisma.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/starter/src/index.ts",
+                "path": "accelerate/starter/src/index.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/svelte-starter/prisma/seed.ts",
+                "path": "accelerate/svelte-starter/prisma/seed.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from accelerate/svelte-starter/src/lib/prisma.ts",
+                "path": "accelerate/svelte-starter/src/lib/prisma.ts"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 232,
+                "message": null,
+                "symbols": 1771,
+                "relationships": 7454,
+                "routes": 131,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1061
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 15,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1061
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 1008,
+                "message": "12 file(s) contained syntax the worker could not fully parse. Worker input was capped at 600 files or 6291456 bytes.",
+                "symbols": 933,
+                "relationships": 3202,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1061
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 2569,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1061
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 1224,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 542,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 1061
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 2569
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Failed analyzer providers: typescript-semantic.",
+            "Graph or enrichment limits: product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

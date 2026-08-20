@@ -1,0 +1,616 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:24:10+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "firebase-quickstarts",
+        "url": "https://github.com/firebase/quickstart-js.git",
+        "commit_sha": "0f12f1c8e13dfa54773838b5c130f115b78d1c20",
+        "size": "large",
+        "primary_language": "JavaScript",
+        "known_frameworks": [
+            "Firebase"
+        ],
+        "architecture_type": "multi-application examples monorepo",
+        "repository_shape": [
+            "large",
+            "old",
+            "many-examples",
+            "integration-heavy"
+        ],
+        "expected_high_level_systems": [
+            "authentication examples",
+            "database examples",
+            "storage examples"
+        ],
+        "why_selected": "Noisy examples test runtime-evidence isolation across many Firebase products.",
+        "candidate_kind": "cursed"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 4393,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 4026,
+        "peak_php_memory_bytes": 37748736,
+        "files_discovered": 413,
+        "repository_bytes": 24624539,
+        "files_analyzed": 324,
+        "files_skipped": 89,
+        "stack": [
+            "React",
+            "Firebase",
+            "Database"
+        ],
+        "overview": "This repository has 324 readable project files and appears to use React, Firebase, Database. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Frontend application",
+                "explanation": "This is the part of the project that renders the user interface.",
+                "evidence": [
+                    "ai/ai-react-app/src/App.tsx",
+                    "ai/ai-react-app/src/components/Common/FileUploader.tsx",
+                    "ai/ai-react-app/src/components/Common/PromptInput.tsx",
+                    "ai/ai-react-app/src/components/Common/ResponseDisplay.tsx",
+                    "ai/ai-react-app/src/components/Layout/LeftSidebar.tsx",
+                    "ai/ai-react-app/src/components/Layout/MainLayout.tsx",
+                    "ai/ai-react-app/src/components/Layout/RightSidebar.tsx",
+                    "ai/ai-react-app/src/components/Layout/TopBar.tsx",
+                    "ai/ai-react-app/src/components/Specific/ChatMessage.tsx",
+                    "ai/ai-react-app/src/config/firebase-config.ts",
+                    "ai/ai-react-app/src/config/personas.ts",
+                    "ai/ai-react-app/src/main.tsx"
+                ]
+            },
+            {
+                "key": "firebase",
+                "type": "service",
+                "label": "Firebase",
+                "explanation": "Firebase is connected for application services such as authentication, data, or storage.",
+                "evidence": [
+                    ".github/workflows/firebase-ai-check.yml",
+                    "ai/ai-react-app/src/config/firebase-config.ts",
+                    "ai/ai-react-app/src/services/firebaseAIService.ts",
+                    "ai/ai-samples/src/services/firebaseAIService.ts",
+                    "auth/anon.ts",
+                    "auth/apple-popup.ts",
+                    "auth/apple-redirect.ts",
+                    "auth/chromextension/background.js",
+                    "auth/chromextension/credentials.js",
+                    "auth/chromextension/manifest.json",
+                    "auth/config.ts",
+                    "auth/customauth.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "auth/anon.ts",
+                    "auth/apple-popup.ts",
+                    "auth/apple-redirect.ts",
+                    "auth/chromextension/background.js",
+                    "auth/chromextension/credentials.js",
+                    "auth/chromextension/manifest.json",
+                    "auth/config.ts",
+                    "auth/customauth.ts",
+                    "auth/email-link.ts",
+                    "auth/email-password.ts",
+                    "auth/exampletokengenerator/auth.ts",
+                    "auth/facebook-popup.ts"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "database/.eslintrc.json",
+                    "database/database.rules.json",
+                    "database/firebase.json",
+                    "database/package-lock.json",
+                    "database/package.json"
+                ]
+            }
+        ],
+        "symbols": 1105,
+        "relationships": 6631,
+        "routes": 7,
+        "route_sample": [
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 17
+            },
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/actor/:id",
+                "confidence": "high",
+                "line": 18
+            },
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/movie/:id",
+                "confidence": "high",
+                "line": 19
+            },
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/myprofile",
+                "confidence": "high",
+                "line": 20
+            },
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/vectorsearch",
+                "confidence": "high",
+                "line": 21
+            },
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/advancedsearch",
+                "confidence": "high",
+                "line": 22
+            },
+            {
+                "path": "dataconnect/app/src/App.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/*",
+                "confidence": "high",
+                "line": 23
+            }
+        ],
+        "features": 4,
+        "feature_clusters": [
+            {
+                "label": "AI chat",
+                "confidence": "strong",
+                "score": 123,
+                "symbols": 20,
+                "evidence": [
+                    {
+                        "path": "ai/ai-samples/src/App.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/index.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/index.tsx",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/index.tsx",
+                        "line": 10,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/index.tsx",
+                        "line": 25,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/index.tsx",
+                        "line": 36,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/service.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/service.ts",
+                        "line": 10,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/features/chat/service.ts",
+                        "line": 23,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "ai/ai-samples/src/index.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 48,
+                "symbols": 8,
+                "evidence": [
+                    {
+                        "path": "auth/mfa-password.ts",
+                        "line": 510,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "auth/phone-invisible.ts",
+                        "line": 167,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "auth/phone-simple-popup.ts",
+                        "line": 107,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "auth/phone-visible.ts",
+                        "line": 168,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Admin",
+                "confidence": "strong",
+                "score": 12,
+                "symbols": 2,
+                "evidence": [
+                    {
+                        "path": "firestore/functions/src/index.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "functions/functions/src/index.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Notifications",
+                "confidence": "likely",
+                "score": 6,
+                "symbols": 1,
+                "evidence": [
+                    {
+                        "path": "messaging/main.ts",
+                        "line": 83,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "Firebase",
+            "project_id.firebaseio.com"
+        ],
+        "tables": [],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 115,
+        "finding_types": {
+            "authentication_boundary": 2,
+            "duplicate_content": 21,
+            "environment_access": 6,
+            "large_file": 8,
+            "possible_unused_dependency": 10,
+            "sensitive_system": 35,
+            "ui_handler": 19,
+            "unresolved_local_import": 14
+        },
+        "finding_severities": {
+            "attention": 59,
+            "info": 56
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Common/FileUploader.tsx",
+                "path": "ai/ai-react-app/src/components/Common/FileUploader.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Common/PromptInput.tsx",
+                "path": "ai/ai-react-app/src/components/Common/PromptInput.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Common/ResponseDisplay.tsx",
+                "path": "ai/ai-react-app/src/components/Common/ResponseDisplay.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Layout/LeftSidebar.tsx",
+                "path": "ai/ai-react-app/src/components/Layout/LeftSidebar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Layout/MainLayout.tsx",
+                "path": "ai/ai-react-app/src/components/Layout/MainLayout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Layout/RightSidebar.tsx",
+                "path": "ai/ai-react-app/src/components/Layout/RightSidebar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Layout/TopBar.tsx",
+                "path": "ai/ai-react-app/src/components/Layout/TopBar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Layout/TopBar.tsx",
+                "path": "ai/ai-react-app/src/components/Layout/TopBar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/components/Specific/ChatMessage.tsx",
+                "path": "ai/ai-react-app/src/components/Specific/ChatMessage.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/main.tsx",
+                "path": "ai/ai-react-app/src/main.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "ChatView.tsx is large enough to be risky to edit",
+                "path": "ai/ai-react-app/src/views/ChatView.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/views/ChatView.tsx",
+                "path": "ai/ai-react-app/src/views/ChatView.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/views/LiveView.tsx",
+                "path": "ai/ai-react-app/src/views/LiveView.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from ai/ai-react-app/src/views/NanoBananaView.tsx",
+                "path": "ai/ai-react-app/src/views/NanoBananaView.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in auth/anon.ts",
+                "path": "auth/anon.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in auth/apple-popup.ts",
+                "path": "auth/apple-popup.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in auth/apple-redirect.ts",
+                "path": "auth/apple-redirect.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in auth/chromextension/background.js",
+                "path": "auth/chromextension/background.js"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in auth/chromextension/credentials.js",
+                "path": "auth/chromextension/credentials.js"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in auth/chromextension/manifest.json",
+                "path": "auth/chromextension/manifest.json"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 68,
+                "message": null,
+                "symbols": 618,
+                "relationships": 3309,
+                "routes": 7,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 324
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 324
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 1105,
+                "message": "14 file(s) contained syntax the worker could not fully parse.",
+                "symbols": 636,
+                "relationships": 3117,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 324
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 1552,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 324
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 525,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 27,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 324
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 1552
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Failed analyzer providers: typescript-semantic."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

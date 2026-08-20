@@ -1,0 +1,545 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:23:06+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "express-realworld",
+        "url": "https://github.com/gothinkster/node-express-realworld-example-app.git",
+        "commit_sha": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b",
+        "size": "small",
+        "primary_language": "JavaScript",
+        "known_frameworks": [
+            "Express",
+            "MongoDB"
+        ],
+        "architecture_type": "REST API monolith",
+        "repository_shape": [
+            "small",
+            "old",
+            "conventional",
+            "limited-tests"
+        ],
+        "expected_high_level_systems": [
+            "API routes",
+            "authentication",
+            "data models"
+        ],
+        "why_selected": "RealWorld backend with JWT auth, route handlers, and persistence.",
+        "candidate_kind": "application"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 2177,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 1844,
+        "peak_php_memory_bytes": 10485760,
+        "files_discovered": 66,
+        "repository_bytes": 494565,
+        "files_analyzed": 57,
+        "files_skipped": 9,
+        "stack": [
+            "Express",
+            "Node API",
+            "Prisma",
+            "Database",
+            "Docker"
+        ],
+        "overview": "This repository has 57 readable project files and appears to use Express, Node API, Prisma, Database, Docker. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "api",
+                "type": "api",
+                "label": "Express API",
+                "explanation": "This Express server receives requests and runs backend rules.",
+                "evidence": [
+                    "e2e/src/server/server.spec.ts",
+                    "src/app/routes/article/article.controller.ts",
+                    "src/app/routes/article/article.mapper.ts",
+                    "src/app/routes/article/article.model.ts",
+                    "src/app/routes/article/article.service.ts",
+                    "src/app/routes/article/author.mapper.ts",
+                    "src/app/routes/article/comment.model.ts",
+                    "src/app/routes/auth/auth.controller.ts",
+                    "src/app/routes/auth/auth.service.ts",
+                    "src/app/routes/auth/auth.ts",
+                    "src/app/routes/auth/register-input.model.ts",
+                    "src/app/routes/auth/registered-user.model.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": []
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "src/app/models/http-exception.model.ts",
+                    "src/prisma/migrations/20210924225358_initial/migration.sql",
+                    "src/prisma/migrations/20211001143221_implicit_tags/migration.sql",
+                    "src/prisma/migrations/20211105153605_api_url/migration.sql",
+                    "src/prisma/migrations/20211221184529_deprecated_preview/migration.sql",
+                    "src/prisma/migrations/migration_lock.toml",
+                    "src/prisma/prisma-client.ts",
+                    "src/prisma/seed.ts"
+                ]
+            },
+            {
+                "key": "docker",
+                "type": "deployment",
+                "label": "Docker environment",
+                "explanation": "Docker files describe a repeatable way to run parts of this project.",
+                "evidence": [
+                    "Dockerfile"
+                ]
+            }
+        ],
+        "symbols": 148,
+        "relationships": 1008,
+        "routes": 8,
+        "route_sample": [
+            {
+                "path": "src/app/routes/article/article.controller.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/articles",
+                "confidence": "high",
+                "line": 30
+            },
+            {
+                "path": "src/app/routes/article/article.controller.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/articles",
+                "confidence": "high",
+                "line": 71
+            },
+            {
+                "path": "src/app/routes/auth/auth.controller.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 14
+            },
+            {
+                "path": "src/app/routes/auth/auth.controller.ts",
+                "framework": "Express-style",
+                "method": "POST",
+                "route_path": "/users/login",
+                "confidence": "high",
+                "line": 30
+            },
+            {
+                "path": "src/app/routes/auth/auth.controller.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/user",
+                "confidence": "high",
+                "line": 45
+            },
+            {
+                "path": "src/app/routes/auth/auth.controller.ts",
+                "framework": "Express-style",
+                "method": "PUT",
+                "route_path": "/user",
+                "confidence": "high",
+                "line": 61
+            },
+            {
+                "path": "src/app/routes/tag/tag.controller.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/tags",
+                "confidence": "high",
+                "line": 13
+            },
+            {
+                "path": "src/main.ts",
+                "framework": "Express-style",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 21
+            }
+        ],
+        "features": 2,
+        "feature_clusters": [
+            {
+                "label": "Profile",
+                "confidence": "strong",
+                "score": 75,
+                "symbols": 11,
+                "evidence": [
+                    {
+                        "path": "src/app/routes/article/article.service.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.controller.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.model.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.service.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.service.ts",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.service.ts",
+                        "line": 22,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.service.ts",
+                        "line": 42,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/app/routes/profile/profile.utils.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "src/app/routes/routes.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 15,
+                "symbols": 2,
+                "evidence": [
+                    {
+                        "path": "src/app/routes/auth/auth.controller.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "src/app/routes/auth/auth.service.ts",
+                        "line": 84,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [],
+        "tables": [
+            "Article",
+            "ArticleTags",
+            "Comment",
+            "Tag",
+            "User",
+            "_ArticleToTag",
+            "_UserFavorites",
+            "_UserFollows"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 35,
+        "finding_types": {
+            "database_operation": 13,
+            "database_write": 10,
+            "destructive_database_operation": 2,
+            "environment_access": 7,
+            "http_call": 1,
+            "large_file": 1,
+            "possible_unused_dependency": 1
+        },
+        "finding_severities": {
+            "attention": 26,
+            "info": 9
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "article.service.ts is large enough to be risky to edit",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "tslib has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Axios HTTP request",
+                "path": "e2e/src/server/server.spec.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "e2e/src/support/test-setup.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "e2e/src/support/test-setup.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.controller.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.controller.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.controller.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_write",
+                "title": "Database create operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_write",
+                "title": "Database create operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_write",
+                "title": "Database update operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_write",
+                "title": "Database update operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_write",
+                "title": "Database update operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_write",
+                "title": "Database update operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "destructive_database_operation",
+                "title": "Database delete operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "destructive_database_operation",
+                "title": "Database delete operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.service.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/app/routes/article/article.service.ts"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 17,
+                "message": null,
+                "symbols": 127,
+                "relationships": 606,
+                "routes": 8,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 57
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 57
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 586,
+                "message": "1 file(s) contained syntax the worker could not fully parse.",
+                "symbols": 62,
+                "relationships": 476,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 57
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 812,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 57
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 190,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 33,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 57
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 812
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Failed analyzer providers: typescript-semantic."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

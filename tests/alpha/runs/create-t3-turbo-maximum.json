@@ -1,0 +1,494 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:22:21+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "create-t3-turbo",
+        "url": "https://github.com/t3-oss/create-t3-turbo.git",
+        "commit_sha": "8f945b7bb3bfb3ca8358d48b1ff0214079bc11ee",
+        "size": "medium",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Next.js",
+            "Expo",
+            "Turborepo",
+            "Prisma"
+        ],
+        "architecture_type": "web and mobile monorepo",
+        "repository_shape": [
+            "medium",
+            "new",
+            "many-packages",
+            "rapid-development-candidate"
+        ],
+        "expected_high_level_systems": [
+            "web app",
+            "mobile app",
+            "shared API",
+            "database"
+        ],
+        "why_selected": "Modern multi-app monorepo with shared packages and cross-package imports.",
+        "candidate_kind": "rapid-development-candidate"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 608,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 287,
+        "peak_php_memory_bytes": 23068672,
+        "files_discovered": 138,
+        "repository_bytes": 1069516,
+        "files_analyzed": 123,
+        "files_skipped": 15,
+        "stack": [
+            "Next.js",
+            "Drizzle",
+            "Database",
+            "Vercel"
+        ],
+        "overview": "This repository has 123 readable project files and appears to use Next.js, Drizzle, Database, Vercel. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "apps/expo/src/app/index.tsx",
+                    "apps/expo/src/app/post/[id].tsx",
+                    "apps/expo/src/app/_layout.tsx",
+                    "apps/nextjs/next.config.js",
+                    "apps/nextjs/src/app/api/auth/[...all]/route.ts",
+                    "apps/nextjs/src/app/api/trpc/[trpc]/route.ts",
+                    "apps/nextjs/src/app/layout.tsx",
+                    "apps/nextjs/src/app/page.tsx",
+                    "apps/nextjs/src/app/_components/auth-showcase.tsx",
+                    "apps/nextjs/src/app/_components/posts.tsx"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "apps/expo/src/utils/auth.ts",
+                    "apps/nextjs/src/app/_components/auth-showcase.tsx",
+                    "apps/nextjs/src/auth/client.ts",
+                    "apps/nextjs/src/auth/server.ts",
+                    "apps/tanstack-start/src/auth/client.ts",
+                    "apps/tanstack-start/src/auth/server.ts",
+                    "apps/tanstack-start/src/component/auth-showcase.tsx",
+                    "packages/auth/env.ts",
+                    "packages/auth/eslint.config.ts",
+                    "packages/auth/package.json",
+                    "packages/auth/src/index.ts",
+                    "packages/auth/tsconfig.json"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "packages/db/src/auth-schema.ts",
+                    "packages/db/src/schema.ts"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": []
+            }
+        ],
+        "symbols": 366,
+        "relationships": 2093,
+        "routes": 0,
+        "route_sample": [],
+        "features": 1,
+        "feature_clusters": [
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 28,
+                "symbols": 4,
+                "evidence": [
+                    {
+                        "path": "apps/expo/src/app/index.tsx",
+                        "line": 101,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "apps/tanstack-start/src/component/auth-showcase.tsx",
+                        "line": 7,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "Postgres"
+        ],
+        "tables": [],
+        "packages": 1595,
+        "security_findings": 227,
+        "findings": 288,
+        "finding_types": {
+            "authentication_boundary": 3,
+            "database_operation": 5,
+            "dependency_vulnerability": 226,
+            "destructive_database_operation": 1,
+            "duplicate_content": 4,
+            "environment_access": 21,
+            "http_call": 1,
+            "navigation": 2,
+            "possible_unused_dependency": 7,
+            "process_or_dynamic_execution": 1,
+            "sensitive_system": 13,
+            "ui_handler": 3,
+            "unresolved_local_import": 1
+        },
+        "finding_severities": {
+            "attention": 102,
+            "info": 60,
+            "risk": 126
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/expo/src/app/_layout.tsx",
+                "path": "apps/expo/src/app/_layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/expo/src/utils/auth.ts",
+                "path": "apps/expo/src/utils/auth.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/nextjs/src/app/_components/auth-showcase.tsx",
+                "path": "apps/nextjs/src/app/_components/auth-showcase.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/nextjs/src/auth/client.ts",
+                "path": "apps/nextjs/src/auth/client.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/nextjs/src/auth/server.ts",
+                "path": "apps/nextjs/src/auth/server.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/tanstack-start/src/auth/client.ts",
+                "path": "apps/tanstack-start/src/auth/client.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/tanstack-start/src/auth/server.ts",
+                "path": "apps/tanstack-start/src/auth/server.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/tanstack-start/src/component/auth-showcase.tsx",
+                "path": "apps/tanstack-start/src/component/auth-showcase.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in packages/auth/env.ts",
+                "path": "packages/auth/env.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in packages/auth/eslint.config.ts",
+                "path": "packages/auth/eslint.config.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in packages/auth/package.json",
+                "path": "packages/auth/package.json"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in packages/auth/src/index.ts",
+                "path": "packages/auth/src/index.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in packages/auth/tsconfig.json",
+                "path": "packages/auth/tsconfig.json"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in packages/db/src/auth-schema.ts",
+                "path": "packages/db/src/auth-schema.ts"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "apps/nextjs/src/auth/client.ts"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "packages/api/eslint.config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "packages/api/tsconfig.json"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "tooling/eslint/tsconfig.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "expo-dev-client has no obvious readable-file reference",
+                "path": "apps/expo/package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "expo-linking has no obvious readable-file reference",
+                "path": "apps/expo/package.json"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 173,
+                "relationships": 1030,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 207,
+                "relationships": 893,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 185,
+                "relationships": 880,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 25,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 12,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 1595,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 226,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "wtfcode-native",
+            "duration_ms": 0
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

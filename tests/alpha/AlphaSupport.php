@@ -201,7 +201,7 @@ function alpha_scan_repository(string $path, string $profile, string $commit): a
         'symbols' => count($feature['symbols'] ?? []),
         'evidence' => array_map(static fn (array $evidence): array => array_intersect_key($evidence, array_flip(['path','line','signals','confidence'])), array_slice($feature['evidence'] ?? [], 0, 10)),
     ], $graph['features'] ?? []);
-    $routes = array_map(static fn (array $route): array => array_intersect_key($route, array_flip(['method','route_path','path','handler_key','framework','line','confidence'])), array_slice($graph['routes'] ?? [], 0, 50));
+    $routes = array_map(static fn (array $route): array => array_intersect_key($route, array_flip(['method','route_path','path','framework','line','confidence'])), array_slice($graph['routes'] ?? [], 0, 50));
     $nodes = array_map(static fn (array $node): array => array_intersect_key($node, array_flip(['key','type','label','explanation','evidence'])), $inspection['nodes'] ?? []);
     return SensitiveDataSanitizer::scrub([
         'status' => $partialReasons === [] ? 'success' : 'partial',

@@ -1,0 +1,900 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:23:10+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "fastapi-full-stack",
+        "url": "https://github.com/tiangolo/full-stack-fastapi-template.git",
+        "commit_sha": "162344da111e833b30892728372ab95331f06873",
+        "size": "medium",
+        "primary_language": "Python",
+        "known_frameworks": [
+            "FastAPI",
+            "React",
+            "SQLModel",
+            "Docker"
+        ],
+        "architecture_type": "frontend and backend application",
+        "repository_shape": [
+            "medium",
+            "new",
+            "well-documented",
+            "tested"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "API",
+            "authentication",
+            "database",
+            "deployment"
+        ],
+        "why_selected": "Maintained full-stack Python/React template with clear service boundaries.",
+        "candidate_kind": "application-template"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 4682,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 4323,
+        "peak_php_memory_bytes": 58720256,
+        "files_discovered": 252,
+        "repository_bytes": 1596887,
+        "files_analyzed": 219,
+        "files_skipped": 33,
+        "stack": [
+            "React",
+            "FastAPI",
+            "Database",
+            "Docker"
+        ],
+        "overview": "This repository has 219 readable project files and appears to use React, FastAPI, Database, Docker. It found 5 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Frontend application",
+                "explanation": "This is the part of the project that renders the user interface.",
+                "evidence": [
+                    "frontend/components.json",
+                    "frontend/src/client/client/client.gen.ts",
+                    "frontend/src/client/client/index.ts",
+                    "frontend/src/client/client/types.gen.ts",
+                    "frontend/src/client/client/utils.gen.ts",
+                    "frontend/src/client/client.gen.ts",
+                    "frontend/src/client/core/auth.gen.ts",
+                    "frontend/src/client/core/bodySerializer.gen.ts",
+                    "frontend/src/client/core/params.gen.ts",
+                    "frontend/src/client/core/pathSerializer.gen.ts",
+                    "frontend/src/client/core/queryKeySerializer.gen.ts",
+                    "frontend/src/client/core/serverSentEvents.gen.ts"
+                ]
+            },
+            {
+                "key": "api",
+                "type": "api",
+                "label": "FastAPI API",
+                "explanation": "This server receives requests and runs backend rules.",
+                "evidence": [
+                    "backend/app/api/deps.py",
+                    "backend/app/api/main.py",
+                    "backend/app/api/routes/items.py",
+                    "backend/app/api/routes/login.py",
+                    "backend/app/api/routes/private.py",
+                    "backend/app/api/routes/users.py",
+                    "backend/app/api/routes/utils.py",
+                    "backend/app/api/routes/__init__.py",
+                    "backend/app/api/__init__.py",
+                    "backend/app/main.py"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "backend/app/core/security.py",
+                    "backend/app/crud.py",
+                    "frontend/src/client/core/auth.gen.ts",
+                    "frontend/src/components/Common/AuthLayout.tsx",
+                    "frontend/src/hooks/useAuth.ts"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "backend/app/alembic/versions/d98dd8ec85a3_edit_replace_id_integers_in_all_models_.py",
+                    "backend/app/alembic/versions/e2412789c190_initialize_models.py",
+                    "backend/app/models.py"
+                ]
+            },
+            {
+                "key": "docker",
+                "type": "deployment",
+                "label": "Docker environment",
+                "explanation": "Docker files describe a repeatable way to run parts of this project.",
+                "evidence": [
+                    ".github/workflows/deploy-docker-compose.yml",
+                    ".github/workflows/test-docker-compose.yml",
+                    "backend/Dockerfile"
+                ]
+            }
+        ],
+        "symbols": 1563,
+        "relationships": 9673,
+        "routes": 18,
+        "route_sample": [
+            {
+                "path": "backend/app/api/routes/items.py",
+                "framework": "FastAPI",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 13
+            },
+            {
+                "path": "backend/app/api/routes/items.py",
+                "framework": "FastAPI",
+                "method": "GET",
+                "route_path": "/{id}",
+                "confidence": "high",
+                "line": 48
+            },
+            {
+                "path": "backend/app/api/routes/items.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 61
+            },
+            {
+                "path": "backend/app/api/routes/items.py",
+                "framework": "FastAPI",
+                "method": "PUT",
+                "route_path": "/{id}",
+                "confidence": "high",
+                "line": 75
+            },
+            {
+                "path": "backend/app/api/routes/items.py",
+                "framework": "FastAPI",
+                "method": "DELETE",
+                "route_path": "/{id}",
+                "confidence": "high",
+                "line": 99
+            },
+            {
+                "path": "backend/app/api/routes/login.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/login/access-token",
+                "confidence": "high",
+                "line": 23
+            },
+            {
+                "path": "backend/app/api/routes/login.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/login/test-token",
+                "confidence": "high",
+                "line": 45
+            },
+            {
+                "path": "backend/app/api/routes/login.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/password-recovery/{email}",
+                "confidence": "high",
+                "line": 53
+            },
+            {
+                "path": "backend/app/api/routes/login.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/reset-password/",
+                "confidence": "high",
+                "line": 77
+            },
+            {
+                "path": "backend/app/api/routes/private.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/users/",
+                "confidence": "high",
+                "line": 23
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "PATCH",
+                "route_path": "/me",
+                "confidence": "high",
+                "line": 81
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "PATCH",
+                "route_path": "/me/password",
+                "confidence": "high",
+                "line": 103
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "GET",
+                "route_path": "/me",
+                "confidence": "high",
+                "line": 124
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "DELETE",
+                "route_path": "/me",
+                "confidence": "high",
+                "line": 132
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "POST",
+                "route_path": "/signup",
+                "confidence": "high",
+                "line": 146
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "GET",
+                "route_path": "/{user_id}",
+                "confidence": "high",
+                "line": 162
+            },
+            {
+                "path": "backend/app/api/routes/users.py",
+                "framework": "FastAPI",
+                "method": "DELETE",
+                "route_path": "/{user_id}",
+                "confidence": "high",
+                "line": 214
+            },
+            {
+                "path": "backend/app/api/routes/utils.py",
+                "framework": "FastAPI",
+                "method": "GET",
+                "route_path": "/health-check/",
+                "confidence": "high",
+                "line": 29
+            }
+        ],
+        "features": 5,
+        "feature_clusters": [
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 209,
+                "symbols": 27,
+                "evidence": [
+                    {
+                        "path": "backend/app/api/main.py",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/app/api/routes/login.py",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/app/api/routes/login.py",
+                        "line": 46,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/app/api/routes/login.py",
+                        "line": 54,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/app/api/routes/login.py",
+                        "line": 78,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/app/api/routes/login.py",
+                        "line": 105,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "backend/app/crud.py",
+                        "line": 45,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/client/types.gen.ts",
+                        "line": 10,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/hooks/useAuth.ts",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/hooks/useAuth.ts",
+                        "line": 41,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Registration",
+                "confidence": "strong",
+                "score": 158,
+                "symbols": 25,
+                "evidence": [
+                    {
+                        "path": "backend/app/api/routes/users.py",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/app/api/routes/users.py",
+                        "line": 37,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/app/api/routes/users.py",
+                        "line": 57,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/app/api/routes/users.py",
+                        "line": 125,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/app/api/routes/users.py",
+                        "line": 133,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "backend/app/api/routes/users.py",
+                        "line": 147,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/signup.tsx",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/signup.tsx",
+                        "line": 40,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/signup.tsx",
+                        "line": 60,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/signup.tsx",
+                        "line": 74,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Admin",
+                "confidence": "strong",
+                "score": 81,
+                "symbols": 13,
+                "evidence": [
+                    {
+                        "path": "frontend/src/routes/_layout/admin.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "frontend/src/routes/_layout/admin.tsx",
+                        "line": 12,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/_layout/admin.tsx",
+                        "line": 39,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/_layout/admin.tsx",
+                        "line": 51,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/_layout/admin.tsx",
+                        "line": 59,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routeTree.gen.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Profile",
+                "confidence": "strong",
+                "score": 63,
+                "symbols": 10,
+                "evidence": [
+                    {
+                        "path": "frontend/src/components/Sidebar/User.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/components/Sidebar/User.tsx",
+                        "line": 27,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/components/ui/avatar.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "frontend/src/components/ui/avatar.tsx",
+                        "line": 6,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/components/ui/avatar.tsx",
+                        "line": 22,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/components/ui/avatar.tsx",
+                        "line": 35,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 30,
+                "symbols": 5,
+                "evidence": [
+                    {
+                        "path": "frontend/src/client/client/utils.gen.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/routes/_layout/items.tsx",
+                        "line": 31,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/client/client/utils.gen.ts",
+                        "line": 17,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "frontend/src/client/core/utils.gen.ts",
+                        "line": 85,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "localhost",
+            "Sentry"
+        ],
+        "tables": [
+            "item",
+            "user"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 58,
+        "finding_types": {
+            "database_operation": 9,
+            "duplicate_content": 2,
+            "environment_access": 11,
+            "http_call": 1,
+            "large_file": 2,
+            "navigation": 7,
+            "possible_unused_dependency": 3,
+            "repeated_client_setup": 1,
+            "sensitive_system": 5,
+            "ui_handler": 16,
+            "unresolved_local_import": 1
+        },
+        "finding_severities": {
+            "attention": 17,
+            "info": 41
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in backend/app/core/security.py",
+                "path": "backend/app/core/security.py"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in backend/app/crud.py",
+                "path": "backend/app/crud.py"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in frontend/src/client/core/auth.gen.ts",
+                "path": "frontend/src/client/core/auth.gen.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "types.gen.ts is large enough to be risky to edit",
+                "path": "frontend/src/client/types.gen.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in frontend/src/components/Common/AuthLayout.tsx",
+                "path": "frontend/src/components/Common/AuthLayout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "sidebar.tsx is large enough to be risky to edit",
+                "path": "frontend/src/components/ui/sidebar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in frontend/src/hooks/useAuth.ts",
+                "path": "frontend/src/hooks/useAuth.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from frontend/src/main.tsx",
+                "path": "frontend/src/main.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": ".agents/skills/library-skills/.library-skills.json"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "backend/app/api/routes/__init__.py"
+            },
+            {
+                "severity": "info",
+                "type": "repeated_client_setup",
+                "title": "Several database or service clients appear to be created",
+                "path": null
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@radix-ui/react-radio-group has no obvious readable-file reference",
+                "path": "frontend/package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@radix-ui/react-scroll-area has no obvious readable-file reference",
+                "path": "frontend/package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@react-email/ui has no obvious readable-file reference",
+                "path": "packages/react-email/package.json"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "frontend/playwright.config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "frontend/playwright.config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "frontend/playwright.config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "frontend/playwright.config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "frontend/playwright.config.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "frontend/playwright.config.ts"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 82,
+                "message": null,
+                "symbols": 688,
+                "relationships": 4582,
+                "routes": 18,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 219
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 219
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 999,
+                "message": "3 file(s) contained syntax the worker could not fully parse.",
+                "symbols": 786,
+                "relationships": 3545,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 219
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 1803,
+                "message": null,
+                "symbols": 638,
+                "relationships": 2954,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 219
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 610,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 44,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 219
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 1803
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}
