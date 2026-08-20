@@ -190,7 +190,7 @@ final class Project
     {
         $unique = [];
         foreach ($findings as $finding) {
-            $signature = strtolower(implode('|', [(string) ($finding['finding_type'] ?? ''), (string) ($finding['title'] ?? ''), (string) ($finding['file_path'] ?? '')]));
+            $signature = strtolower(implode('|', [(string) ($finding['finding_type'] ?? ''), (string) ($finding['title'] ?? '')]));
             if (isset($unique[$signature])) continue;
             $unique[$signature] = $finding;
             if (count($unique) >= max(1, $limit)) break;

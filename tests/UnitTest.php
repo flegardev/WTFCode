@@ -14,9 +14,10 @@ function assert_same(mixed $expected, mixed $actual, string $message): void
 $findingSummary = Project::deduplicateFindings([
     ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'lib/db.ts'],
     ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'lib/db.ts'],
+    ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'app/actions.ts'],
     ['finding_type' => 'authentication_boundary', 'title' => 'Authentication boundary', 'file_path' => 'auth.ts'],
 ], 12);
-assert_same(2, count($findingSummary), 'First-screen findings should collapse repeated type, title, and file combinations');
+assert_same(2, count($findingSummary), 'First-screen findings should collapse repeated categories even when evidence spans files');
 
 assert_same('https://github.com/openai/openai-quickstart-node.git', RepositoryImporter::normalizeGithubUrl('https://github.com/openai/openai-quickstart-node'), 'Public GitHub URLs should normalize to a clone URL');
 assert_same(null, RepositoryImporter::normalizeGithubUrl('git@github.com:openai/openai-quickstart-node.git'), 'SSH URLs should be rejected');
