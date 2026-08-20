@@ -17,10 +17,8 @@ $userId = null;
 $projectId = null;
 
 try {
-    $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'V2 Integration', 'email' => $email, 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-    $userId = (int) $pdo->lastInsertId();
-    $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'V2 fixture ' . $token, 'repository_url' => 'https://github.com/wtfcode-fixtures/' . $token . '.git', 'local_path' => $fixture, 'status' => 'scanning']);
-    $projectId = (int) $pdo->lastInsertId();
+    $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'V2 Integration', 'email' => $email, 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+    $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'V2 fixture ' . $token, 'repository_url' => 'https://github.com/wtfcode-fixtures/' . $token . '.git', 'local_path' => $fixture, 'status' => 'scanning']);
 
     $first = (new RepoScanner())->scan($projectId, $fixture);
     integration_assert(($first['symbol_graph']['stats']['symbols'] ?? 0) > 0, 'First scan should persist a graph');

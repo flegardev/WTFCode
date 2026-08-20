@@ -37,10 +37,8 @@ $token = bin2hex(random_bytes(6));
 $userId = null;
 $git = [];
 try {
-    $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'V3 dogfood', 'email' => 'dogfood-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-    $userId = (int) $pdo->lastInsertId();
-    $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'WTFCode dogfood', 'repository_url' => 'https://github.com/flegardev/WTFCode.git?dogfood=' . $token, 'local_path' => $root, 'status' => 'ready']);
-    $projectId = (int) $pdo->lastInsertId();
+    $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'V3 dogfood', 'email' => 'dogfood-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+    $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'WTFCode dogfood', 'repository_url' => 'https://github.com/flegardev/WTFCode.git?dogfood=' . $token, 'local_path' => $root, 'status' => 'ready']);
     foreach ([
         'foundation_to_ast' => ['8ea9276', '8f62122', 'Add AST and semantic analyzers'],
         'ast_to_structural' => ['8f62122', 'f224283', 'Add ast-grep and ripgrep structural analysis'],

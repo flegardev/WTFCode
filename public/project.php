@@ -9,7 +9,11 @@ $project = $projectId === false || $projectId === null ? null : Project::findFor
 if ($project === null) { http_response_code(404); exit('Project not found.'); }
 if (is_post()) {
     verify_csrf();
-    $error = Project::rescan($project, Auth::id(), post_string('profile'));
+    $userId = Auth::id();
+    $profile = post_string('profile');
+    release_session_lock();
+    $error = Project::rescan($project, $userId, $profile);
+    resume_session();
     flash($error === null ? 'success' : 'error', $error ?? 'Repository analysis refreshed.');
     redirect('project.php?id=' . (int) $project['id']);
 }

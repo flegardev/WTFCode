@@ -32,10 +32,8 @@ mkdir($directory, 0700, true);
 $userId = null;
 try {
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'route.php', "<?php\nfunction health() { return ['ok' => true]; }\n");
-    $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'Change test', 'email' => 'change-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-    $userId = (int) $pdo->lastInsertId();
-    $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'Change fixture', 'repository_url' => 'https://github.com/wtfcode-change/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
-    $projectId = (int) $pdo->lastInsertId();
+    $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Change test', 'email' => 'change-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+    $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Change fixture', 'repository_url' => 'https://github.com/wtfcode-change/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
     (new RepoScanner())->scan($projectId, $directory, AnalysisProfile::QUICK);
     ChangeGuardService::capture($projectId, $userId, 'before', 'before', 'Add status route');
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'route.php', "<?php\nfunction health() { return ['ok' => true]; }\nfunction status() { return ['status' => 'ready']; }\n");

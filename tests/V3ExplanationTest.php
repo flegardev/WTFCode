@@ -29,10 +29,8 @@ try {
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'auth' . DIRECTORY_SEPARATOR . 'route.js', "export const route = 'auth';\n");
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'chat' . DIRECTORY_SEPARATOR . 'route.js', "export const route = 'chat';\n");
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'ChatConsumer.js', "import { route } from './chat/route.js';\nexport const selected = route;\n");
-    $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'Explanation test', 'email' => 'explain-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-    $userId = (int) $pdo->lastInsertId();
-    $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'Explanation fixture', 'repository_url' => 'https://github.com/wtfcode-explain/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
-    $projectId = (int) $pdo->lastInsertId();
+    $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Explanation test', 'email' => 'explain-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+    $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Explanation fixture', 'repository_url' => 'https://github.com/wtfcode-explain/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
     (new RepoScanner())->scan($projectId, $directory, AnalysisProfile::QUICK);
     putenv('WTF_CODE_EXPLANATION_PROVIDER=deterministic');
     $answer = ExplanationManager::answer($projectId, 'How does login work?');

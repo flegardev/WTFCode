@@ -10,14 +10,13 @@ final class ChangeGuardService
         if (!in_array($phase, ['before', 'after'], true)) throw new InvalidArgumentException('Change Guard phase must be before or after.');
         $snapshot = SensitiveDataSanitizer::scrub(self::snapshot($projectId));
         $json = json_encode($snapshot, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-        $statement = Database::connection()->prepare('INSERT INTO change_guard_snapshots (project_id, user_id, phase, label, intended_change, commit_sha, scan_run_id, snapshot_json, fingerprint) VALUES (:project_id, :user_id, :phase, :label, :intended, :commit_sha, :scan_run_id, :snapshot_json, :fingerprint)');
-        $statement->execute([
+        $id = Database::insert('INSERT INTO change_guard_snapshots (project_id, user_id, phase, label, intended_change, commit_sha, scan_run_id, snapshot_json, fingerprint) VALUES (:project_id, :user_id, :phase, :label, :intended, :commit_sha, :scan_run_id, :snapshot_json, :fingerprint)', [
             'project_id' => $projectId, 'user_id' => $userId, 'phase' => $phase,
             'label' => substr(trim($label), 0, 180), 'intended' => substr(trim($intended), 0, 500),
             'commit_sha' => $snapshot['commit_sha'], 'scan_run_id' => $snapshot['scan_run_id'],
             'snapshot_json' => $json, 'fingerprint' => hash('sha256', $json),
         ]);
-        return ['id' => (int) Database::connection()->lastInsertId(), 'phase' => $phase, 'snapshot' => $snapshot];
+        return ['id' => $id, 'phase' => $phase, 'snapshot' => $snapshot];
     }
 
     /** @return array<string, mixed>|null */
@@ -61,8 +60,13 @@ final class ChangeGuardService
         $schema->execute(['project_id' => $projectId]);
         $packages = $pdo->prepare("SELECT CONCAT(ecosystem, ':', package_name, '@', package_version) FROM package_inventory WHERE project_id = :project_id AND scan_run_id = :scan_run_id ORDER BY ecosystem, package_name LIMIT 3000");
         $packages->execute(['project_id' => $projectId, 'scan_run_id' => (int) ($scan['id'] ?? 0)]);
-        $security = $pdo->prepare("SELECT CONCAT(finding_type, ':', severity, ':', COALESCE(file_path,''), ':', COALESCE(JSON_UNQUOTE(JSON_EXTRACT(evidence_json, '$.rule_id')),'')) FROM scan_findings WHERE project_id = :project_id ORDER BY finding_type, file_path LIMIT 2000");
+        $security = $pdo->prepare('SELECT finding_type, severity, file_path, evidence_json FROM scan_findings WHERE project_id = :project_id ORDER BY finding_type, file_path LIMIT 2000');
         $security->execute(['project_id' => $projectId]);
+        $securityFacts = [];
+        foreach ($security->fetchAll() as $finding) {
+            $evidence = json_decode((string) ($finding['evidence_json'] ?? '{}'), true);
+            $securityFacts[] = implode(':', [(string) $finding['finding_type'], (string) $finding['severity'], (string) ($finding['file_path'] ?? ''), (string) ($evidence['rule_id'] ?? '')]);
+        }
         $graph = SymbolRepository::graph($projectId, 300);
         $architecture = [];
         foreach ($graph['nodes'] as $node) $architecture[] = $node['architecture'] . '>' . $node['subsystem'];
@@ -70,7 +74,7 @@ final class ChangeGuardService
             'scan_run_id' => isset($scan['id']) ? (int) $scan['id'] : null, 'commit_sha' => $scan['commit_sha'] ?? null,
             'routes' => array_values(array_unique($routes)), 'schema' => array_values(array_unique($schema->fetchAll(PDO::FETCH_COLUMN))),
             'dependencies' => array_values(array_unique($packages->fetchAll(PDO::FETCH_COLUMN))), 'critical_symbols' => array_values(array_unique($symbols->fetchAll(PDO::FETCH_COLUMN))),
-            'security' => array_values(array_unique($security->fetchAll(PDO::FETCH_COLUMN))), 'architecture' => array_values(array_unique($architecture)),
+            'security' => array_values(array_unique($securityFacts)), 'architecture' => array_values(array_unique($architecture)),
         ];
     }
 

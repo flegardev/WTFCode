@@ -25,7 +25,8 @@ final class ToolDoctor
         ];
 
         $results = [
-            $this->mysqlCheck(),
+            $this->databaseCheck(),
+            $this->libraryCheck('PDO PostgreSQL', extension_loaded('pdo_pgsql'), PHP_VERSION, 'pdo_pgsql is available for Supabase PostgreSQL.'),
             $this->composerCheck($workingDirectory),
             $this->libraryCheck('PHP Parser', class_exists(PhpParser\ParserFactory::class), '5.8.0', 'Composer library is available for read-only PHP AST analysis.'),
             $this->workerCheck('Tree-sitter', 'node_modules/web-tree-sitter/package.json', '0.20.8 + grammar bundle 0.1.13'),
@@ -34,7 +35,7 @@ final class ToolDoctor
         ];
         foreach ($checks as $check) $results[] = $this->commandCheck($check, $workingDirectory);
         usort($results, static function (array $left, array $right): int {
-            $order = ['PHP', 'Composer', 'MySQL', 'Git', 'Node', 'PHP Parser', 'Tree-sitter', 'TypeScript Semantic', 'ast-grep', 'Semgrep', 'ctags', 'Gitleaks', 'OSV', 'ripgrep', 'Syft', 'Grype'];
+            $order = ['PHP', 'Composer', 'PDO PostgreSQL', 'Database', 'Git', 'Node', 'PHP Parser', 'Tree-sitter', 'TypeScript Semantic', 'ast-grep', 'Semgrep', 'ctags', 'Gitleaks', 'OSV', 'ripgrep', 'Syft', 'Grype'];
             return array_search($left['name'], $order, true) <=> array_search($right['name'], $order, true);
         });
         return $results;
@@ -74,13 +75,13 @@ final class ToolDoctor
     }
 
     /** @return array<string, mixed> */
-    private function mysqlCheck(): array
+    private function databaseCheck(): array
     {
         try {
             $version = (string) Database::connection()->query('SELECT VERSION()')->fetchColumn();
-            return ['name' => 'MySQL', 'status' => 'Ready', 'version' => $version, 'path' => null, 'message' => 'Database connection succeeded through PDO.'];
+            return ['name' => 'Database', 'status' => 'Ready', 'version' => substr($version, 0, 120), 'path' => null, 'message' => Database::driver() . ' connection succeeded through PDO.'];
         } catch (Throwable $exception) {
-            return ['name' => 'MySQL', 'status' => 'Missing', 'version' => null, 'path' => null, 'message' => 'Database connection failed: ' . $exception->getMessage()];
+            return ['name' => 'Database', 'status' => 'Missing', 'version' => null, 'path' => null, 'message' => 'Database connection failed; credentials were not displayed.'];
         }
     }
 

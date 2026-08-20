@@ -11,6 +11,10 @@ function assert_same(mixed $expected, mixed $actual, string $message): void
     }
 }
 
+assert_same(false, csrf_token_is_valid('', ''), 'Missing CSRF tokens must never validate');
+assert_same(false, csrf_token_is_valid('submitted', ''), 'A submitted CSRF token requires a server-side session token');
+assert_same(true, csrf_token_is_valid('same-token', 'same-token'), 'Matching non-empty CSRF tokens should validate');
+
 $findingSummary = Project::deduplicateFindings([
     ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'lib/db.ts'],
     ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'lib/db.ts'],

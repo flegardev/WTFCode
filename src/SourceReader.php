@@ -7,7 +7,9 @@ final class SourceReader
     /** @return array{start: int, end: int, lines: array<int, array{number: int, text: string}>}|null */
     public static function excerpt(array $project, string $relativePath, int $startLine, int $endLine, int $context = 3): ?array
     {
-        $root = realpath((string) ($project['local_path'] ?? ''));
+        try { $workingCopy = RepositoryImporter::workingCopy($project); }
+        catch (Throwable) { return null; }
+        $root = realpath($workingCopy);
         if ($root === false || !is_dir($root)) return null;
         $candidate = realpath($root . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath));
         $rootPrefix = rtrim(strtolower(str_replace('\\', '/', $root)), '/') . '/';

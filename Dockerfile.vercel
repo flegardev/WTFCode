@@ -1,0 +1,76 @@
+# syntax=docker/dockerfile:1.7
+
+FROM composer:2 AS composer-dependencies
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress --no-scripts
+
+FROM node:24.19.0-bookworm-slim AS node-dependencies
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+
+FROM dunglas/frankenphp:1-php8.4-bookworm
+
+ARG GITLEAKS_VERSION=8.30.1
+ARG GITLEAKS_SHA256=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+ARG OSV_VERSION=2.5.1
+ARG OSV_SHA256=f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be
+ARG SYFT_VERSION=1.51.0
+ARG SYFT_SHA256=2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f
+ARG GRYPE_VERSION=0.117.0
+ARG GRYPE_SHA256=38525dab1e06f162ebaa02f94d82d1f807076b011a44180cf2777edf1a7b9c26
+
+RUN install-php-extensions pdo_pgsql mbstring curl opcache
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl git libcap2-bin ripgrep tar \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tar.gz; \
+    echo "${GITLEAKS_SHA256}  /tmp/gitleaks.tar.gz" | sha256sum -c -; \
+    tar -xzf /tmp/gitleaks.tar.gz -C /usr/local/bin gitleaks; \
+    curl -fsSL "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64" -o /usr/local/bin/osv-scanner; \
+    echo "${OSV_SHA256}  /usr/local/bin/osv-scanner" | sha256sum -c -; \
+    curl -fsSL "https://github.com/anchore/syft/releases/download/v${SYFT_VERSION}/syft_${SYFT_VERSION}_linux_amd64.tar.gz" -o /tmp/syft.tar.gz; \
+    echo "${SYFT_SHA256}  /tmp/syft.tar.gz" | sha256sum -c -; \
+    tar -xzf /tmp/syft.tar.gz -C /usr/local/bin syft; \
+    curl -fsSL "https://github.com/anchore/grype/releases/download/v${GRYPE_VERSION}/grype_${GRYPE_VERSION}_linux_amd64.tar.gz" -o /tmp/grype.tar.gz; \
+    echo "${GRYPE_SHA256}  /tmp/grype.tar.gz" | sha256sum -c -; \
+    tar -xzf /tmp/grype.tar.gz -C /usr/local/bin grype; \
+    chmod 0755 /usr/local/bin/gitleaks /usr/local/bin/osv-scanner /usr/local/bin/syft /usr/local/bin/grype; \
+    rm -f /tmp/gitleaks.tar.gz /tmp/syft.tar.gz /tmp/grype.tar.gz
+
+WORKDIR /app
+COPY --from=composer-dependencies /app/vendor /app/vendor
+COPY --from=node-dependencies /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-dependencies /app/node_modules /app/node_modules
+COPY bootstrap.php composer.json composer.lock package.json package-lock.json THIRD_PARTY.md ./
+COPY src ./src
+COPY public ./public
+COPY views ./views
+COPY workers ./workers
+COPY config ./config
+COPY supabase ./supabase
+COPY deploy/Caddyfile /etc/caddy/Caddyfile
+COPY tools/*.php ./tools/
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && printf '%s\n' 'expose_php=0' 'display_errors=0' 'log_errors=1' 'memory_limit=1024M' 'max_execution_time=0' 'upload_max_filesize=2M' 'post_max_size=2M' > "$PHP_INI_DIR/conf.d/wtfcode-production.ini" \
+    && useradd --system --home-dir /app --shell /usr/sbin/nologin wtfcode \
+    && mkdir -p /tmp/wtfcode/repos /tmp/wtfcode/cache /tmp/wtfcode/tmp /data/caddy /config/caddy \
+    && chown -R wtfcode:wtfcode /tmp/wtfcode /data/caddy /config/caddy \
+    && setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp
+
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    SESSION_DRIVER=database \
+    WTF_STORAGE_PATH=/tmp/wtfcode \
+    WTF_SCAN_PROFILE=quick \
+    TMPDIR=/tmp/wtfcode/tmp \
+    PORT=8080
+
+USER wtfcode
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -fsS "http://127.0.0.1:${PORT:-8080}/health" > /dev/null || exit 1
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

@@ -1,7 +1,7 @@
 {
-  "verification_date": "2026-08-19",
-  "platform": "windows-amd64",
-  "policy": "Versions are pinned. Release artifacts were verified against the checksum asset published with the same GitHub release before extraction. Executable hashes identify the exact local binary used by WTFCode.",
+  "verification_date": "2026-08-20",
+  "platform": "windows-amd64 and linux-amd64",
+  "policy": "Versions are pinned. Release artifacts are verified against the checksum asset or digest published with the same official GitHub release before extraction.",
   "tools": [
     {
       "name": "Gitleaks",
@@ -9,7 +9,9 @@
       "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
       "artifact": "gitleaks_8.30.1_windows_x64.zip",
       "artifact_sha256": "d29144deff3a68aa93ced33dddf84b7fdc26070add4aa0f4513094c8332afc4e",
-      "executable_sha256": "17157e2ee8b76fc8b1d8bee607a250e34b8a8023c8bc81822d4b5ee4d78fcb7c"
+      "executable_sha256": "17157e2ee8b76fc8b1d8bee607a250e34b8a8023c8bc81822d4b5ee4d78fcb7c",
+      "linux_artifact": "gitleaks_8.30.1_linux_x64.tar.gz",
+      "linux_artifact_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
     },
     {
       "name": "OSV-Scanner",
@@ -17,7 +19,9 @@
       "source": "https://github.com/google/osv-scanner/releases/tag/v2.5.1",
       "artifact": "osv-scanner_windows_amd64.exe",
       "artifact_sha256": "25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6",
-      "executable_sha256": "25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6"
+      "executable_sha256": "25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6",
+      "linux_artifact": "osv-scanner_linux_amd64",
+      "linux_artifact_sha256": "f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be"
     },
     {
       "name": "Syft",
@@ -25,7 +29,9 @@
       "source": "https://github.com/anchore/syft/releases/tag/v1.51.0",
       "artifact": "syft_1.51.0_windows_amd64.zip",
       "artifact_sha256": "fc5ffaeffb993576ece9c791da5a688fb2c8969a1479bbfe58583672c64da336",
-      "executable_sha256": "75adfff66c266adac51fe8addeca97702f82b4d822d02bf70b79f556c84d3a46"
+      "executable_sha256": "75adfff66c266adac51fe8addeca97702f82b4d822d02bf70b79f556c84d3a46",
+      "linux_artifact": "syft_1.51.0_linux_amd64.tar.gz",
+      "linux_artifact_sha256": "2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f"
     },
     {
       "name": "Grype",
@@ -33,7 +39,9 @@
       "source": "https://github.com/anchore/grype/releases/tag/v0.117.0",
       "artifact": "grype_0.117.0_windows_amd64.zip",
       "artifact_sha256": "7728ee9c06792e62444bd651274e4dd1e30eec02eee1266bb6c9c9d237d0f0cb",
-      "executable_sha256": "eb65f1c0a6a107fd80fe5bffa86df174a07a94980034b0c9bdd7468ead1b96ce"
+      "executable_sha256": "eb65f1c0a6a107fd80fe5bffa86df174a07a94980034b0c9bdd7468ead1b96ce",
+      "linux_artifact": "grype_0.117.0_linux_amd64.tar.gz",
+      "linux_artifact_sha256": "38525dab1e06f162ebaa02f94d82d1f807076b011a44180cf2777edf1a7b9c26"
     }
   ],
   "trusted_configs": [

@@ -53,28 +53,34 @@ final class Auth
         }
 
         try {
-            $statement = Database::connection()->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)');
-            $statement->execute(['name' => $name, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT)]);
+            $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => $name, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT)]);
         } catch (PDOException $exception) {
-            if ($exception->getCode() === '23000') {
+            if (Database::isUniqueViolation($exception)) {
                 return ['email' => 'An account already uses that email address.'];
             }
             throw $exception;
         }
 
-        self::loginById((int) Database::connection()->lastInsertId());
+        self::loginById($userId);
         return [];
     }
 
     public static function attempt(string $email, string $password): bool
     {
+        $rateKey = LoginRateLimiter::key($email);
+        if (LoginRateLimiter::blocked($rateKey)) {
+            Logger::warning('Login rate limit reached', ['attempt_hash' => $rateKey]);
+            return false;
+        }
         $statement = Database::connection()->prepare('SELECT id, name, email, password_hash FROM users WHERE email = :email LIMIT 1');
         $statement->execute(['email' => strtolower(trim($email))]);
         $user = $statement->fetch();
         if (!$user || !password_verify($password, $user['password_hash'])) {
+            LoginRateLimiter::failed($rateKey);
             Logger::warning('Login failed', ['email_hash' => hash('sha256', strtolower(trim($email)))]);
             return false;
         }
+        LoginRateLimiter::clear($rateKey);
         if (password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
             Database::connection()->prepare('UPDATE users SET password_hash = :hash WHERE id = :id')->execute(['hash' => password_hash($password, PASSWORD_DEFAULT), 'id' => $user['id']]);
         }
@@ -87,7 +93,14 @@ final class Auth
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], (bool) $params['secure'], (bool) $params['httponly']);
+            setcookie(session_name(), '', [
+                'expires' => time() - 42000,
+                'path' => $params['path'],
+                'domain' => $params['domain'],
+                'secure' => (bool) $params['secure'],
+                'httponly' => (bool) $params['httponly'],
+                'samesite' => $params['samesite'] ?: 'Lax',
+            ]);
         }
         session_destroy();
     }

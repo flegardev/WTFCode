@@ -13,7 +13,7 @@ final class SymbolRepository
 
     public static function counts(int $projectId): array
     {
-        $statement = Database::connection()->prepare("SELECT COUNT(*) AS symbol_count, COUNT(DISTINCT file_id) AS symbol_file_count, SUM(symbol_type = 'table') AS table_count, SUM(symbol_type = 'external_service') AS service_count, SUM(symbol_type = 'environment_variable') AS env_count FROM code_symbols WHERE project_id = :project_id");
+        $statement = Database::connection()->prepare("SELECT COUNT(*) AS symbol_count, COUNT(DISTINCT file_id) AS symbol_file_count, SUM(CASE WHEN symbol_type = 'table' THEN 1 ELSE 0 END) AS table_count, SUM(CASE WHEN symbol_type = 'external_service' THEN 1 ELSE 0 END) AS service_count, SUM(CASE WHEN symbol_type = 'environment_variable' THEN 1 ELSE 0 END) AS env_count FROM code_symbols WHERE project_id = :project_id");
         $statement->execute(['project_id' => $projectId]);
         $counts = $statement->fetch() ?: [];
         $route = Database::connection()->prepare('SELECT COUNT(*) FROM code_routes WHERE project_id = :project_id');
@@ -42,7 +42,7 @@ final class SymbolRepository
         $total = (int) $count->fetchColumn();
         $pages = max(1, (int) ceil($total / $perPage));
         $page = min($page, $pages);
-        $statement = Database::connection()->prepare("SELECT cs.*, pf.path, pf.role_name, pf.language AS file_language, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id) AS outgoing_count, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.target_symbol_id = cs.id) AS incoming_count FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE $where ORDER BY FIELD(cs.confidence, 'high', 'medium', 'low'), FIELD(cs.symbol_type, 'route_handler', 'controller', 'model', 'class', 'component', 'function', 'method', 'table', 'module'), cs.name LIMIT :limit OFFSET :offset");
+        $statement = Database::connection()->prepare("SELECT cs.*, pf.path, pf.role_name, pf.language AS file_language, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id) AS outgoing_count, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.target_symbol_id = cs.id) AS incoming_count FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE $where ORDER BY CASE cs.confidence WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, CASE cs.symbol_type WHEN 'route_handler' THEN 1 WHEN 'controller' THEN 2 WHEN 'model' THEN 3 WHEN 'class' THEN 4 WHEN 'component' THEN 5 WHEN 'function' THEN 6 WHEN 'method' THEN 7 WHEN 'table' THEN 8 WHEN 'module' THEN 9 ELSE 10 END, cs.name LIMIT :limit OFFSET :offset");
         foreach ($params as $key => $value) $statement->bindValue(':' . $key, $value, PDO::PARAM_STR);
         $statement->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $statement->bindValue(':offset', ($page - 1) * $perPage, PDO::PARAM_INT);
@@ -66,7 +66,7 @@ final class SymbolRepository
 
     public static function fileSymbols(int $projectId, int $fileId): array
     {
-        $statement = Database::connection()->prepare("SELECT cs.*, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id) AS outgoing_count, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.target_symbol_id = cs.id) AS incoming_count FROM code_symbols cs WHERE cs.project_id = :project_id AND cs.file_id = :file_id ORDER BY cs.start_line, FIELD(cs.symbol_type, 'module', 'class', 'interface', 'trait', 'controller', 'model', 'function', 'method', 'property', 'column')");
+        $statement = Database::connection()->prepare("SELECT cs.*, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id) AS outgoing_count, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.target_symbol_id = cs.id) AS incoming_count FROM code_symbols cs WHERE cs.project_id = :project_id AND cs.file_id = :file_id ORDER BY cs.start_line, CASE cs.symbol_type WHEN 'module' THEN 1 WHEN 'class' THEN 2 WHEN 'interface' THEN 3 WHEN 'trait' THEN 4 WHEN 'controller' THEN 5 WHEN 'model' THEN 6 WHEN 'function' THEN 7 WHEN 'method' THEN 8 WHEN 'property' THEN 9 WHEN 'column' THEN 10 ELSE 11 END");
         $statement->execute(['project_id' => $projectId, 'file_id' => $fileId]);
         return $statement->fetchAll();
     }
@@ -74,7 +74,7 @@ final class SymbolRepository
     public static function search(int $projectId, string $query, int $limit = 30): array
     {
         $limit = max(1, min(100, $limit));
-        $statement = Database::connection()->prepare("SELECT cs.*, pf.path, pf.role_name FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND (cs.name LIKE :name OR cs.qualified_name LIKE :qualified OR pf.path LIKE :path) ORDER BY (LOWER(cs.name) = LOWER(:exact)) DESC, FIELD(cs.confidence, 'high', 'medium', 'low'), FIELD(cs.symbol_type, 'route_handler', 'controller', 'model', 'class', 'component', 'function', 'method', 'table', 'module') LIMIT $limit");
+        $statement = Database::connection()->prepare("SELECT cs.*, pf.path, pf.role_name FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND (LOWER(cs.name) LIKE LOWER(:name) OR LOWER(cs.qualified_name) LIKE LOWER(:qualified) OR LOWER(pf.path) LIKE LOWER(:path)) ORDER BY CASE WHEN LOWER(cs.name) = LOWER(:exact) THEN 1 ELSE 0 END DESC, CASE cs.confidence WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, CASE cs.symbol_type WHEN 'route_handler' THEN 1 WHEN 'controller' THEN 2 WHEN 'model' THEN 3 WHEN 'class' THEN 4 WHEN 'component' THEN 5 WHEN 'function' THEN 6 WHEN 'method' THEN 7 WHEN 'table' THEN 8 WHEN 'module' THEN 9 ELSE 10 END LIMIT $limit");
         $search = '%' . $query . '%';
         $statement->execute(['project_id' => $projectId, 'name' => $search, 'qualified' => $search, 'path' => $search, 'exact' => $query]);
         return $statement->fetchAll();
@@ -84,7 +84,7 @@ final class SymbolRepository
     {
         $outgoing = $direction !== 'incoming';
         $column = $outgoing ? 'sr.source_symbol_id' : 'sr.target_symbol_id';
-        $statement = Database::connection()->prepare("SELECT sr.*, source.name AS source_name, source.symbol_type AS source_type, source_file.path AS source_path, target.name AS target_name, target.symbol_type AS target_type, target_file.path AS target_path, evidence.path AS evidence_path FROM symbol_relationships sr LEFT JOIN code_symbols source ON source.id = sr.source_symbol_id LEFT JOIN project_files source_file ON source_file.id = source.file_id LEFT JOIN code_symbols target ON target.id = sr.target_symbol_id LEFT JOIN project_files target_file ON target_file.id = target.file_id INNER JOIN project_files evidence ON evidence.id = sr.evidence_file_id WHERE sr.project_id = :project_id AND $column = :symbol_id ORDER BY FIELD(sr.confidence, 'high', 'medium', 'low'), sr.relationship_type, sr.evidence_line_start LIMIT 200");
+        $statement = Database::connection()->prepare("SELECT sr.*, source.name AS source_name, source.symbol_type AS source_type, source_file.path AS source_path, target.name AS target_name, target.symbol_type AS target_type, target_file.path AS target_path, evidence.path AS evidence_path FROM symbol_relationships sr LEFT JOIN code_symbols source ON source.id = sr.source_symbol_id LEFT JOIN project_files source_file ON source_file.id = source.file_id LEFT JOIN code_symbols target ON target.id = sr.target_symbol_id LEFT JOIN project_files target_file ON target_file.id = target.file_id INNER JOIN project_files evidence ON evidence.id = sr.evidence_file_id WHERE sr.project_id = :project_id AND $column = :symbol_id ORDER BY CASE sr.confidence WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, sr.relationship_type, sr.evidence_line_start LIMIT 200");
         $statement->execute(['project_id' => $projectId, 'symbol_id' => $symbolId]);
         return $statement->fetchAll();
     }
@@ -94,7 +94,7 @@ final class SymbolRepository
         $where = 'cr.project_id = :project_id';
         $params = ['project_id' => $projectId];
         if ($search !== '') {
-            $where .= ' AND (cr.route_path LIKE :route_path OR cr.route_name LIKE :route_name OR cr.http_method = :method OR pf.path LIKE :file_path)';
+            $where .= ' AND (LOWER(cr.route_path) LIKE LOWER(:route_path) OR LOWER(cr.route_name) LIKE LOWER(:route_name) OR cr.http_method = :method OR LOWER(pf.path) LIKE LOWER(:file_path))';
             $params += ['route_path' => '%' . $search . '%', 'route_name' => '%' . $search . '%', 'method' => strtoupper($search), 'file_path' => '%' . $search . '%'];
         }
         $statement = Database::connection()->prepare("SELECT cr.*, pf.path, handler.name AS handler_name, handler.symbol_type AS handler_type FROM code_routes cr INNER JOIN project_files pf ON pf.id = cr.file_id LEFT JOIN code_symbols handler ON handler.id = cr.handler_symbol_id WHERE $where ORDER BY cr.route_path, cr.http_method, cr.id LIMIT 500");
@@ -104,7 +104,7 @@ final class SymbolRepository
 
     public static function tables(int $projectId): array
     {
-        $statement = Database::connection()->prepare("SELECT cs.*, pf.path, (SELECT COUNT(*) FROM code_symbols child WHERE child.parent_symbol_id = cs.id AND child.symbol_type = 'column') AS column_count, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.target_symbol_id = cs.id OR sr.source_symbol_id = cs.id) AS relationship_count FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND cs.symbol_type IN ('table', 'model', 'schema') ORDER BY cs.name, JSON_EXTRACT(cs.metadata_json, '$.reference_only'), pf.path LIMIT 500");
+        $statement = Database::connection()->prepare("SELECT cs.*, pf.path, (SELECT COUNT(*) FROM code_symbols child WHERE child.parent_symbol_id = cs.id AND child.symbol_type = 'column') AS column_count, (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.target_symbol_id = cs.id OR sr.source_symbol_id = cs.id) AS relationship_count FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND cs.symbol_type IN ('table', 'model', 'schema') ORDER BY cs.name, pf.path LIMIT 500");
         $statement->execute(['project_id' => $projectId]);
         return $statement->fetchAll();
     }
@@ -119,7 +119,7 @@ final class SymbolRepository
     public static function graph(int $projectId, int $limit = 180): array
     {
         $limit = max(20, min(300, $limit));
-        $nodes = Database::connection()->prepare("SELECT cs.id, cs.name, cs.qualified_name, cs.symbol_type, cs.confidence, cs.start_line, cs.metadata_json, pf.id AS file_id, pf.path, pf.role_name, pf.language FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id ORDER BY (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id OR sr.target_symbol_id = cs.id) DESC, FIELD(cs.confidence, 'high', 'medium', 'low') LIMIT $limit");
+        $nodes = Database::connection()->prepare("SELECT cs.id, cs.name, cs.qualified_name, cs.symbol_type, cs.confidence, cs.start_line, cs.metadata_json, pf.id AS file_id, pf.path, pf.role_name, pf.language FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id ORDER BY (SELECT COUNT(*) FROM symbol_relationships sr WHERE sr.source_symbol_id = cs.id OR sr.target_symbol_id = cs.id) DESC, CASE cs.confidence WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END LIMIT $limit");
         $nodes->execute(['project_id' => $projectId]);
         $nodeRows = $nodes->fetchAll();
         foreach ($nodeRows as &$node) {
@@ -137,7 +137,7 @@ final class SymbolRepository
         if ($nodeRows === []) return ['nodes' => [], 'edges' => []];
         $ids = array_map('intval', array_column($nodeRows, 'id'));
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $edges = Database::connection()->prepare("SELECT sr.id, sr.source_symbol_id, sr.target_symbol_id, sr.relationship_type, sr.confidence, sr.evidence_line_start, pf.path AS evidence_path FROM symbol_relationships sr INNER JOIN project_files pf ON pf.id = sr.evidence_file_id WHERE sr.project_id = ? AND sr.source_symbol_id IN ($placeholders) AND sr.target_symbol_id IN ($placeholders) AND sr.confidence IN ('high', 'medium') ORDER BY FIELD(sr.confidence, 'high', 'medium'), sr.id LIMIT 700");
+        $edges = Database::connection()->prepare("SELECT sr.id, sr.source_symbol_id, sr.target_symbol_id, sr.relationship_type, sr.confidence, sr.evidence_line_start, pf.path AS evidence_path FROM symbol_relationships sr INNER JOIN project_files pf ON pf.id = sr.evidence_file_id WHERE sr.project_id = ? AND sr.source_symbol_id IN ($placeholders) AND sr.target_symbol_id IN ($placeholders) AND sr.confidence IN ('high', 'medium') ORDER BY CASE sr.confidence WHEN 'high' THEN 1 ELSE 2 END, sr.id LIMIT 700");
         $edges->execute(array_merge([$projectId], $ids, $ids));
         return ['nodes' => $nodeRows, 'edges' => $edges->fetchAll()];
     }
@@ -214,7 +214,7 @@ final class SymbolRepository
     /** @return array<int, array{label: string, symbols: int, evidence: array<int, array<string, mixed>>}> */
     public static function featureCatalog(int $projectId): array
     {
-        $statement = Database::connection()->prepare("SELECT cs.id, cs.name, cs.symbol_type, cs.start_line, cs.confidence, cs.metadata_json, pf.path FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND JSON_LENGTH(JSON_EXTRACT(cs.metadata_json, '$.features')) > 0 ORDER BY cs.confidence, pf.path, cs.start_line");
+        $statement = Database::connection()->prepare("SELECT cs.id, cs.name, cs.symbol_type, cs.start_line, cs.confidence, cs.metadata_json, pf.path FROM code_symbols cs INNER JOIN project_files pf ON pf.id = cs.file_id WHERE cs.project_id = :project_id AND cs.metadata_json IS NOT NULL ORDER BY CASE cs.confidence WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, pf.path, cs.start_line");
         $statement->execute(['project_id' => $projectId]);
         $features = [];
         foreach ($statement->fetchAll() as $symbol) {

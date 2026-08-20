@@ -41,7 +41,9 @@ final class ExplorationService
     {
         $valid = array_column(self::lessons($projectId), 'key');
         if (!in_array($lessonKey, $valid, true)) return false;
-        $statement = Database::connection()->prepare('INSERT IGNORE INTO learning_progress (user_id, project_id, lesson_key) VALUES (:user_id, :project_id, :lesson_key)');
+        $statement = Database::connection()->prepare(Database::isPostgres()
+            ? 'INSERT INTO learning_progress (user_id, project_id, lesson_key) VALUES (:user_id, :project_id, :lesson_key) ON CONFLICT (user_id, project_id, lesson_key) DO NOTHING'
+            : 'INSERT IGNORE INTO learning_progress (user_id, project_id, lesson_key) VALUES (:user_id, :project_id, :lesson_key)');
         $statement->execute(['user_id' => $userId, 'project_id' => $projectId, 'lesson_key' => $lessonKey]);
         return true;
     }

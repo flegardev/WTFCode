@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 config/database.local.php
 storage/repos/*
 !storage/repos/.gitkeep
@@ -7,9 +9,14 @@ storage/logs/*
 storage/cache/*
 !storage/cache/.gitkeep
 storage/alpha-corpus/
+storage/tmp/
 .playwright-cli/
 output/
 vendor/
 node_modules/
 tools/composer.phar
 tools/bin/
+*.log
+*.tmp
+*security*.json
+*dogfood*.json

@@ -6,7 +6,9 @@ final class GitDiffService
 {
     public static function commits(array $project): array
     {
-        $output = self::run((string) $project['local_path'], ['log', '--format=%H%x09%s', '-n', '20']);
+        try { $path = RepositoryImporter::workingCopy($project); }
+        catch (Throwable) { return []; }
+        $output = self::run($path, ['log', '--format=%H%x09%s', '-n', '20']);
         $commits = [];
         foreach ($output as $line) {
             [$sha, $message] = array_pad(explode("\t", $line, 2), 2, '');
@@ -18,7 +20,8 @@ final class GitDiffService
     public static function compare(array $project, string $from, string $to, string $intendedChange = ''): array
     {
         if (!self::isSafeRef($from) || !self::isSafeRef($to) || $from === $to) return ['error' => 'Choose two different commit references from this repository.'];
-        $path = (string) $project['local_path'];
+        try { $path = RepositoryImporter::workingCopy($project); }
+        catch (Throwable) { return ['error' => 'The temporary repository copy could not be prepared. Try again.']; }
         $stat = self::run($path, ['diff', '--stat', $from, $to, '--']);
         $changes = self::run($path, ['diff', '--name-status', $from, $to, '--']);
         if ($changes === []) return ['error' => 'No file changes were found between those commits.'];

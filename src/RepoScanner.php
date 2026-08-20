@@ -20,7 +20,7 @@ final class RepoScanner
         $profile = AnalysisProfile::normalize($profile);
         $currentCommit = $this->currentCommit($root);
         $previousScan = SymbolRepository::latestScan($projectId);
-        $previousCommit = is_string($previousScan['commit_sha'] ?? null) ? $previousScan['commit_sha'] : null;
+        $previousCommit = is_string($previousScan['commit_sha'] ?? null) ? trim($previousScan['commit_sha']) : null;
         $changedPaths = $this->changedPaths($root, $previousCommit, $currentCommit);
         $jobId = AnalysisJobStore::create($projectId, $profile, $currentCommit, $previousCommit, $changedPaths);
         AnalysisJobStore::running($jobId);
@@ -43,8 +43,7 @@ final class RepoScanner
             $nodeIds = $this->persistNodes($projectId, $analysis['nodes']);
             $this->persistEdges($projectId, $analysis['edges'], $nodeIds);
             $commit = $currentCommit;
-            $pdo->prepare('INSERT INTO scan_runs (project_id, commit_sha, analysis_version, analysis_profile, files_scanned, findings_count, analyzer_stats_json, engine_status_json) VALUES (:project_id, :commit_sha, :analysis_version, :analysis_profile, :files_scanned, :findings_count, :analyzer_stats_json, :engine_status_json)')
-                ->execute([
+            $scanRunId = Database::insert('INSERT INTO scan_runs (project_id, commit_sha, analysis_version, analysis_profile, files_scanned, findings_count, analyzer_stats_json, engine_status_json) VALUES (:project_id, :commit_sha, :analysis_version, :analysis_profile, :files_scanned, :findings_count, :analyzer_stats_json, :engine_status_json)', [
                     'project_id' => $projectId,
                     'commit_sha' => $commit,
                     'analysis_version' => AnalysisEngine::VERSION,
@@ -54,7 +53,6 @@ final class RepoScanner
                     'analyzer_stats_json' => json_encode($analysis['symbol_graph']['stats'], JSON_UNESCAPED_SLASHES),
                     'engine_status_json' => json_encode($analysis['symbol_graph']['engine_runs'] ?? [], JSON_UNESCAPED_SLASHES),
                 ]);
-            $scanRunId = (int) $pdo->lastInsertId();
             FindingStore::persist($projectId, $scanRunId, $analysis['findings']);
             SymbolGraphStore::persist($projectId, $scanRunId, $fileIds, $analysis['symbol_graph']);
             AnalyzerRunStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['engine_runs'] ?? []);
@@ -410,18 +408,20 @@ final class RepoScanner
 
     private function persistFiles(int $projectId, array $files): array
     {
-        $statement = Database::connection()->prepare('INSERT INTO project_files (project_id, path, language, file_size, line_count, content_hash, role_name, plain_summary, symbols_json) VALUES (:project_id, :path, :language, :file_size, :line_count, :content_hash, :role_name, :plain_summary, :symbols_json)');
+        $statement = Database::connection()->prepare('INSERT INTO project_files (project_id, path, language, file_size, line_count, content_hash, role_name, plain_summary, symbols_json) VALUES (:project_id, :path, :language, :file_size, :line_count, :content_hash, :role_name, :plain_summary, :symbols_json)' . (Database::isPostgres() ? ' RETURNING id' : ''));
         $ids = [];
         foreach ($files as $file) {
             $statement->execute(['project_id' => $projectId, 'path' => $file['path'], 'language' => $file['language'], 'file_size' => $file['size'], 'line_count' => $file['lines'], 'content_hash' => $file['hash'], 'role_name' => $file['role'], 'plain_summary' => $file['summary'], 'symbols_json' => json_encode($file['symbols'], JSON_UNESCAPED_SLASHES)]);
-            $ids[$file['path']] = (int) Database::connection()->lastInsertId();
+            $ids[$file['path']] = Database::isPostgres() ? (int) $statement->fetchColumn() : (int) Database::connection()->lastInsertId();
         }
         return $ids;
     }
 
     private function persistDependencies(int $projectId, array $files, array $ids): void
     {
-        $statement = Database::connection()->prepare('INSERT IGNORE INTO project_dependencies (project_id, source_file_id, target_file_id, target_path, relationship_type) VALUES (:project_id, :source_file_id, :target_file_id, :target_path, :relationship_type)');
+        $statement = Database::connection()->prepare(Database::isPostgres()
+            ? 'INSERT INTO project_dependencies (project_id, source_file_id, target_file_id, target_path, relationship_type) VALUES (:project_id, :source_file_id, :target_file_id, :target_path, :relationship_type) ON CONFLICT (source_file_id, target_path, relationship_type) DO NOTHING'
+            : 'INSERT IGNORE INTO project_dependencies (project_id, source_file_id, target_file_id, target_path, relationship_type) VALUES (:project_id, :source_file_id, :target_file_id, :target_path, :relationship_type)');
         foreach ($files as $file) {
             foreach ($file['imports'] as $import) {
                 $target = $this->resolveImport($file['path'], $import, $ids);
@@ -449,18 +449,20 @@ final class RepoScanner
 
     private function persistNodes(int $projectId, array $nodes): array
     {
-        $statement = Database::connection()->prepare('INSERT INTO architecture_nodes (project_id, node_key, node_type, label, plain_explanation, evidence_json) VALUES (:project_id, :node_key, :node_type, :label, :plain_explanation, :evidence_json)');
+        $statement = Database::connection()->prepare('INSERT INTO architecture_nodes (project_id, node_key, node_type, label, plain_explanation, evidence_json) VALUES (:project_id, :node_key, :node_type, :label, :plain_explanation, :evidence_json)' . (Database::isPostgres() ? ' RETURNING id' : ''));
         $ids = [];
         foreach ($nodes as $node) {
             $statement->execute(['project_id' => $projectId, 'node_key' => $node['key'], 'node_type' => $node['type'], 'label' => $node['label'], 'plain_explanation' => $node['explanation'], 'evidence_json' => json_encode($node['evidence'], JSON_UNESCAPED_SLASHES)]);
-            $ids[$node['key']] = (int) Database::connection()->lastInsertId();
+            $ids[$node['key']] = Database::isPostgres() ? (int) $statement->fetchColumn() : (int) Database::connection()->lastInsertId();
         }
         return $ids;
     }
 
     private function persistEdges(int $projectId, array $edges, array $nodeIds): void
     {
-        $statement = Database::connection()->prepare('INSERT IGNORE INTO architecture_edges (project_id, from_node_id, to_node_id, relationship_label, evidence_json) VALUES (:project_id, :from_node_id, :to_node_id, :relationship_label, :evidence_json)');
+        $statement = Database::connection()->prepare(Database::isPostgres()
+            ? 'INSERT INTO architecture_edges (project_id, from_node_id, to_node_id, relationship_label, evidence_json) VALUES (:project_id, :from_node_id, :to_node_id, :relationship_label, :evidence_json) ON CONFLICT (project_id, from_node_id, to_node_id, relationship_label) DO NOTHING'
+            : 'INSERT IGNORE INTO architecture_edges (project_id, from_node_id, to_node_id, relationship_label, evidence_json) VALUES (:project_id, :from_node_id, :to_node_id, :relationship_label, :evidence_json)');
         foreach ($edges as $edge) {
             if (!isset($nodeIds[$edge['from']], $nodeIds[$edge['to']])) continue;
             $statement->execute(['project_id' => $projectId, 'from_node_id' => $nodeIds[$edge['from']], 'to_node_id' => $nodeIds[$edge['to']], 'relationship_label' => $edge['label'], 'evidence_json' => json_encode($edge['evidence'])]);

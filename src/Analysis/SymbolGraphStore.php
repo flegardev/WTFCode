@@ -8,7 +8,7 @@ final class SymbolGraphStore
     public static function persist(int $projectId, int $scanRunId, array $fileIds, array $graph): void
     {
         $pdo = Database::connection();
-        $symbolStatement = $pdo->prepare('INSERT INTO code_symbols (project_id, scan_run_id, file_id, symbol_key, symbol_type, language, name, qualified_name, signature_text, visibility, is_exported, start_line, end_line, confidence, metadata_json, provenance_json) VALUES (:project_id, :scan_run_id, :file_id, :symbol_key, :symbol_type, :language, :name, :qualified_name, :signature_text, :visibility, :is_exported, :start_line, :end_line, :confidence, :metadata_json, :provenance_json)');
+        $symbolStatement = $pdo->prepare('INSERT INTO code_symbols (project_id, scan_run_id, file_id, symbol_key, symbol_type, language, name, qualified_name, signature_text, visibility, is_exported, start_line, end_line, confidence, metadata_json, provenance_json) VALUES (:project_id, :scan_run_id, :file_id, :symbol_key, :symbol_type, :language, :name, :qualified_name, :signature_text, :visibility, :is_exported, :start_line, :end_line, :confidence, :metadata_json, :provenance_json)' . (Database::isPostgres() ? ' RETURNING id' : ''));
         $symbolIds = [];
         foreach ($graph['symbols'] as $symbol) {
             if (!isset($fileIds[$symbol['path']])) continue;
@@ -30,7 +30,7 @@ final class SymbolGraphStore
                 'metadata_json' => self::json($symbol['metadata']),
                 'provenance_json' => self::json(is_array($symbol['metadata']['provenance'] ?? null) ? $symbol['metadata']['provenance'] : []),
             ]);
-            $symbolIds[$symbol['key']] = (int) $pdo->lastInsertId();
+            $symbolIds[$symbol['key']] = Database::isPostgres() ? (int) $symbolStatement->fetchColumn() : (int) $pdo->lastInsertId();
         }
 
         $parentStatement = $pdo->prepare('UPDATE code_symbols SET parent_symbol_id = :parent_id WHERE id = :id AND project_id = :project_id');

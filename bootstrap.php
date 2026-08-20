@@ -23,16 +23,47 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
+foreach (['src/Logger.php', 'src/helpers.php', 'src/Database.php'] as $file) {
+    require_once __DIR__ . DIRECTORY_SEPARATOR . $file;
+}
+
+$config = app_config();
+if ($config['environment'] === 'production') {
+    ini_set('display_errors', '0');
+    ini_set('display_startup_errors', '0');
+    error_reporting(E_ALL);
+}
+
+set_exception_handler(static function (Throwable $exception): void {
+    Logger::error('Unhandled application exception', ['type' => get_class($exception), 'message' => $exception->getMessage()]);
+    if (PHP_SAPI === 'cli') {
+        $config = app_config();
+        fwrite(STDERR, $config['debug'] ? 'Application error: ' . SensitiveDataSanitizer::text($exception->getMessage()) . PHP_EOL : 'Application error.' . PHP_EOL);
+        exit(1);
+    }
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    $config = app_config();
+    exit($config['debug'] ? 'Application error: ' . SensitiveDataSanitizer::text($exception->getMessage()) : 'Something went wrong. Please try again.');
+});
+
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    send_security_headers();
+}
+
+if (PHP_SAPI !== 'cli' && !defined('WTF_CODE_NO_SESSION') && session_status() !== PHP_SESSION_ACTIVE) {
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
-    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+    ini_set('session.gc_maxlifetime', (string) $config['session_lifetime']);
+    session_name('wtfcode_session');
+    if ($config['session_driver'] === 'database') {
+        session_set_save_handler(new DatabaseSessionHandler((int) $config['session_lifetime']), true);
+    }
 
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'secure' => $secure,
+        'secure' => request_is_secure(),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -40,9 +71,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 foreach ([
-    'src/Database.php',
-    'src/Logger.php',
-    'src/helpers.php',
     'src/Auth.php',
     'src/RepositoryImporter.php',
     'src/RepoScanner.php',
@@ -54,17 +82,3 @@ foreach ([
 ] as $file) {
     require_once __DIR__ . DIRECTORY_SEPARATOR . $file;
 }
-
-set_exception_handler(static function (Throwable $exception): void {
-    Logger::error('Unhandled application exception', ['type' => get_class($exception), 'message' => $exception->getMessage()]);
-    if (PHP_SAPI === 'cli') {
-        fwrite(STDERR, 'Application error: ' . $exception->getMessage() . PHP_EOL);
-        exit(1);
-    }
-    http_response_code(500);
-    $config = app_config();
-    if ($config['environment'] === 'local') {
-        exit('Application error: ' . e($exception->getMessage()));
-    }
-    exit('Something went wrong. Please try again.');
-});

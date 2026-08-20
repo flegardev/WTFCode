@@ -6,9 +6,8 @@ final class AnalysisJobStore
 {
     public static function create(int $projectId, string $profile, ?string $commit, ?string $previousCommit, array $changedPaths): int
     {
-        $statement = Database::connection()->prepare('INSERT INTO analysis_jobs (project_id, analysis_profile, state, commit_sha, previous_commit_sha, changed_paths_json) VALUES (:project_id, :profile, :state, :commit, :previous, :paths)');
-        $statement->execute(['project_id' => $projectId, 'profile' => AnalysisProfile::normalize($profile), 'state' => 'queued', 'commit' => $commit, 'previous' => $previousCommit, 'paths' => json_encode(array_slice(array_values(array_unique($changedPaths)), 0, 1000), JSON_UNESCAPED_SLASHES)]);
-        return (int) Database::connection()->lastInsertId();
+        self::failStale($projectId);
+        return Database::insert('INSERT INTO analysis_jobs (project_id, analysis_profile, state, commit_sha, previous_commit_sha, changed_paths_json) VALUES (:project_id, :profile, :state, :commit, :previous, :paths)', ['project_id' => $projectId, 'profile' => AnalysisProfile::normalize($profile), 'state' => 'queued', 'commit' => $commit, 'previous' => $previousCommit, 'paths' => json_encode(array_slice(array_values(array_unique($changedPaths)), 0, 1000), JSON_UNESCAPED_SLASHES)]);
     }
 
     public static function running(int $jobId): void { self::state($jobId, 'running', null, 'started_at'); }
@@ -26,6 +25,7 @@ final class AnalysisJobStore
 
     public static function latest(int $projectId): ?array
     {
+        self::failStale($projectId);
         $statement = Database::connection()->prepare('SELECT * FROM analysis_jobs WHERE project_id = :project_id ORDER BY id DESC LIMIT 1');
         $statement->execute(['project_id' => $projectId]);
         $job = $statement->fetch() ?: null;
@@ -34,6 +34,15 @@ final class AnalysisJobStore
         $steps->execute(['job_id' => $job['id']]);
         $job['steps'] = $steps->fetchAll();
         return $job;
+    }
+
+    private static function failStale(int $projectId): void
+    {
+        $cutoff = Database::isPostgres()
+            ? "CURRENT_TIMESTAMP - INTERVAL '15 minutes'"
+            : 'DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 15 MINUTE)';
+        $statement = Database::connection()->prepare("UPDATE analysis_jobs SET state = 'failed', error_message = :error, finished_at = CURRENT_TIMESTAMP WHERE project_id = :project_id AND state IN ('queued', 'running') AND created_at < $cutoff");
+        $statement->execute(['error' => 'Hosted execution ended before the analysis completed.', 'project_id' => $projectId]);
     }
 
     private static function state(int $jobId, string $state, ?string $error, string $timestamp): void

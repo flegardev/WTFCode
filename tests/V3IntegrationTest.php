@@ -14,21 +14,19 @@ $token = bin2hex(random_bytes(6));
 $userId = null;
 
 try {
-    $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute([
+    $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', [
         'name' => 'V3 Integration',
         'email' => 'v3-' . $token . '@wtfcode.local',
         'password_hash' => password_hash($token, PASSWORD_DEFAULT),
     ]);
-    $userId = (int) $pdo->lastInsertId();
     $fixture = __DIR__ . '/fixtures/v2/plain-php';
-    $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute([
+    $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', [
         'user_id' => $userId,
         'name' => 'V3 fixture ' . $token,
         'repository_url' => 'https://github.com/wtfcode-v3-fixtures/' . $token . '.git',
         'local_path' => $fixture,
         'status' => 'scanning',
     ]);
-    $projectId = (int) $pdo->lastInsertId();
     (new RepoScanner())->scan($projectId, $fixture);
 
     $scan = $pdo->query('SELECT * FROM scan_runs WHERE project_id = ' . $projectId . ' ORDER BY id DESC LIMIT 1')->fetch(PDO::FETCH_ASSOC);

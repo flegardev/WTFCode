@@ -6,6 +6,8 @@ final class RepositoryImporter
 {
     private const MAX_REPOSITORY_BYTES = 104857600;
     private const GIT_TIMEOUT_SECONDS = 90;
+    /** @var array<int, string> */
+    private static array $requestCopies = [];
 
     public static function normalizeGithubUrl(string $url): ?string
     {
@@ -46,7 +48,9 @@ final class RepositoryImporter
             throw new RuntimeException('The private repository storage directory could not be created.');
         }
 
-        $result = self::runGit(['-c', 'protocol.file.allow=never', 'clone', '--quiet', '--depth', '100', '--no-tags', '--no-recurse-submodules', $repositoryUrl, $destination]);
+        $emptyHooks = self::storageRoot() . DIRECTORY_SEPARATOR . 'empty-hooks';
+        if (!is_dir($emptyHooks) && !mkdir($emptyHooks, 0700, true) && !is_dir($emptyHooks)) throw new RuntimeException('Git isolation could not be initialized.');
+        $result = self::runGit(['-c', 'protocol.file.allow=never', '-c', 'core.hooksPath=' . $emptyHooks, '-c', 'credential.helper=', '-c', 'core.fsmonitor=false', 'clone', '--quiet', '--depth', '100', '--no-tags', '--no-recurse-submodules', '--config', 'core.hooksPath=' . $emptyHooks, $repositoryUrl, $destination]);
         if ($result['exit_code'] !== 0 || !is_dir($destination . DIRECTORY_SEPARATOR . '.git')) {
             self::deleteDirectory($destination);
             throw new RuntimeException('Git could not clone that public repository. Check the URL and make sure Git is installed on the server.');
@@ -60,12 +64,29 @@ final class RepositoryImporter
 
     public static function projectPath(int $projectId): string
     {
-        return __DIR__ . '/../storage/repos/project-' . $projectId;
+        $suffix = self::ephemeral() ? '-' . bin2hex(random_bytes(6)) : '';
+        return self::storageRoot() . DIRECTORY_SEPARATOR . 'repos' . DIRECTORY_SEPARATOR . 'project-' . $projectId . $suffix;
     }
 
-    private static function deleteDirectory(string $directory): void
+    public static function workingCopy(array $project): string
     {
-        if (!is_dir($directory) || !str_starts_with(str_replace('\\', '/', realpath(dirname($directory)) ?: ''), str_replace('\\', '/', realpath(__DIR__ . '/../storage/repos') ?: ''))) {
+        $projectId = (int) ($project['id'] ?? 0);
+        $current = (string) ($project['local_path'] ?? '');
+        if ($current !== '' && is_dir($current . DIRECTORY_SEPARATOR . '.git')) return $current;
+        if (isset(self::$requestCopies[$projectId]) && is_dir(self::$requestCopies[$projectId] . DIRECTORY_SEPARATOR . '.git')) return self::$requestCopies[$projectId];
+        $url = self::normalizeGithubUrl((string) ($project['repository_url'] ?? ''));
+        if ($projectId < 1 || $url === null) throw new RuntimeException('The project repository cannot be rehydrated.');
+        $path = self::clone($projectId, $url);
+        self::$requestCopies[$projectId] = $path;
+        if (self::ephemeral()) register_shutdown_function(static fn () => self::cleanup($path));
+        return $path;
+    }
+
+    public static function cleanup(string $directory): void
+    {
+        $reposRoot = realpath(self::storageRoot() . DIRECTORY_SEPARATOR . 'repos');
+        $parent = realpath(dirname($directory));
+        if (!is_dir($directory) || $reposRoot === false || $parent === false || rtrim(str_replace('\\', '/', $parent), '/') !== rtrim(str_replace('\\', '/', $reposRoot), '/')) {
             return;
         }
         $items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
@@ -75,37 +96,36 @@ final class RepositoryImporter
         rmdir($directory);
     }
 
+    public static function ephemeral(): bool
+    {
+        return app_config()['environment'] === 'production';
+    }
+
+    public static function storageRoot(): string
+    {
+        return (string) app_config()['storage_path'];
+    }
+
     /** @return array{exit_code: int, output: array<int, string>} */
     private static function runGit(array $arguments): array
     {
-        $descriptors = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-        $environment = array_merge(getenv() ?: [], ['GIT_CONFIG_NOSYSTEM' => '1', 'GIT_CONFIG_GLOBAL' => __DIR__ . '/../storage/.empty-git-config', 'GIT_TERMINAL_PROMPT' => '0']);
-        $process = proc_open(array_merge(['git'], $arguments), $descriptors, $pipes, null, $environment, ['bypass_shell' => true]);
-        if (!is_resource($process)) {
+        $root = self::storageRoot();
+        if (!is_dir($root) && !mkdir($root, 0700, true) && !is_dir($root)) return ['exit_code' => 1, 'output' => []];
+        $emptyConfig = $root . DIRECTORY_SEPARATOR . '.empty-git-config';
+        if (!is_file($emptyConfig)) @file_put_contents($emptyConfig, '', LOCK_EX);
+        try {
+            $result = (new SafeProcessRunner())->run(new ProcessRunRequest(
+                array_merge(['git'], $arguments),
+                $root,
+                self::GIT_TIMEOUT_SECONDS,
+                1_048_576,
+                1_048_576,
+                ['GIT_CONFIG_NOSYSTEM' => '1', 'GIT_CONFIG_GLOBAL' => $emptyConfig, 'GIT_TERMINAL_PROMPT' => '0', 'GIT_OPTIONAL_LOCKS' => '0'],
+            ));
+            return ['exit_code' => $result->exitCode, 'output' => array_filter(preg_split('/\r?\n/', trim($result->stdout . "\n" . $result->stderr)) ?: [])];
+        } catch (Throwable) {
             return ['exit_code' => 1, 'output' => []];
         }
-        stream_set_blocking($pipes[1], false);
-        stream_set_blocking($pipes[2], false);
-        $stdout = '';
-        $stderr = '';
-        $startedAt = microtime(true);
-        $timedOut = false;
-        while (($status = proc_get_status($process))['running']) {
-            $stdout .= stream_get_contents($pipes[1]);
-            $stderr .= stream_get_contents($pipes[2]);
-            if (microtime(true) - $startedAt >= self::GIT_TIMEOUT_SECONDS) {
-                $timedOut = true;
-                proc_terminate($process);
-                break;
-            }
-            usleep(100000);
-        }
-        $stdout .= stream_get_contents($pipes[1]);
-        $stderr .= stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $exitCode = proc_close($process);
-        return ['exit_code' => $timedOut ? 1 : $exitCode, 'output' => array_filter(preg_split('/\r?\n/', trim($stdout . "\n" . $stderr)) ?: [])];
     }
 
     private static function directorySize(string $directory): int

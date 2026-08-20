@@ -15,23 +15,27 @@ final class Project
         if (text_length($name) > 140) return ['error' => 'Project names must be 140 characters or fewer.'];
 
         try {
-            $statement = Database::connection()->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)');
-            $statement->execute(['user_id' => $userId, 'name' => $name, 'repository_url' => $repositoryUrl, 'local_path' => '', 'status' => 'queued']);
+            $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => $name, 'repository_url' => $repositoryUrl, 'local_path' => '', 'status' => 'queued']);
         } catch (PDOException $exception) {
-            if ($exception->getCode() === '23000') return ['error' => 'You have already imported this repository.'];
+            if (Database::isUniqueViolation($exception)) return ['error' => 'You have already imported this repository.'];
             throw $exception;
         }
 
-        $projectId = (int) Database::connection()->lastInsertId();
+        $path = null;
         try {
             self::setStatus($projectId, 'cloning');
             $path = RepositoryImporter::clone($projectId, $repositoryUrl);
             Database::connection()->prepare('UPDATE projects SET local_path = :local_path, status = :status WHERE id = :id')->execute(['local_path' => $path, 'status' => 'scanning', 'id' => $projectId]);
-            (new RepoScanner())->scan($projectId, $path);
+            (new RepoScanner())->scan($projectId, $path, AnalysisProfile::normalize((string) app_config()['scan_profile']));
         } catch (Throwable $exception) {
             Logger::error('Repository import failed', ['project_id' => $projectId, 'type' => get_class($exception), 'message' => $exception->getMessage()]);
             Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($exception->getMessage(), 0, 500), 'id' => $projectId]);
             return ['error' => 'The repository could not be imported. Check that the URL is public, Git is installed, and the server can reach GitHub.'];
+        } finally {
+            if ($path !== null && RepositoryImporter::ephemeral()) {
+                RepositoryImporter::cleanup($path);
+                Database::connection()->prepare("UPDATE projects SET local_path = '' WHERE id = :id")->execute(['id' => $projectId]);
+            }
         }
         return ['project' => self::findForUser($projectId, $userId)];
     }
@@ -39,14 +43,19 @@ final class Project
     public static function rescan(array $project, int $userId, string $profile = AnalysisProfile::QUICK): ?string
     {
         if ((int) $project['user_id'] !== $userId) return 'Project not found.';
+        $path = null;
         try {
             @set_time_limit(120);
             self::setStatus((int) $project['id'], 'scanning');
-            (new RepoScanner())->scan((int) $project['id'], (string) $project['local_path'], AnalysisProfile::normalize($profile));
+            $path = RepositoryImporter::workingCopy($project);
+            Database::connection()->prepare('UPDATE projects SET local_path = :path WHERE id = :id')->execute(['path' => RepositoryImporter::ephemeral() ? '' : $path, 'id' => $project['id']]);
+            (new RepoScanner())->scan((int) $project['id'], $path, AnalysisProfile::normalize($profile));
         } catch (Throwable $exception) {
             Logger::error('Repository rescan failed', ['project_id' => $project['id'], 'type' => get_class($exception), 'message' => $exception->getMessage()]);
             Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($exception->getMessage(), 0, 500), 'id' => $project['id']]);
-            return 'The repository could not be rescanned. Check that its private clone is still available.';
+            return 'The repository could not be rescanned. Try Quick analysis again.';
+        } finally {
+            if ($path !== null && RepositoryImporter::ephemeral()) RepositoryImporter::cleanup($path);
         }
         return null;
     }
@@ -127,11 +136,17 @@ final class Project
 
     public static function transitiveDependents(int $projectId, int $fileId): array
     {
-        $sql = "WITH RECURSIVE dependency_tree (file_id, depth, visited) AS (
-            SELECT source_file_id, 1, CAST(CONCAT(',', source_file_id, ',') AS CHAR(1000)) FROM project_dependencies WHERE project_id = :project_id_root AND target_file_id = :file_id
-            UNION ALL
-            SELECT pd.source_file_id, dependency_tree.depth + 1, CONCAT(dependency_tree.visited, pd.source_file_id, ',') FROM project_dependencies pd INNER JOIN dependency_tree ON pd.target_file_id = dependency_tree.file_id WHERE pd.project_id = :project_id_tree AND dependency_tree.depth < 8 AND LOCATE(CONCAT(',', pd.source_file_id, ','), dependency_tree.visited) = 0
-        ) SELECT pf.id, pf.path, pf.role_name, MIN(dependency_tree.depth) AS depth FROM dependency_tree INNER JOIN project_files pf ON pf.id = dependency_tree.file_id WHERE dependency_tree.depth >= 2 GROUP BY pf.id, pf.path, pf.role_name ORDER BY depth, pf.path LIMIT 100";
+        $sql = Database::isPostgres()
+            ? "WITH RECURSIVE dependency_tree (file_id, depth, visited) AS (
+                SELECT source_file_id, 1, ARRAY[source_file_id]::bigint[] FROM project_dependencies WHERE project_id = :project_id_root AND target_file_id = :file_id
+                UNION ALL
+                SELECT pd.source_file_id, dependency_tree.depth + 1, dependency_tree.visited || pd.source_file_id FROM project_dependencies pd INNER JOIN dependency_tree ON pd.target_file_id = dependency_tree.file_id WHERE pd.project_id = :project_id_tree AND dependency_tree.depth < 8 AND NOT (pd.source_file_id = ANY(dependency_tree.visited))
+            ) SELECT pf.id, pf.path, pf.role_name, MIN(dependency_tree.depth) AS depth FROM dependency_tree INNER JOIN project_files pf ON pf.id = dependency_tree.file_id WHERE dependency_tree.depth >= 2 GROUP BY pf.id, pf.path, pf.role_name ORDER BY depth, pf.path LIMIT 100"
+            : "WITH RECURSIVE dependency_tree (file_id, depth, visited) AS (
+                SELECT source_file_id, 1, CAST(CONCAT(',', source_file_id, ',') AS CHAR(1000)) FROM project_dependencies WHERE project_id = :project_id_root AND target_file_id = :file_id
+                UNION ALL
+                SELECT pd.source_file_id, dependency_tree.depth + 1, CONCAT(dependency_tree.visited, pd.source_file_id, ',') FROM project_dependencies pd INNER JOIN dependency_tree ON pd.target_file_id = dependency_tree.file_id WHERE pd.project_id = :project_id_tree AND dependency_tree.depth < 8 AND LOCATE(CONCAT(',', pd.source_file_id, ','), dependency_tree.visited) = 0
+            ) SELECT pf.id, pf.path, pf.role_name, MIN(dependency_tree.depth) AS depth FROM dependency_tree INNER JOIN project_files pf ON pf.id = dependency_tree.file_id WHERE dependency_tree.depth >= 2 GROUP BY pf.id, pf.path, pf.role_name ORDER BY depth, pf.path LIMIT 100";
         $statement = Database::connection()->prepare($sql);
         $statement->execute(['project_id_root' => $projectId, 'project_id_tree' => $projectId, 'file_id' => $fileId]);
         return $statement->fetchAll();
@@ -180,7 +195,7 @@ final class Project
     public static function findings(int $projectId, int $limit = 12): array
     {
         $limit = max(1, min($limit, 100));
-        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id ORDER BY FIELD(severity, 'risk', 'attention', 'info'), id DESC LIMIT " . min(500, $limit * 20));
+        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id ORDER BY CASE severity WHEN 'risk' THEN 1 WHEN 'attention' THEN 2 ELSE 3 END, id DESC LIMIT " . min(500, $limit * 20));
         $statement->execute(['project_id' => $projectId]);
         return self::deduplicateFindings($statement->fetchAll(), $limit);
     }
@@ -200,7 +215,7 @@ final class Project
 
     public static function securityFindings(int $projectId, int $limit = 300): array
     {
-        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id AND finding_type IN ('possible_secret', 'possible_exposed_secret', 'dependency_vulnerability', 'code_security_finding', 'dynamic_code_execution', 'process_execution', 'process_or_dynamic_execution', 'authentication_boundary', 'destructive_database_operation', 'file_operation') ORDER BY FIELD(severity, 'risk', 'attention', 'info'), id DESC LIMIT " . max(1, min($limit, 500)));
+        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id AND finding_type IN ('possible_secret', 'possible_exposed_secret', 'dependency_vulnerability', 'code_security_finding', 'dynamic_code_execution', 'process_execution', 'process_or_dynamic_execution', 'authentication_boundary', 'destructive_database_operation', 'file_operation') ORDER BY CASE severity WHEN 'risk' THEN 1 WHEN 'attention' THEN 2 ELSE 3 END, id DESC LIMIT " . max(1, min($limit, 500)));
         $statement->execute(['project_id' => $projectId]);
         $rows = $statement->fetchAll();
         foreach ($rows as &$row) {

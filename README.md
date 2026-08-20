@@ -8,7 +8,7 @@ WTFCode is a plain-PHP codebase understanding tool for people who can build quic
 
 - Secure registration, login, logout, CSRF protection, and per-user project ownership.
 - Public GitHub repository import with strict `https://github.com/owner/repository` validation.
-- Private Git clone storage outside the public web root.
+- Restricted Git cloning outside the public web root; hosted clones are temporary and removed after each request.
 - Automatic stack detection for Next.js, React, Vue, FastAPI, Django, Node APIs, PHP, Supabase, Docker, Vercel, and common data-layer signals.
 - File map with routes, API endpoints, authentication, configuration, UI, and data-model roles.
 - Import/include dependency extraction for JavaScript, TypeScript, PHP, and Python.
@@ -45,7 +45,7 @@ The fact-level fusion benchmark and its limits are recorded in `tests/reports/v3
 ## Intentional MVP boundaries
 
 - Only public GitHub repositories are supported. Private repository OAuth is not faked.
-- Source contents are analysed in memory during the scan but are not saved to MySQL. The clone remains in private application storage so Git analysis and rescans can work.
+- Source contents are analysed during the scan but are not saved to PostgreSQL. Hosted clones are temporary; source and Git views may re-clone the public repository for that request.
 - Static analysis cannot prove runtime behavior. Dynamic imports, remote services, generated code, environment-specific deployment behavior, and indirect dependencies may not be detected.
 - Imports are capped at a 100 MB cloned repository, 3,000 readable files, 256 KB per readable file, and 20 MB of total readable source per scan. A partial scan is disclosed in the project findings.
 - Security analysis is static and incomplete. It does not prove exploitability or replace tests, manual review, incident response, backups, or Git.
@@ -62,10 +62,16 @@ src/ExplorationService  Per-user learning checklist and progress
 src/PromptSafetyService Evidence-backed change-prompt builder
 src/ExplanationService  Plain-English and evidence-based explanations
 src/GitDiffService.php  Safe commit comparison
-storage/repos/          Private repository clones, never web-served
-storage/logs/           Private application logs
-database/schema.sql     MySQL 8 schema
+storage/repos/          Local-only private clone storage
+supabase/               Canonical PostgreSQL schema and future migrations
+Dockerfile.vercel       Production FrankenPHP container
 ```
+
+## Production deployment
+
+Production uses the root `Dockerfile.vercel`, PHP 8.4 on FrankenPHP, and a backend-only Supabase PostgreSQL connection. It keeps authentication, CSRF, and authorization in PHP; it does not use Supabase Auth or expose a Supabase client key. Start with [Deploy today](docs/DEPLOY-TODAY.md), then use the detailed [Supabase](docs/DEPLOY-SUPABASE.md), [Vercel](docs/DEPLOY-VERCEL.md), and [data ownership](docs/DATA-OWNERSHIP.md) guides.
+
+The hosted default is `quick`. Deep, Security, and Maximum scans are available, but larger repositories may exceed request-duration or memory limits; background jobs are the next architecture step for those profiles.
 
 ## Local setup
 
@@ -130,7 +136,7 @@ php tests/FusionBenchmark.php
 php tests/Benchmark.php --group=core
 ```
 
-`UnitTest.php` covers repository URL restriction, blast-radius explanation behavior, and read-only scanner inspection of imports and symbols. `V3FeatureEvidenceTest.php` separates runtime feature signals from fixtures, analyzer patterns, documentation, and generated artifacts. The V2 and V3 integration suites require the configured MySQL database. `FusionBenchmark.php` compares native, external, and fused evidence on the curated local fixtures. `Benchmark.php` shallow-clones a versioned public-repository suite and reports whether required stack and architecture signals are present; see `tests/benchmarks/README.md` for the human scorecard workflow.
+`UnitTest.php` covers repository URL restriction, blast-radius explanation behavior, and read-only scanner inspection of imports and symbols. `V3FeatureEvidenceTest.php` separates runtime feature signals from fixtures, analyzer patterns, documentation, and generated artifacts. The V2 and V3 integration suites require the configured database and are exercised against PostgreSQL in the production container gate. `FusionBenchmark.php` compares native, external, and fused evidence on the curated local fixtures. `Benchmark.php` shallow-clones a versioned public-repository suite and reports whether required stack and architecture signals are present; see `tests/benchmarks/README.md` for the human scorecard workflow.
 
 ## Roadmap
 

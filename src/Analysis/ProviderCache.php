@@ -5,10 +5,12 @@ declare(strict_types=1);
 final class ProviderCache
 {
     private string $root;
+    private bool $databaseBacked;
 
     public function __construct(?string $root = null)
     {
-        $this->root = $root ?? dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'providers';
+        $this->databaseBacked = $root === null && (app_config()['environment'] ?? 'local') === 'production' && Database::isPostgres();
+        $this->root = $root ?? app_config()['storage_path'] . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'providers';
     }
 
     public function key(AnalysisRequest $request, AnalyzerProviderInterface $provider, ?string $revision = null): string
@@ -19,9 +21,19 @@ final class ProviderCache
     public function load(AnalysisRequest $request, AnalyzerProviderInterface $provider, ?string $revision = null): ?AnalyzerResult
     {
         $key = $this->key($request, $provider, $revision);
-        $path = $this->path($provider->id(), $key);
-        if (!is_file($path) || filesize($path) > 20_971_520) return null;
-        $decoded = json_decode((string) file_get_contents($path), true);
+        if ($this->databaseBacked) {
+            try {
+                $statement = Database::connection()->prepare('SELECT result_json FROM provider_cache_entries WHERE cache_key = :key AND expires_at > CURRENT_TIMESTAMP LIMIT 1');
+                $statement->execute(['key' => $key]);
+                $json = $statement->fetchColumn();
+                if (!is_string($json) || strlen($json) > 20_971_520) return null;
+            } catch (Throwable) { return null; }
+        } else {
+            $path = $this->path($provider->id(), $key);
+            if (!is_file($path) || filesize($path) > 20_971_520) return null;
+            $json = (string) file_get_contents($path);
+        }
+        $decoded = json_decode($json, true);
         if (!is_array($decoded) || ($decoded['cache_key'] ?? '') !== $key) return null;
         $result = $decoded['result'] ?? null;
         if (!is_array($result) || !in_array($result['status'] ?? '', [AnalyzerResult::SUCCESS, AnalyzerResult::PARTIAL], true)) return null;
@@ -37,11 +49,21 @@ final class ProviderCache
         if (!in_array($result->status, [AnalyzerResult::SUCCESS, AnalyzerResult::PARTIAL], true)) return null;
         if (count($result->graph['relationships'] ?? []) > 8000 || count($result->graph['symbols'] ?? []) > 5000) return null;
         $key = $this->key($request, $provider);
-        $directory = dirname($this->path($provider->id(), $key));
-        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) return null;
         $payload = SensitiveDataSanitizer::scrub(['cache_key' => $key, 'created_at' => gmdate(DATE_ATOM), 'result' => ['engine' => $result->engine, 'version' => $result->engineVersion, 'status' => $result->status, 'graph' => $result->graph, 'findings' => $result->findings]]);
         $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         if (!is_string($json) || strlen($json) > 16_777_216) return null;
+        if ($this->databaseBacked) {
+            try {
+                $sql = 'INSERT INTO provider_cache_entries (cache_key, provider_id, provider_version, analysis_version, result_json, expires_at, updated_at) VALUES (:key, :provider, :version, :analysis, :result, :expires, CURRENT_TIMESTAMP) ON CONFLICT (cache_key) DO UPDATE SET provider_id = EXCLUDED.provider_id, provider_version = EXCLUDED.provider_version, analysis_version = EXCLUDED.analysis_version, result_json = EXCLUDED.result_json, expires_at = EXCLUDED.expires_at, updated_at = CURRENT_TIMESTAMP';
+                Database::connection()->prepare($sql)->execute([
+                    'key' => $key, 'provider' => substr($provider->id(), 0, 80), 'version' => substr($provider->version(), 0, 100),
+                    'analysis' => AnalysisEngine::VERSION, 'result' => $json, 'expires' => gmdate('Y-m-d H:i:sP', time() + 604800),
+                ]);
+                return $key;
+            } catch (Throwable) { return null; }
+        }
+        $directory = dirname($this->path($provider->id(), $key));
+        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) return null;
         $temporary = tempnam($directory, 'cache-');
         if ($temporary === false) return null;
         try {

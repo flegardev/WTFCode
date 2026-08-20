@@ -5,7 +5,8 @@ declare(strict_types=1);
 final class ProcessRunRequest
 {
     private const ALLOWED_ENVIRONMENT = [
-        'PATH', 'PATHEXT', 'SystemRoot', 'WINDIR', 'COMSPEC', 'TEMP', 'TMP',
+        'PATH', 'PATHEXT', 'SystemRoot', 'WINDIR', 'COMSPEC', 'TEMP', 'TMP', 'TMPDIR',
+        'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_GLOBAL', 'GIT_TERMINAL_PROMPT', 'GIT_OPTIONAL_LOCKS',
     ];
 
     /** @var array<int, string> */

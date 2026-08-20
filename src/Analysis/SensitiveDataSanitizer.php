@@ -31,6 +31,7 @@ final class SensitiveDataSanitizer
             '/\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/',
             '/\bxox[baprs]-[A-Za-z0-9-]{20,}\b/',
             '/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/',
+            '#\bpostgres(?:ql)?://[^\s"\']+#i',
         ];
         return preg_replace($patterns, '<redacted>', $value) ?? '<redacted>';
     }
@@ -43,7 +44,7 @@ final class SensitiveDataSanitizer
         $safe = [];
         foreach ($value as $key => $item) {
             $name = strtolower((string) $key);
-            if (in_array($name, ['secret', 'raw_secret', 'password', 'private_key', 'authorization', 'token_value'], true)) {
+            if (in_array($name, ['secret', 'raw_secret', 'password', 'db_password', 'database_url', 'private_key', 'authorization', 'token_value'], true)) {
                 $safe[$key] = '<redacted>';
                 continue;
             }

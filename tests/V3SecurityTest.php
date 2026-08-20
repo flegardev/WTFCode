@@ -77,11 +77,17 @@ try {
     security_assert(AnalysisProfile::includes(AnalysisProfile::MAXIMUM, 'grype'), 'Maximum scans must include optional Grype');
 
     $manifest = json_decode((string) file_get_contents(__DIR__ . '/../config/tool-manifest.json'), true, flags: JSON_THROW_ON_ERROR);
-    $binaryNames = ['Gitleaks' => 'gitleaks.exe', 'OSV-Scanner' => 'osv-scanner.exe', 'Syft' => 'syft.exe', 'Grype' => 'grype.exe'];
+    $binaryNames = ['Gitleaks' => 'gitleaks', 'OSV-Scanner' => 'osv-scanner', 'Syft' => 'syft', 'Grype' => 'grype'];
     foreach ($manifest['tools'] as $tool) {
-        $binary = __DIR__ . '/../tools/bin/' . $binaryNames[$tool['name']];
-        security_assert(is_file($binary), $tool['name'] . ' binary should exist for checksum verification');
-        security_assert(hash_file('sha256', $binary) === $tool['executable_sha256'], $tool['name'] . ' executable hash must match the pinned manifest');
+        if (PHP_OS_FAMILY === 'Windows') {
+            $binary = __DIR__ . '/../tools/bin/' . $binaryNames[$tool['name']] . '.exe';
+            security_assert(is_file($binary), $tool['name'] . ' binary should exist for checksum verification');
+            security_assert(hash_file('sha256', $binary) === $tool['executable_sha256'], $tool['name'] . ' executable hash must match the pinned manifest');
+        } else {
+            $binary = ToolDetector::findExecutable($binaryNames[$tool['name']]);
+            security_assert($binary !== null && is_file($binary), $tool['name'] . ' Linux binary should be available');
+            security_assert(preg_match('/^[a-f0-9]{64}$/', (string) ($tool['linux_artifact_sha256'] ?? '')) === 1, $tool['name'] . ' Linux release artifact checksum must be pinned');
+        }
     }
     security_assert(hash_file('sha256', __DIR__ . '/../config/security/gitleaks.toml') === ($manifest['trusted_configs'][0]['sha256'] ?? ''), 'Pinned Gitleaks configuration hash must match the manifest');
 
@@ -89,12 +95,9 @@ try {
     $pdo->beginTransaction();
     try {
         $token = bin2hex(random_bytes(8));
-        $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'Security test', 'email' => 'security-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-        $userId = (int) $pdo->lastInsertId();
-        $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'Security fixture', 'repository_url' => 'https://github.com/wtfcode-security/' . $token . '.git', 'local_path' => $root, 'status' => 'ready']);
-        $projectId = (int) $pdo->lastInsertId();
-        $pdo->prepare('INSERT INTO scan_runs (project_id, analysis_version, analysis_profile) VALUES (:project_id, :analysis_version, :analysis_profile)')->execute(['project_id' => $projectId, 'analysis_version' => AnalysisEngine::VERSION, 'analysis_profile' => AnalysisProfile::SECURITY]);
-        $scanRunId = (int) $pdo->lastInsertId();
+        $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Security test', 'email' => 'security-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+        $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Security fixture', 'repository_url' => 'https://github.com/wtfcode-security/' . $token . '.git', 'local_path' => $root, 'status' => 'ready']);
+        $scanRunId = Database::insert('INSERT INTO scan_runs (project_id, analysis_version, analysis_profile) VALUES (:project_id, :analysis_version, :analysis_profile)', ['project_id' => $projectId, 'analysis_version' => AnalysisEngine::VERSION, 'analysis_profile' => AnalysisProfile::SECURITY]);
         FindingStore::persist($projectId, $scanRunId, [$unsafeFinding]);
         $stored = (string) $pdo->query('SELECT CONCAT(title, plain_explanation, evidence_json) FROM scan_findings WHERE scan_run_id = ' . $scanRunId)->fetchColumn();
         security_assert(!str_contains($stored, $rawSecret), 'Database persistence must apply the final secret-sanitization boundary');

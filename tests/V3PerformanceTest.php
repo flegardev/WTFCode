@@ -60,10 +60,8 @@ try {
     $secondRuns = $secondInspection['symbol_graph']['engine_runs'];
     performance_assert(count(array_filter($secondRuns, static fn (array $run): bool => !empty($run['cache_hit']))) === count($secondRuns), 'Unchanged provider output must be reused from an exact content-addressed cache');
 
-    $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)')->execute(['name' => 'Performance test', 'email' => 'performance-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-    $userId = (int) $pdo->lastInsertId();
-    $pdo->prepare('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)')->execute(['user_id' => $userId, 'name' => 'Performance fixture', 'repository_url' => 'https://github.com/wtfcode-performance/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
-    $projectId = (int) $pdo->lastInsertId();
+    $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Performance test', 'email' => 'performance-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+    $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Performance fixture', 'repository_url' => 'https://github.com/wtfcode-performance/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
     (new RepoScanner())->scan($projectId, $directory, AnalysisProfile::QUICK);
 
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'Service3.php', "<?php\nfunction service3(): int { return 3; }\nfunction changedFeature(): string { return 'changed'; }\n");
