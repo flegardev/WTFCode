@@ -434,7 +434,7 @@
       "expected": "Human-review artifacts retain route evidence without unnecessary secret-shaped internal identifiers.",
       "actual": "The values were non-secret hashes, but their field name and entropy created high-volume secret-scan noise.",
       "root_cause": "The bounded artifact copied an internal graph identity that was not needed for manual route review.",
-      "fix_commit": "pending",
+      "fix_commit": "1bf1ef636eb0708c97608ed031af57f3e7786411",
       "regression_test": "tests/AlphaRunnerTest.php — route samples omit internal handler_key values",
       "status": "fixed"
     }
