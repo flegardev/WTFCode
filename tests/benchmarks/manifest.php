@@ -53,7 +53,7 @@ return [
         'label' => 'Express RealWorld API',
         'repository' => 'https://github.com/gothinkster/node-express-realworld-example-app.git',
         'group' => 'core',
-        'required_stack' => ['Node API'],
+        'required_stack' => ['Express', 'Node API'],
         'forbidden_stack' => ['Next.js', 'React', 'Vue', 'FastAPI', 'Django', 'PHP'],
         'required_nodes' => ['api'],
         'questions' => ['Where are API routes defined?', 'Trace authentication.'],
