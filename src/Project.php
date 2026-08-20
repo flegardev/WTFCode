@@ -179,9 +179,23 @@ final class Project
 
     public static function findings(int $projectId, int $limit = 12): array
     {
-        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id ORDER BY FIELD(severity, 'risk', 'attention', 'info'), id DESC LIMIT " . max(1, min($limit, 100)));
+        $limit = max(1, min($limit, 100));
+        $statement = Database::connection()->prepare("SELECT * FROM scan_findings WHERE project_id = :project_id ORDER BY FIELD(severity, 'risk', 'attention', 'info'), id DESC LIMIT " . min(500, $limit * 20));
         $statement->execute(['project_id' => $projectId]);
-        return $statement->fetchAll();
+        return self::deduplicateFindings($statement->fetchAll(), $limit);
+    }
+
+    /** @param array<int,array<string,mixed>> $findings @return array<int,array<string,mixed>> */
+    public static function deduplicateFindings(array $findings, int $limit): array
+    {
+        $unique = [];
+        foreach ($findings as $finding) {
+            $signature = strtolower(implode('|', [(string) ($finding['finding_type'] ?? ''), (string) ($finding['title'] ?? ''), (string) ($finding['file_path'] ?? '')]));
+            if (isset($unique[$signature])) continue;
+            $unique[$signature] = $finding;
+            if (count($unique) >= max(1, $limit)) break;
+        }
+        return array_values($unique);
     }
 
     public static function securityFindings(int $projectId, int $limit = 300): array
