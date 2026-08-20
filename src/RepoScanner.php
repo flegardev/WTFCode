@@ -294,6 +294,7 @@ final class RepoScanner
         elseif ($hasLanguage('PHP')) { $stack[] = 'PHP'; $nodes[] = $this->node('api', 'server', 'PHP project', 'This PHP codebase contains server-side source and may handle pages, requests, or application rules.', $this->phpApplicationEvidence($primaryFiles)); }
         if ($hasRuntimePattern('/(?:@supabase\/|supabase\.auth|\bSUPABASE_(?:URL|ANON_KEY|SERVICE_ROLE_KEY)\b)/i')) { $stack[] = 'Supabase'; $nodes[] = $this->node('supabase', 'service', 'Supabase', 'Supabase is connected as an external service for data, authentication, or both.', $this->matchingPaths($paths, ['supabase', 'lib/'])); }
         if ($hasRuntimePattern('/(?:from\s+[\'\"]firebase(?:\/|[\'\"])|initializeApp\s*\(|firebase\.auth\s*\()/i')) { $stack[] = 'Firebase'; $nodes[] = $this->node('firebase', 'service', 'Firebase', 'Firebase is connected for application services such as authentication, data, or storage.', $this->matchingPaths($paths, ['firebase', 'auth', 'firestore'])); }
+        if ($hasPackageDependency('next-auth') || $hasPackageDependency('@auth/core')) $stack[] = 'Auth.js';
         if ($hasAuthPath() || $authEvidence !== []) { $nodes[] = $this->node('auth', 'auth', 'Authentication', 'This part decides who is signed in and which requests are allowed.', $authEvidence); }
         if ($hasPackageDependency('@prisma/client') || $hasPath('prisma/schema.prisma')) $stack[] = 'Prisma';
         if ($hasPackageDependency('drizzle-orm') || $hasPath('packages/drizzle-orm/')) $stack[] = 'Drizzle';

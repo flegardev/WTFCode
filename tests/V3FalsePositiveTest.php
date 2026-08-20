@@ -26,12 +26,13 @@ try {
     file_put_contents($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'RuntimeLinks.js', "// See https://docs.example.dev/runtime\nconst WEBSITE = 'https://www.example.dev';\nconst API_BASE_URL = 'https://api.real-service.dev/v1';\nfetch(API_BASE_URL + '/items');\n");
     file_put_contents($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'ClientConfig.ts', "new PaymentSdk(key, { apiVersion: null, appInfo: { url: 'https://github.com/example/plugin' } });\n");
     file_put_contents($root . DIRECTORY_SEPARATOR . 'service.toml', "# S3 example: bucket.s3-region.amazonaws.com\ns3_host = 'env(S3_HOST)'\n");
-    file_put_contents($root . DIRECTORY_SEPARATOR . 'package.json', '{"name":"generic-next-key","config":{"next":"not-a-framework"},"dependencies":{"@aws-sdk/client-s3":"1.0.0"}}');
+    file_put_contents($root . DIRECTORY_SEPARATOR . 'package.json', '{"name":"generic-next-key","config":{"next":"not-a-framework"},"dependencies":{"@aws-sdk/client-s3":"1.0.0","next-auth":"5.0.0"}}');
     file_put_contents($root . DIRECTORY_SEPARATOR . 'package-lock.json', '{"lockfileVersion":3,"packages":{"node_modules/aws-transitive":{"name":"aws-sdk"}}}');
     file_put_contents($root . DIRECTORY_SEPARATOR . '.playwright-cli' . DIRECTORY_SEPARATOR . 'page.yml', 'snapshot: generated browser evidence');
     $result = (new RepoScanner())->inspect($root, AnalysisProfile::QUICK);
     false_positive_assert(!in_array('.playwright-cli/page.yml', array_column($result['files'], 'path'), true), 'Generated Playwright artifacts must not enter repository analysis');
     false_positive_assert(!in_array('Next.js', $result['stack'], true), 'A generic next key must not prove Next.js');
+    false_positive_assert(in_array('Auth.js', $result['stack'], true), 'A direct next-auth dependency must identify Auth.js');
     false_positive_assert(!in_array('Docker', $result['stack'], true), 'README Docker prose must not prove Docker use');
     $services = array_values(array_filter($result['symbol_graph']['symbols'], static fn (array $symbol): bool => ($symbol['type'] ?? '') === 'external_service'));
     false_positive_assert(array_column($services, 'name') === ['api.real-service.dev'], 'Only runtime endpoint configuration or network calls may prove external services; got ' . json_encode(array_column($services, 'name')));
