@@ -15,9 +15,25 @@ function performance_git(string $root, array $arguments): void
     if (!$result->succeeded()) throw new RuntimeException('Git fixture command failed: ' . implode(' ', $arguments));
 }
 
+final class PerformanceVersionProvider implements AnalyzerProviderInterface
+{
+    public function __construct(private readonly string $providerVersion) {}
+    public function id(): string { return 'performance-version-fixture'; }
+    public function version(): string { return $this->providerVersion; }
+    public function supportedLanguages(): array { return ['PHP']; }
+    public function capabilities(): array { return ['symbols']; }
+    public function isAvailable(): bool { return true; }
+    public function healthCheck(): AnalyzerHealth { return new AnalyzerHealth('ready', 'fixture', $this->version()); }
+    public function analyze(AnalysisRequest $request): AnalyzerResult { return new AnalyzerResult($this->id(), $this->version(), AnalyzerResult::SUCCESS, ['symbols' => [], 'relationships' => [], 'routes' => [], 'stats' => []]); }
+}
+
 $plainRequest = new AnalysisRequest(__DIR__, [['path' => 'one.php', 'language' => 'PHP', 'content' => '<?php function one() {}', 'hash' => hash('sha256', 'one')]]);
 $otherRequest = new AnalysisRequest(__DIR__, [['path' => 'two.php', 'language' => 'PHP', 'content' => '<?php function two() {}', 'hash' => hash('sha256', 'two')]]);
 performance_assert($plainRequest->revision() !== $otherRequest->revision(), 'Non-Git cache revisions must include file paths and content hashes');
+$cache = new ProviderCache(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wtfcode-cache-key-fixture');
+performance_assert($cache->key($plainRequest, new PerformanceVersionProvider('1.0.0')) !== $cache->key($plainRequest, new PerformanceVersionProvider('2.0.0')), 'Provider version changes must invalidate cache identity');
+$deepRequest = new AnalysisRequest(__DIR__, $plainRequest->files(), AnalysisProfile::DEEP);
+performance_assert($cache->key($plainRequest, new PerformanceVersionProvider('1.0.0')) !== $cache->key($deepRequest, new PerformanceVersionProvider('1.0.0')), 'Profile configuration changes must invalidate cache identity');
 $implementationFiles = new ReflectionMethod(ProviderCache::class, 'implementationFiles');
 $nativeImplementation = $implementationFiles->invoke(new ProviderCache(), new NativeAnalyzerProvider());
 performance_assert(in_array(str_replace('\\', '/', (string) realpath(__DIR__ . '/../src/Analysis/FlaskAdapter.php')), array_map(static fn (string $path): string => str_replace('\\', '/', $path), $nativeImplementation), true), 'Native provider cache identity must include transitive framework adapters');
