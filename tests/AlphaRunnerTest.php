@@ -17,6 +17,10 @@ foreach ($corpus['repositories'] as $repo) {
     alpha_assert(preg_match('/^[a-f0-9]{40}$/', (string) $repo['commit_sha']) === 1, 'Alpha repositories must pin a full commit SHA.');
     alpha_assert(str_contains(alpha_scorecard_template($repo), 'Overall usefulness (1–5): UNSCORED'), 'Human scores must start UNSCORED.');
 }
+$unreviewed = alpha_scorecard_template($corpus['repositories'][0]);
+alpha_assert(alpha_reviewed_scorecard($unreviewed) === null, 'UNSCORED templates must never count as completed human reviews.');
+$reviewed = str_replace(['- Reviewer: UNSCORED', '- Best insight WTFCode found: UNSCORED'], ['- Reviewer: Alpha reviewer', '- Best insight WTFCode found: A bounded useful insight.'], $unreviewed);
+alpha_assert(alpha_reviewed_scorecard($reviewed)['best_insight'] === 'A bounded useful insight.', 'Reviewed scorecards must expose their human-authored best insight.');
 $process = alpha_process([PHP_BINARY, '-r', 'usleep(200000); echo "alpha-ok";'], dirname(__DIR__), 5);
 alpha_assert($process['exit_code'] === 0 && trim($process['stdout']) === 'alpha-ok', 'Alpha process isolation must preserve a successful child exit code.');
 

@@ -282,6 +282,20 @@ function alpha_run_results(string $root): array
     return $results;
 }
 
+/** @return array{usefulness:?string,best_insight:?string}|null */
+function alpha_reviewed_scorecard(string $text): ?array
+{
+    if (!preg_match('/^- Reviewer:\s*(.+)$/mi', $text, $reviewerMatch) || strcasecmp(trim($reviewerMatch[1]), 'UNSCORED') === 0) return null;
+    $usefulness = null;
+    if (preg_match('/Did WTFCode teach you something useful[^\n]*\*\*(Yes|Somewhat|No)\*\*/i', $text, $match)) $usefulness = ucfirst(strtolower($match[1]));
+    $bestInsight = null;
+    if (preg_match('/^- Best insight WTFCode found:\s*(.+)$/mi', $text, $match)) {
+        $candidate = trim($match[1]);
+        if (strcasecmp($candidate, 'UNSCORED') !== 0) $bestInsight = $candidate;
+    }
+    return ['usefulness' => $usefulness, 'best_insight' => $bestInsight];
+}
+
 function alpha_generate_reports(string $root): void
 {
     $results = alpha_run_results($root);
@@ -304,14 +318,14 @@ function alpha_generate_reports(string $root): void
     $reports = $root . '/tests/alpha/reports';
     if (!is_dir($reports)) mkdir($reports, 0700, true);
     $reviews = ['completed' => 0, 'Yes' => 0, 'Somewhat' => 0, 'No' => 0];
+    $reviewInsights = [];
     foreach (glob($root . '/tests/alpha/scorecards/*.md') ?: [] as $scorecard) {
         $text = (string) file_get_contents($scorecard);
-        if (!preg_match('/^- Reviewer:\s*(?!UNSCORED)(.+)$/mi', $text)) continue;
+        $review = alpha_reviewed_scorecard($text);
+        if ($review === null) continue;
         $reviews['completed']++;
-        if (preg_match('/Did WTFCode teach you something useful[^\n]*\*\*(Yes|Somewhat|No)\*\*/i', $text, $match)) {
-            $answer = ucfirst(strtolower($match[1]));
-            $reviews[$answer]++;
-        }
+        if ($review['usefulness'] !== null) $reviews[$review['usefulness']]++;
+        if ($review['best_insight'] !== null) $reviewInsights[pathinfo($scorecard, PATHINFO_FILENAME)] = $review['best_insight'];
     }
     $dashboard = [
         '# WTFCode Alpha dashboard', '',
@@ -369,13 +383,14 @@ function alpha_generate_reports(string $root): void
         }));
         $severity = ['P0' => 0, 'P1' => 0, 'P2' => 0, 'P3' => 0];
         foreach ($batchFailures as $failure) $severity[$failure['severity'] ?? 'P3']++;
-        $slowestName = 'not run'; $slowestMs = -1; $limitations = [];
+        $slowestName = 'not run'; $slowestMs = -1; $limitations = []; $bestInsight = null;
         foreach ($names as $name) {
             $result = $quick[$name] ?? null;
             if ($result === null) continue;
             $duration = (int) ($result['machine']['scan_duration_ms'] ?? 0);
             if ($duration > $slowestMs) { $slowestMs = $duration; $slowestName = $name . ' (' . number_format($duration / 1000, 2) . 's)'; }
             foreach ($result['machine']['partial_reasons'] ?? [] as $reason) $limitations[] = $name . ': ' . $reason;
+            if ($bestInsight === null && isset($reviewInsights[$name])) $bestInsight = $name . ': ' . $reviewInsights[$name];
         }
         $worst = $batchFailures === [] ? 'None recorded.' : ($batchFailures[0]['id'] . ': ' . $batchFailures[0]['description']);
         $fixedFailures = array_values(array_filter($batchFailures, static fn (array $failure): bool => ($failure['status'] ?? '') === 'fixed'));
@@ -387,7 +402,7 @@ function alpha_generate_reports(string $root): void
             '- Fixes made: ' . ($fixedFailures === [] ? 'none in this batch' : implode(', ', array_column($fixedFailures, 'id'))) . '.',
             '- Regressions added: ' . ($fixedFailures === [] ? 'none' : implode('; ', array_column($fixedFailures, 'regression_test'))) . '.', '',
             '## Product observations', '',
-            '- Best insight: UNSCORED until human review.',
+            '- Best insight: ' . ($bestInsight ?? 'No repository in this batch received manual human review.'),
             '- Worst false positive: ' . $worst,
             '- Performance outlier: ' . $slowestName . '.',
             '- Unresolved limitation: ' . ($limitations === [] ? 'No Quick-profile limitation was recorded.' : implode(' ', array_slice(array_unique($limitations), 0, 3))), '',
