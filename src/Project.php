@@ -55,7 +55,24 @@ final class Project
         try {
             $prepared = GitHubAppService::withRepositoryAccess($userId, $installationRecordId, $repositoryId, static function (array $repository, string $token) use ($userId, $installationRecordId, $name, &$projectId, &$path): array {
                 $projectName = $name === '' ? (string) $repository['name'] : $name;
-                try {
+                $existing = Database::connection()->prepare('SELECT id, name FROM projects WHERE user_id = :user_id AND repository_url = :repository_url LIMIT 1');
+                $existing->execute(['user_id' => $userId, 'repository_url' => (string) $repository['repository_url']]);
+                $ownedProject = $existing->fetch();
+                if ($ownedProject) {
+                    $id = (int) $ownedProject['id'];
+                    Database::connection()->prepare('UPDATE projects SET name = :name, local_path = :local_path, status = :status, last_error = NULL, github_installation_id = :installation_id, github_repository_id = :repository_id, github_repository_owner = :repository_owner, github_repository_name = :repository_name, github_repository_visibility = :repository_visibility WHERE id = :id AND user_id = :user_id')->execute([
+                        'name' => $name === '' ? (string) $ownedProject['name'] : $projectName,
+                        'local_path' => '',
+                        'status' => 'cloning',
+                        'installation_id' => $installationRecordId,
+                        'repository_id' => (int) $repository['id'],
+                        'repository_owner' => (string) $repository['owner'],
+                        'repository_name' => (string) $repository['name'],
+                        'repository_visibility' => (string) $repository['visibility'],
+                        'id' => $id,
+                        'user_id' => $userId,
+                    ]);
+                } else try {
                     $id = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status, github_installation_id, github_repository_id, github_repository_owner, github_repository_name, github_repository_visibility) VALUES (:user_id, :name, :repository_url, :local_path, :status, :installation_id, :repository_id, :repository_owner, :repository_name, :repository_visibility)', [
                         'user_id' => $userId,
                         'name' => $projectName,
@@ -69,7 +86,7 @@ final class Project
                         'repository_visibility' => (string) $repository['visibility'],
                     ]);
                 } catch (PDOException $exception) {
-                    if (Database::isUniqueViolation($exception)) throw new GitHubAccessException('You have already imported this repository.', 'Duplicate private project import.', 'duplicate_project', $exception);
+                    if (Database::isUniqueViolation($exception)) throw new GitHubAccessException('This repository changed while it was being linked. Try again.', 'Concurrent private project import.', 'concurrent_project', $exception);
                     throw $exception;
                 }
                 $projectId = $id;
