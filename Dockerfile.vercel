@@ -21,7 +21,7 @@ ARG SYFT_SHA256=2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f
 ARG GRYPE_VERSION=0.117.0
 ARG GRYPE_SHA256=38525dab1e06f162ebaa02f94d82d1f807076b011a44180cf2777edf1a7b9c26
 
-RUN install-php-extensions pdo_pgsql mbstring curl opcache
+RUN install-php-extensions pdo_pgsql mbstring curl openssl opcache
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl git libcap2-bin ripgrep tar \
     && rm -rf /var/lib/apt/lists/*

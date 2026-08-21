@@ -10,6 +10,8 @@ storage/cache/*
 !storage/cache/.gitkeep
 storage/alpha-corpus/
 storage/tmp/
+storage/.empty-git-config
+storage/askpass-*
 .playwright-cli/
 output/
 vendor/

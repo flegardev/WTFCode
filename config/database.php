@@ -66,4 +66,10 @@ return [
     'session_lifetime' => max(900, (int) ($environmentValue('SESSION_LIFETIME') ?? '7200')),
     'version' => substr($environmentValue('APP_VERSION', 'VERCEL_GIT_COMMIT_SHA') ?? 'dev', 0, 64),
     'vercel' => $booleanValue($environmentValue('VERCEL')),
+    'github_app_id' => $environmentValue('GITHUB_APP_ID') ?? '',
+    'github_app_slug' => $environmentValue('GITHUB_APP_SLUG') ?? '',
+    'github_app_client_id' => $environmentValue('GITHUB_APP_CLIENT_ID') ?? '',
+    'github_app_client_secret' => $environmentValue('GITHUB_APP_CLIENT_SECRET') ?? '',
+    'github_app_private_key' => $environmentValue('GITHUB_APP_PRIVATE_KEY') ?? '',
+    'github_app_callback_url' => $environmentValue('GITHUB_APP_CALLBACK_URL') ?? '',
 ];

@@ -15,6 +15,13 @@ assert_same(false, csrf_token_is_valid('', ''), 'Missing CSRF tokens must never 
 assert_same(false, csrf_token_is_valid('submitted', ''), 'A submitted CSRF token requires a server-side session token');
 assert_same(true, csrf_token_is_valid('same-token', 'same-token'), 'Matching non-empty CSRF tokens should validate');
 
+$_SESSION = [];
+$githubState = GitHubConnectState::begin(42);
+assert_same(false, GitHubConnectState::consume($githubState, 41), 'GitHub callback state must be bound to the authenticated WTFCode user');
+$githubState = GitHubConnectState::begin(42);
+assert_same(true, GitHubConnectState::consume($githubState, 42), 'Fresh GitHub callback state should validate once for its owner');
+assert_same(false, GitHubConnectState::consume($githubState, 42), 'GitHub callback state must not be replayable');
+
 $findingSummary = Project::deduplicateFindings([
     ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'lib/db.ts'],
     ['finding_type' => 'database_operation', 'title' => 'Database operation', 'file_path' => 'lib/db.ts'],
@@ -27,6 +34,10 @@ assert_same('https://github.com/openai/openai-quickstart-node.git', RepositoryIm
 assert_same(null, RepositoryImporter::normalizeGithubUrl('git@github.com:openai/openai-quickstart-node.git'), 'SSH URLs should be rejected');
 assert_same(null, RepositoryImporter::normalizeGithubUrl('https://example.com/openai/openai-quickstart-node'), 'Non-GitHub hosts should be rejected');
 assert_same(null, RepositoryImporter::normalizeGithubUrl('https://github.com/openai/openai-quickstart-node?download=1'), 'Repository URLs with query strings should be rejected');
+assert_same('<redacted>', SensitiveDataSanitizer::text('ghs_abcdefghijklmnopqrstuvwxyz123456'), 'GitHub installation tokens must be redacted from diagnostic text');
+$importerSource = (string) file_get_contents(__DIR__ . '/../src/RepositoryImporter.php');
+assert_same(false, str_contains($importerSource, 'https://x-access-token:'), 'GitHub credentials must never be embedded in repository URLs');
+assert_same(true, str_contains($importerSource, 'GIT_ASKPASS'), 'Private clones should pass credentials through an isolated askpass process');
 
 $cleanupPath = RepositoryImporter::storageRoot() . DIRECTORY_SEPARATOR . 'repos' . DIRECTORY_SEPARATOR . 'project-cleanup-regression';
 if (!is_dir($cleanupPath) && !mkdir($cleanupPath, 0700, true) && !is_dir($cleanupPath)) {

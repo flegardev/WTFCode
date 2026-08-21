@@ -69,7 +69,7 @@ Dockerfile.vercel       Production FrankenPHP container
 
 ## Production deployment
 
-Production uses the root `Dockerfile.vercel`, PHP 8.4 on FrankenPHP, and a backend-only Supabase PostgreSQL connection. It keeps authentication, CSRF, and authorization in PHP; it does not use Supabase Auth or expose a Supabase client key. Start with [Deploy today](docs/DEPLOY-TODAY.md), then use the detailed [Supabase](docs/DEPLOY-SUPABASE.md), [Vercel](docs/DEPLOY-VERCEL.md), and [data ownership](docs/DATA-OWNERSHIP.md) guides.
+Production uses the root `Dockerfile.vercel`, PHP 8.4 on FrankenPHP, and a backend-only Supabase PostgreSQL connection. It keeps authentication, CSRF, and authorization in PHP; it does not use Supabase Auth or expose a Supabase client key. Start with [Deploy today](docs/DEPLOY-TODAY.md), then use the detailed [Supabase](docs/DEPLOY-SUPABASE.md), [Vercel](docs/DEPLOY-VERCEL.md), [GitHub App](docs/GITHUB-APP.md), and [data ownership](docs/DATA-OWNERSHIP.md) guides.
 
 The hosted default is `quick`. Deep, Security, and Maximum scans are available, but larger repositories may exceed request-duration or memory limits; background jobs are the next architecture step for those profiles.
 
@@ -104,7 +104,7 @@ Requirements:
 - Every database access uses PDO prepared statements.
 - Every modifying form validates a CSRF token.
 - Project queries include the authenticated user ID before files, scan data, or Git history are accessible.
-- Imports only accept canonical public GitHub HTTPS URLs. Arbitrary clone targets, file URLs, SSH URLs, and non-GitHub hosts are rejected.
+- Imports only accept canonical GitHub HTTPS URLs. Private repositories require the read-only GitHub App picker; arbitrary clone targets, credential-bearing URLs, file URLs, SSH URLs, and non-GitHub hosts are rejected.
 - Repository paths are allocated server-side from a project ID; callers never submit a filesystem path.
 - Git runs through argument arrays with the shell bypassed; clone URLs and commit refs are independently allowlisted. Imports disable Git terminal prompts and time out after 90 seconds.
 - Git clone disables submodule recursion. The scanner skips symlinks and ignored dependency/build directories, and no imported repository code is installed or executed.
@@ -147,4 +147,4 @@ Major feature expansion is frozen for the supervised Alpha. The current prioriti
 3. Improve React and shared-client traces, terminal-effect detection, and partial-scan explanations.
 4. Move larger Deep, Security, and Maximum scans to durable background jobs when synchronous hosting proves unreliable.
 
-Private-repository OAuth, teams, billing, autonomous edits, and a broader V4 analyzer expansion are intentionally deferred until the supervised Alpha validates demand and trust.
+Teams, billing, autonomous edits, and a broader V4 analyzer expansion are intentionally deferred until the supervised Alpha validates demand and trust.

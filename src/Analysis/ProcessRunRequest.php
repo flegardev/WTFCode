@@ -7,6 +7,7 @@ final class ProcessRunRequest
     private const ALLOWED_ENVIRONMENT = [
         'PATH', 'PATHEXT', 'SystemRoot', 'WINDIR', 'COMSPEC', 'TEMP', 'TMP', 'TMPDIR',
         'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_GLOBAL', 'GIT_TERMINAL_PROMPT', 'GIT_OPTIONAL_LOCKS',
+        'GIT_ASKPASS', 'WTF_GITHUB_INSTALLATION_TOKEN',
     ];
 
     /** @var array<int, string> */

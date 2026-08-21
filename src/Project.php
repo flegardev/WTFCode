@@ -5,7 +5,7 @@ declare(strict_types=1);
 final class Project
 {
     /** @return array{project: array<string, mixed>}|array{error: string} */
-    public static function createFromGithub(int $userId, string $name, string $repositoryUrl): array
+    public static function createFromGithub(int $userId, string $name, string $repositoryUrl, string $profile = AnalysisProfile::QUICK): array
     {
         @set_time_limit(120);
         $repositoryUrl = RepositoryImporter::normalizeGithubUrl($repositoryUrl);
@@ -13,6 +13,9 @@ final class Project
         if ($repositoryUrl === null) return ['error' => 'Use a public HTTPS GitHub repository URL, for example https://github.com/owner/repository.'];
         if ($name === '') $name = RepositoryImporter::defaultName($repositoryUrl);
         if (text_length($name) > 140) return ['error' => 'Project names must be 140 characters or fewer.'];
+
+        try { GitHubAppService::inspectPublicRepository($repositoryUrl); }
+        catch (GitHubAccessException $exception) { return ['error' => $exception->safeMessage()]; }
 
         try {
             $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => $name, 'repository_url' => $repositoryUrl, 'local_path' => '', 'status' => 'queued']);
@@ -26,11 +29,12 @@ final class Project
             self::setStatus($projectId, 'cloning');
             $path = RepositoryImporter::clone($projectId, $repositoryUrl);
             Database::connection()->prepare('UPDATE projects SET local_path = :local_path, status = :status WHERE id = :id')->execute(['local_path' => $path, 'status' => 'scanning', 'id' => $projectId]);
-            (new RepoScanner())->scan($projectId, $path, AnalysisProfile::normalize((string) app_config()['scan_profile']));
+            (new RepoScanner())->scan($projectId, $path, AnalysisProfile::normalize($profile));
         } catch (Throwable $exception) {
             Logger::error('Repository import failed', ['project_id' => $projectId, 'type' => get_class($exception), 'message' => $exception->getMessage()]);
-            Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($exception->getMessage(), 0, 500), 'id' => $projectId]);
-            return ['error' => 'The repository could not be imported. Check that the URL is public, Git is installed, and the server can reach GitHub.'];
+            $safe = self::safeRepositoryError($exception, 'The repository could not be imported. Check the URL or connect GitHub for private access.');
+            Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($safe, 0, 500), 'id' => $projectId]);
+            return ['error' => $safe];
         } finally {
             if ($path !== null && RepositoryImporter::ephemeral()) {
                 RepositoryImporter::cleanup($path);
@@ -38,6 +42,57 @@ final class Project
             }
         }
         return ['project' => self::findForUser($projectId, $userId)];
+    }
+
+    /** @return array{project: array<string, mixed>}|array{error: string} */
+    public static function createFromGitHubInstallation(int $userId, int $installationRecordId, int $repositoryId, string $name, string $profile = AnalysisProfile::QUICK): array
+    {
+        @set_time_limit(120);
+        $name = trim($name);
+        if (text_length($name) > 140) return ['error' => 'Project names must be 140 characters or fewer.'];
+        $projectId = null;
+        $path = null;
+        try {
+            $prepared = GitHubAppService::withRepositoryAccess($userId, $installationRecordId, $repositoryId, static function (array $repository, string $token) use ($userId, $installationRecordId, $name, &$projectId, &$path): array {
+                $projectName = $name === '' ? (string) $repository['name'] : $name;
+                try {
+                    $id = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status, github_installation_id, github_repository_id, github_repository_owner, github_repository_name, github_repository_visibility) VALUES (:user_id, :name, :repository_url, :local_path, :status, :installation_id, :repository_id, :repository_owner, :repository_name, :repository_visibility)', [
+                        'user_id' => $userId,
+                        'name' => $projectName,
+                        'repository_url' => (string) $repository['repository_url'],
+                        'local_path' => '',
+                        'status' => 'cloning',
+                        'installation_id' => $installationRecordId,
+                        'repository_id' => (int) $repository['id'],
+                        'repository_owner' => (string) $repository['owner'],
+                        'repository_name' => (string) $repository['name'],
+                        'repository_visibility' => (string) $repository['visibility'],
+                    ]);
+                } catch (PDOException $exception) {
+                    if (Database::isUniqueViolation($exception)) throw new GitHubAccessException('You have already imported this repository.', 'Duplicate private project import.', 'duplicate_project', $exception);
+                    throw $exception;
+                }
+                $projectId = $id;
+                $copy = RepositoryImporter::cloneAuthorized($id, (string) $repository['repository_url'], $token);
+                $path = $copy;
+                Database::connection()->prepare('UPDATE projects SET local_path = :local_path, status = :status WHERE id = :id')->execute(['local_path' => $copy, 'status' => 'scanning', 'id' => $id]);
+                return ['project_id' => $id, 'path' => $copy];
+            });
+            $projectId = (int) $prepared['project_id'];
+            $path = (string) $prepared['path'];
+            (new RepoScanner())->scan($projectId, $path, AnalysisProfile::normalize($profile));
+        } catch (Throwable $exception) {
+            $safe = self::safeRepositoryError($exception, 'The private repository could not be imported. Update GitHub access and try again.');
+            Logger::error('Private repository import failed', ['project_id' => $projectId, 'type' => get_class($exception), 'message' => $exception->getMessage()]);
+            if ($projectId !== null) Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id AND user_id = :user_id')->execute(['status' => 'failed', 'last_error' => substr($safe, 0, 500), 'id' => $projectId, 'user_id' => $userId]);
+            return ['error' => $safe];
+        } finally {
+            if ($path !== null && RepositoryImporter::ephemeral()) {
+                RepositoryImporter::cleanup($path);
+                if ($projectId !== null) Database::connection()->prepare("UPDATE projects SET local_path = '' WHERE id = :id AND user_id = :user_id")->execute(['id' => $projectId, 'user_id' => $userId]);
+            }
+        }
+        return ['project' => self::findForUser((int) $projectId, $userId)];
     }
 
     public static function rescan(array $project, int $userId, string $profile = AnalysisProfile::QUICK): ?string
@@ -52,8 +107,9 @@ final class Project
             (new RepoScanner())->scan((int) $project['id'], $path, AnalysisProfile::normalize($profile));
         } catch (Throwable $exception) {
             Logger::error('Repository rescan failed', ['project_id' => $project['id'], 'type' => get_class($exception), 'message' => $exception->getMessage()]);
-            Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($exception->getMessage(), 0, 500), 'id' => $project['id']]);
-            return 'The repository could not be rescanned. Try Quick analysis again.';
+            $safe = self::safeRepositoryError($exception, 'The repository could not be rescanned. Try Quick analysis again.');
+            Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id AND user_id = :user_id')->execute(['status' => 'failed', 'last_error' => substr($safe, 0, 500), 'id' => $project['id'], 'user_id' => $userId]);
+            return $safe;
         } finally {
             if ($path !== null && RepositoryImporter::ephemeral()) RepositoryImporter::cleanup($path);
         }
@@ -250,5 +306,10 @@ final class Project
     private static function setStatus(int $projectId, string $status): void
     {
         Database::connection()->prepare('UPDATE projects SET status = :status, last_error = NULL WHERE id = :id')->execute(['status' => $status, 'id' => $projectId]);
+    }
+
+    private static function safeRepositoryError(Throwable $exception, string $fallback): string
+    {
+        return $exception instanceof GitHubAccessException ? $exception->safeMessage() : $fallback;
     }
 }

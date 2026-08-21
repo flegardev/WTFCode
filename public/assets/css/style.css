@@ -106,5 +106,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .finding-list { min-width:0; grid-template-columns:minmax(0,1fr); }
 .finding,.finding h3,.finding p { min-width:0; overflow-wrap:anywhere; }
 .notice { border-radius:7px; }
+.app-shell.narrow > .import-card + .import-card { margin-top:16px; }
 @media (max-width:900px) { .landing-hero { grid-template-columns:1fr; min-height:auto; }.product-shot { max-width:760px; transform:none; }.project-tools { grid-template-columns:1fr; } }
 @media (max-width:640px) { .nav-shell,.landing-hero,.landing-section,.landing-cta,.app-shell,.auth-shell,.legal-shell,.site-footer { width:min(100% - 28px,1220px); }.landing-hero { gap:42px; padding:54px 0 68px; }.landing-copy h1 { font-size:clamp(3rem,15vw,4.15rem); }.product-shot-bar { grid-template-columns:1fr auto; }.product-shot-bar b { display:none; }.product-shot figcaption { display:none; }.project-heading { padding-bottom:20px; }.project-nav { flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-inline:contain; scrollbar-width:thin; }.project-nav a { flex:0 0 auto; }.mode-nav,.mode-nav + .project-nav-v2 { padding:6px; }.metric-grid article { min-height:96px; } }

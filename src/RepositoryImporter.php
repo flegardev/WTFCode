@@ -37,6 +37,17 @@ final class RepositoryImporter
 
     public static function clone(int $projectId, string $repositoryUrl): string
     {
+        return self::cloneRepository($projectId, $repositoryUrl, null);
+    }
+
+    public static function cloneAuthorized(int $projectId, string $repositoryUrl, string $installationToken): string
+    {
+        if ($installationToken === '' || strlen($installationToken) > 500) throw new RuntimeException('Temporary GitHub repository access is invalid.');
+        return self::cloneRepository($projectId, $repositoryUrl, $installationToken);
+    }
+
+    private static function cloneRepository(int $projectId, string $repositoryUrl, ?string $installationToken): string
+    {
         if (self::normalizeGithubUrl($repositoryUrl) !== $repositoryUrl) {
             throw new RuntimeException('Repository URL validation failed.');
         }
@@ -50,14 +61,32 @@ final class RepositoryImporter
 
         $emptyHooks = self::storageRoot() . DIRECTORY_SEPARATOR . 'empty-hooks';
         if (!is_dir($emptyHooks) && !mkdir($emptyHooks, 0700, true) && !is_dir($emptyHooks)) throw new RuntimeException('Git isolation could not be initialized.');
-        $result = self::runGit(['-c', 'protocol.file.allow=never', '-c', 'core.hooksPath=' . $emptyHooks, '-c', 'credential.helper=', '-c', 'core.fsmonitor=false', 'clone', '--quiet', '--depth', '100', '--no-tags', '--no-recurse-submodules', '--config', 'core.hooksPath=' . $emptyHooks, $repositoryUrl, $destination]);
+        $environment = [];
+        $askPass = null;
+        if ($installationToken !== null) {
+            $askPass = self::createAskPass();
+            $environment = ['GIT_ASKPASS' => $askPass, 'WTF_GITHUB_INSTALLATION_TOKEN' => $installationToken];
+        }
+        try {
+            $result = self::runGit(['-c', 'protocol.file.allow=never', '-c', 'core.hooksPath=' . $emptyHooks, '-c', 'credential.helper=', '-c', 'core.fsmonitor=false', 'clone', '--quiet', '--depth', '100', '--no-tags', '--no-recurse-submodules', '--config', 'core.hooksPath=' . $emptyHooks, $repositoryUrl, $destination], $environment);
+        } finally {
+            if ($askPass !== null) @unlink($askPass);
+            $environment = [];
+            $installationToken = null;
+        }
         if ($result['exit_code'] !== 0 || !is_dir($destination . DIRECTORY_SEPARATOR . '.git')) {
             Logger::warning('Git repository clone failed', [
                 'exit_code' => $result['exit_code'],
                 'detail' => self::safeGitFailureDetail($result['output']),
             ]);
             self::cleanup($destination);
-            throw new RuntimeException('Git could not clone that public repository. Check the URL and make sure Git is installed on the server.');
+            throw new GitHubAccessException(
+                $askPass === null
+                    ? 'Repository not found or unavailable. If it is private, connect GitHub and select it from the repository picker.'
+                    : 'GitHub could not clone this repository. Update the App repository access and try again.',
+                'Git clone failed without exposing process output.',
+                $askPass === null ? 'repository_unavailable' : 'repository_not_granted',
+            );
         }
         if (self::directorySize($destination) > self::MAX_REPOSITORY_BYTES) {
             self::cleanup($destination);
@@ -80,7 +109,21 @@ final class RepositoryImporter
         if (isset(self::$requestCopies[$projectId]) && is_dir(self::$requestCopies[$projectId] . DIRECTORY_SEPARATOR . '.git')) return self::$requestCopies[$projectId];
         $url = self::normalizeGithubUrl((string) ($project['repository_url'] ?? ''));
         if ($projectId < 1 || $url === null) throw new RuntimeException('The project repository cannot be rehydrated.');
-        $path = self::clone($projectId, $url);
+        $installationRecordId = (int) ($project['github_installation_id'] ?? 0);
+        $repositoryId = (int) ($project['github_repository_id'] ?? 0);
+        if ($installationRecordId > 0 || $repositoryId > 0) {
+            if ($installationRecordId < 1 || $repositoryId < 1 || (int) ($project['user_id'] ?? 0) < 1) {
+                throw new GitHubAccessException('This private repository connection is incomplete. Reconnect GitHub and import it again.', 'Private project identifiers are incomplete.', 'connection_incomplete');
+            }
+            $path = GitHubAppService::withRepositoryAccess(
+                (int) $project['user_id'],
+                $installationRecordId,
+                $repositoryId,
+                static fn (array $repository, string $token): string => self::cloneAuthorized($projectId, (string) $repository['repository_url'], $token),
+            );
+        } else {
+            $path = self::clone($projectId, $url);
+        }
         self::$requestCopies[$projectId] = $path;
         if (self::ephemeral()) register_shutdown_function(static fn () => self::cleanup($path));
         return $path;
@@ -95,9 +138,17 @@ final class RepositoryImporter
         }
         $items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($items as $item) {
-            $item->isLink() || !$item->isDir() ? unlink($item->getPathname()) : rmdir($item->getPathname());
+            $path = $item->getPathname();
+            if ($item->isLink() || !$item->isDir()) {
+                @chmod($path, 0600);
+                @unlink($path);
+            } else {
+                @chmod($path, 0700);
+                @rmdir($path);
+            }
         }
-        rmdir($directory);
+        @chmod($directory, 0700);
+        @rmdir($directory);
     }
 
     public static function ephemeral(): bool
@@ -111,7 +162,7 @@ final class RepositoryImporter
     }
 
     /** @return array{exit_code: int, output: array<int, string>} */
-    private static function runGit(array $arguments): array
+    private static function runGit(array $arguments, array $environment = []): array
     {
         $root = self::storageRoot();
         if (!is_dir($root) && !mkdir($root, 0700, true) && !is_dir($root)) return ['exit_code' => 1, 'output' => []];
@@ -124,12 +175,26 @@ final class RepositoryImporter
                 self::GIT_TIMEOUT_SECONDS,
                 1_048_576,
                 1_048_576,
-                ['GIT_CONFIG_NOSYSTEM' => '1', 'GIT_CONFIG_GLOBAL' => $emptyConfig, 'GIT_TERMINAL_PROMPT' => '0', 'GIT_OPTIONAL_LOCKS' => '0'],
+                array_merge(['GIT_CONFIG_NOSYSTEM' => '1', 'GIT_CONFIG_GLOBAL' => $emptyConfig, 'GIT_TERMINAL_PROMPT' => '0', 'GIT_OPTIONAL_LOCKS' => '0'], $environment),
             ));
             return ['exit_code' => $result->exitCode, 'output' => array_filter(preg_split('/\r?\n/', trim($result->stdout . "\n" . $result->stderr)) ?: [])];
         } catch (Throwable) {
             return ['exit_code' => 1, 'output' => []];
         }
+    }
+
+    private static function createAskPass(): string
+    {
+        $root = self::storageRoot();
+        if (!is_dir($root) && !mkdir($root, 0700, true) && !is_dir($root)) throw new RuntimeException('Git credential isolation could not be initialized.');
+        $windows = PHP_OS_FAMILY === 'Windows';
+        $path = $root . DIRECTORY_SEPARATOR . 'askpass-' . bin2hex(random_bytes(12)) . ($windows ? '.cmd' : '.sh');
+        $contents = $windows
+            ? "@echo off\r\necho %~1 | %SystemRoot%\\System32\\findstr.exe /I \"username\" >NUL && (echo x-access-token& exit /B 0)\r\necho %WTF_GITHUB_INSTALLATION_TOKEN%\r\n"
+            : "#!/bin/sh\ncase \"\$1\" in *sername*) printf '%s\\n' 'x-access-token' ;; *) printf '%s\\n' \"\$WTF_GITHUB_INSTALLATION_TOKEN\" ;; esac\n";
+        if (file_put_contents($path, $contents, LOCK_EX) === false) throw new RuntimeException('Git credential isolation could not be initialized.');
+        @chmod($path, 0700);
+        return $path;
     }
 
     private static function directorySize(string $directory): int
