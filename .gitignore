@@ -20,3 +20,5 @@ tools/bin/
 *.tmp
 *security*.json
 *dogfood*.json
+
+.vercel
