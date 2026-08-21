@@ -28,6 +28,15 @@ assert_same(null, RepositoryImporter::normalizeGithubUrl('git@github.com:openai/
 assert_same(null, RepositoryImporter::normalizeGithubUrl('https://example.com/openai/openai-quickstart-node'), 'Non-GitHub hosts should be rejected');
 assert_same(null, RepositoryImporter::normalizeGithubUrl('https://github.com/openai/openai-quickstart-node?download=1'), 'Repository URLs with query strings should be rejected');
 
+$cleanupPath = RepositoryImporter::storageRoot() . DIRECTORY_SEPARATOR . 'repos' . DIRECTORY_SEPARATOR . 'project-cleanup-regression';
+if (!is_dir($cleanupPath) && !mkdir($cleanupPath, 0700, true) && !is_dir($cleanupPath)) {
+    throw new RuntimeException('Unable to create repository cleanup fixture.');
+}
+file_put_contents($cleanupPath . DIRECTORY_SEPARATOR . 'fixture.txt', 'cleanup regression', LOCK_EX);
+RepositoryImporter::cleanup($cleanupPath);
+assert_same(false, is_dir($cleanupPath), 'Failed or replaced repository clones should be cleaned with the supported cleanup path');
+assert_same(false, str_contains((string) file_get_contents(__DIR__ . '/../src/RepositoryImporter.php'), 'deleteDirectory'), 'Repository import must not call an undefined cleanup method');
+
 $explanation = ExplanationService::explainFile(
     ['plain_summary' => 'This file protects requests.', 'role_name' => 'middleware', 'line_count' => 24],
     [['target_path' => './auth']],

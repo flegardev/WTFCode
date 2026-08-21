@@ -42,7 +42,7 @@ final class RepositoryImporter
         }
         $destination = self::projectPath($projectId);
         if (is_dir($destination)) {
-            self::deleteDirectory($destination);
+            self::cleanup($destination);
         }
         if (!is_dir(dirname($destination)) && !mkdir(dirname($destination), 0700, true) && !is_dir(dirname($destination))) {
             throw new RuntimeException('The private repository storage directory could not be created.');
@@ -52,11 +52,15 @@ final class RepositoryImporter
         if (!is_dir($emptyHooks) && !mkdir($emptyHooks, 0700, true) && !is_dir($emptyHooks)) throw new RuntimeException('Git isolation could not be initialized.');
         $result = self::runGit(['-c', 'protocol.file.allow=never', '-c', 'core.hooksPath=' . $emptyHooks, '-c', 'credential.helper=', '-c', 'core.fsmonitor=false', 'clone', '--quiet', '--depth', '100', '--no-tags', '--no-recurse-submodules', '--config', 'core.hooksPath=' . $emptyHooks, $repositoryUrl, $destination]);
         if ($result['exit_code'] !== 0 || !is_dir($destination . DIRECTORY_SEPARATOR . '.git')) {
-            self::deleteDirectory($destination);
+            Logger::warning('Git repository clone failed', [
+                'exit_code' => $result['exit_code'],
+                'detail' => self::safeGitFailureDetail($result['output']),
+            ]);
+            self::cleanup($destination);
             throw new RuntimeException('Git could not clone that public repository. Check the URL and make sure Git is installed on the server.');
         }
         if (self::directorySize($destination) > self::MAX_REPOSITORY_BYTES) {
-            self::deleteDirectory($destination);
+            self::cleanup($destination);
             throw new RuntimeException('This repository is larger than the 100 MB MVP import limit.');
         }
         return $destination;
@@ -141,5 +145,13 @@ final class RepositoryImporter
             }
         }
         return $size;
+    }
+
+    /** @param array<int, string> $output */
+    private static function safeGitFailureDetail(array $output): string
+    {
+        $detail = implode(' ', array_slice($output, -4));
+        $detail = preg_replace('#https://[^\s]+#i', '[repository]', $detail) ?? '';
+        return substr(SensitiveDataSanitizer::text($detail), 0, 500);
     }
 }

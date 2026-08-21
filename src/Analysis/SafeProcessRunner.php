@@ -6,11 +6,15 @@ final class SafeProcessRunner
 {
     public function run(ProcessRunRequest $request): ProcessRunResult
     {
-        $stdoutFile = tempnam(sys_get_temp_dir(), 'wtfcode-stdout-');
-        $stderrFile = tempnam(sys_get_temp_dir(), 'wtfcode-stderr-');
+        $tempDirectory = sys_get_temp_dir();
+        if (!is_dir($tempDirectory) && !mkdir($tempDirectory, 0700, true) && !is_dir($tempDirectory)) {
+            throw new RuntimeException('Unable to create the isolated analyzer temporary directory.');
+        }
+        $stdoutFile = tempnam($tempDirectory, 'wtfcode-stdout-');
+        $stderrFile = tempnam($tempDirectory, 'wtfcode-stderr-');
         $stdinFile = null;
         if ($request->stdin !== null) {
-            $stdinFile = tempnam(sys_get_temp_dir(), 'wtfcode-stdin-');
+            $stdinFile = tempnam($tempDirectory, 'wtfcode-stdin-');
             if ($stdinFile !== false) file_put_contents($stdinFile, $request->stdin, LOCK_EX);
         }
         if ($stdoutFile === false || $stderrFile === false || ($request->stdin !== null && $stdinFile === false)) {
