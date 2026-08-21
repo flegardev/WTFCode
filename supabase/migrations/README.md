@@ -1,5 +1,5 @@
 # PostgreSQL migrations
 
-`../production-schema.sql` is the single bootstrap source for a new WTFCode database and records `202608200001_initial_production` in `schema_migrations`.
+These files mirror the linked Supabase project's authoritative migration history. Deploy pending changes with `supabase db push`; do not paste schema changes directly into the production SQL Editor. `../production-schema.sql` remains a consolidated bootstrap for `php tools/migrate.php` and manual recovery outside the linked Supabase workflow.
 
-Add future upgrades here as ordered `<version>_<description>.sql` files. `php tools/migrate.php` bootstraps an empty database from the production schema, then applies pending files in lexical order. Do not edit an already-applied migration.
+Add future upgrades here with `supabase migration new <description>`. Do not edit an already-applied migration.

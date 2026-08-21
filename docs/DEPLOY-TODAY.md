@@ -3,7 +3,7 @@
 This is the shortest safe path. It intentionally stops before clicking Vercel's final deploy button in the repository-preparation workflow.
 
 1. Create a Supabase project and save the database password.
-2. In Supabase **SQL Editor**, run all of `supabase/production-schema.sql`.
+2. Link the repository to the Supabase project and deploy `supabase/migrations/` with `supabase db push`.
 3. In Supabase **Connect**, copy the **Session pooler** URL on port `5432`; replace and URL-encode the password; keep `sslmode=require`.
 4. Disable the Supabase Data API if nothing else uses it. Do not create or copy any Supabase browser keys for WTFCode.
 5. In Vercel, import `flegardev/WTFCode` as project `wtf-code`, choose `Container`, use root `./`, and leave Build, Install, and Output blank.

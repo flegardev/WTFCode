@@ -1,3 +1,3 @@
 -- WTFCode now uses PostgreSQL as its canonical production database.
--- Apply ../supabase/production-schema.sql to a fresh PostgreSQL/Supabase database.
+-- Apply ../supabase/production-schema.sql to a fresh PostgreSQL database outside the linked Supabase migration workflow.
 -- The numbered files in database/migrations are retained only for legacy MySQL installations.

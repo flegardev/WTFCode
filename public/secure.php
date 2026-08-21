@@ -28,7 +28,7 @@ require __DIR__ . '/../views/header.php';
     <div class="project-heading compact"><div><p class="landing-kicker">Security evidence</p><h1>Review boundaries, not a made-up score.</h1><p>Findings are grouped by impact and retain analyzer, rule, file, and advisory evidence. A finding is a review lead, not proof of exploitability.</p></div></div>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
     <section class="security-summary-grid">
-        <article><span>Confirmed</span><strong><?= count(array_filter($findings, static fn (array $item): bool => ($item['evidence']['confidence'] ?? '') === 'confirmed')) ?></strong><p>Multiple engines or high-certainty evidence.</p></article>
+        <article><span>Confirmed</span><strong><?= count(array_filter($findings, static fn (array $item): bool => ($item['evidence']['confidence'] ?? '') === 'confirmed')) ?></strong><p>Agreement from multiple independent engines.</p></article>
         <article><span>Needs review</span><strong><?= count(array_filter($findings, static fn (array $item): bool => in_array($item['severity'], ['risk', 'attention'], true))) ?></strong><p>Prioritized without claiming exploitation.</p></article>
         <article><span>Packages inventoried</span><strong><?= count($packages) ?></strong><p>Declared, resolved, or detected by available SBOM evidence.</p></article>
     </section>

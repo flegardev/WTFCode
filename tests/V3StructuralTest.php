@@ -48,10 +48,12 @@ TS;
     structural_assert(in_array($rg->status, [AnalyzerResult::SUCCESS, AnalyzerResult::UNAVAILABLE], true), 'ripgrep fallback must either run or report unavailable independently');
     structural_assert(!in_array('README.md', array_column($rg->findings, 'path'), true), 'Documentation text must not become runtime security evidence');
 
-    structural_assert(EvidenceConfidence::label('typescript-semantic', 'high') === 'confirmed', 'Semantic compiler evidence should be confirmed');
+    structural_assert(EvidenceConfidence::label('typescript-semantic', 'high') === 'strong', 'One semantic analyzer must not confirm its own evidence');
+    structural_assert(EvidenceConfidence::label('php-parser', 'high') === 'strong', 'One direct-syntax analyzer must not confirm its own evidence');
     structural_assert(EvidenceConfidence::label('ast-grep', 'medium') === 'likely', 'Single structural patterns should be likely, not confirmed');
     structural_assert(EvidenceConfidence::label('ripgrep', 'low') === 'heuristic', 'Text fallback must stay heuristic');
     structural_assert(EvidenceConfidence::label('php-parser', 'high', 2) === 'confirmed', 'Independent strong evidence should remain confirmed');
+    structural_assert(EvidenceConfidence::label('php-parser', 'low', 2) === 'strong', 'Independent agreement must not promote low-confidence evidence to confirmed');
 } finally {
     foreach (['flow.ts', 'README.md'] as $file) @unlink($root . DIRECTORY_SEPARATOR . $file);
     @rmdir($root);

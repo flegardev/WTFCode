@@ -1,5 +1,5 @@
 -- WTFCode PostgreSQL production schema for a fresh Supabase project.
--- Canonical bootstrap: paste this entire file into the Supabase SQL Editor once.
+-- Consolidated bootstrap for php tools/migrate.php and manual recovery.
 
 CREATE TABLE IF NOT EXISTS schema_migrations (
     version VARCHAR(100) PRIMARY KEY,

@@ -26,7 +26,7 @@ WTFCode is a plain-PHP codebase understanding tool for people who can build quic
 
 V3 phases 1 through 10 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
 
-Evidence is ranked conservatively: semantic resolution outranks direct syntax, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security profiles combine redacted Gitleaks results, optional Semgrep code findings, OSV dependency advisories, optional Syft inventory, and optional offline Grype confirmation without treating a finding as proof of exploitability. See `docs/V3-FOUNDATION.md`, `config/tool-manifest.json`, and `THIRD_PARTY.md` for boundaries and provenance.
+Evidence is ranked conservatively: `confirmed` requires agreement from at least two independent analyzers, a single semantic or direct-syntax analyzer is capped at `strong`, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security profiles combine redacted Gitleaks results, optional Semgrep code findings, OSV dependency advisories, optional Syft inventory, and optional offline Grype confirmation without treating a finding as proof of exploitability. See `docs/V3-FOUNDATION.md`, `config/tool-manifest.json`, and `THIRD_PARTY.md` for boundaries and provenance.
 
 The Cytoscape graph starts at architecture level and drills through subsystems, features, files, and symbols. It supports local search, confidence/relationship/risk/framework filters, neighbor focus, pan/zoom, and confidence-weighted strongest-path tracing without replacing the server-rendered PHP detail pages.
 
@@ -138,11 +138,13 @@ php tests/Benchmark.php --group=core
 
 `UnitTest.php` covers repository URL restriction, blast-radius explanation behavior, and read-only scanner inspection of imports and symbols. `V3FeatureEvidenceTest.php` separates runtime feature signals from fixtures, analyzer patterns, documentation, and generated artifacts. The V2 and V3 integration suites require the configured database and are exercised against PostgreSQL in the production container gate. `FusionBenchmark.php` compares native, external, and fused evidence on the curated local fixtures. `Benchmark.php` shallow-clones a versioned public-repository suite and reports whether required stack and architecture signals are present; see `tests/benchmarks/README.md` for the human scorecard workflow.
 
-## Roadmap
+## Near-term priorities
 
-1. GitHub OAuth with least-privilege private repository access.
-2. Durable scan jobs and background queues for large repositories.
-3. AST-based dependency extraction and richer framework adapters.
-4. An optional, consent-based LLM explanation service.
-5. Prompt-safety suggestions that understand the current blast radius.
-6. Shared team projects, pull-request explanations, and onboarding guides.
+Major feature expansion is frozen for the supervised Alpha. The current priorities are:
+
+1. Test repository import and evidence comprehension with 5–10 developers using their own projects.
+2. Fix the trust, terminology, and navigation problems those sessions expose.
+3. Improve React and shared-client traces, terminal-effect detection, and partial-scan explanations.
+4. Move larger Deep, Security, and Maximum scans to durable background jobs when synchronous hosting proves unreliable.
+
+Private-repository OAuth, teams, billing, autonomous edits, and a broader V4 analyzer expansion are intentionally deferred until the supervised Alpha validates demand and trust.

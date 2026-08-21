@@ -1,4 +1,4 @@
--- Local MySQL compatibility for durable runtime state. Production uses supabase/production-schema.sql.
+-- Local MySQL compatibility for durable runtime state. Production uses the versioned files in supabase/migrations/.
 -- Apply once after 006_performance_jobs.sql.
 
 CREATE TABLE sessions (

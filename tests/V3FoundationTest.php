@@ -66,6 +66,12 @@ foundation_assert(($fused['relationships'][0]['metadata']['source_count'] ?? 0) 
 foundation_assert(($fused['relationships'][0]['metadata']['confidence_label'] ?? '') === 'confirmed', 'Independent engine agreement must promote the explanation label');
 foundation_assert(($fused['relationships'][0]['metadata']['provenance'][0]['evidence_file'] ?? '') === 'src/Auth.php', 'Provenance must retain the evidence file');
 
+$repeated = (new EvidenceFusion())->fuse([
+    (new FoundationFixtureProvider('php-parser', $graphA))->analyze(new AnalysisRequest(__DIR__, [])),
+    (new FoundationFixtureProvider('php-parser', $graphA))->analyze(new AnalysisRequest(__DIR__, [])),
+]);
+foundation_assert(($repeated['relationships'][0]['metadata']['confidence_label'] ?? '') === 'strong', 'Repeated evidence from one engine must not count as independent confirmation');
+
 $request = new AnalysisRequest(__DIR__ . '/fixtures/v2/plain-php', [[
     'path' => 'src/AuthService.php', 'language' => 'PHP', 'content' => "<?php class AuthService {}", 'lines' => 1,
 ]]);

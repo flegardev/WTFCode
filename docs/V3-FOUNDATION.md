@@ -1,6 +1,6 @@
 # WTFCode V3 multi-engine foundation
 
-This document describes the implemented V3 phase-1 boundary. It does not claim that the later AST, security, graph-UX, change-intelligence, or product-mode phases are complete.
+This document describes the phase-1 foundation retained by the completed V3 implementation. Later V3 phases added AST and structural analyzers, security providers, graph UX, change intelligence, product modes, explanation providers, caching, and incremental analysis. The current implementation status and product boundaries live in `README.md`; this document remains the detailed contract for provider isolation, evidence provenance, process safety, and persistence.
 
 ## Scan flow
 
@@ -43,11 +43,11 @@ Equivalent facts retain one graph row. Their metadata contains a provenance list
 - evidence file, line, and range
 - raw evidence type
 
-Agreement from independent engines increases the source count and can promote the beginner-facing confidence label to `confirmed`. It never manufactures an edge that no provider emitted.
+Agreement from at least two independent engines can promote the beginner-facing confidence label to `confirmed`. A single engine, including a semantic analyzer, is capped at `strong`. Agreement never manufactures an edge that no provider emitted, and repeated evidence from one engine does not count as independent confirmation.
 
 ## Process boundary
 
-`SafeProcessRunner` is the only approved boundary for future analyzer CLIs. It uses an argument array with shell bypass, validates the working directory, passes only allowlisted environment keys, caps captured stdout and stderr independently, records truncation and exit codes, and terminates timed-out processes.
+`SafeProcessRunner` is the only approved boundary for analyzer CLIs. It uses an argument array with shell bypass, validates the working directory, passes only allowlisted environment keys, caps captured stdout and stderr independently, records truncation and exit codes, and terminates timed-out processes.
 
 On Windows, process output is written to monitored private temporary files. PHP's Windows pipe implementation can block despite nonblocking mode, which would defeat timeout enforcement. Temporary files are removed after every run.
 

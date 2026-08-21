@@ -26,17 +26,16 @@ final class EvidenceConfidence
         return self::RANK[$provider] ?? 50;
     }
 
-    public static function label(string $provider, string $confidence = 'medium', int $sources = 1, bool $documentation = false): string
+    public static function label(string $provider, string $confidence = 'medium', int $independentSources = 1, bool $documentation = false): string
     {
         if ($documentation) return 'heuristic';
-        if ($sources > 1 && $confidence !== 'low') return 'confirmed';
+        if ($independentSources > 1 && $confidence !== 'low') return 'confirmed';
         $score = self::rank($provider) + match ($confidence) {
             'high' => 8,
             'low' => -12,
             default => 0,
-        } + min(12, max(0, $sources - 1) * 6);
+        };
         return match (true) {
-            $score >= 96 => 'confirmed',
             $score >= 76 => 'strong',
             $score >= 48 => 'likely',
             default => 'heuristic',
