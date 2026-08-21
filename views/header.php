@@ -11,7 +11,7 @@ $currentUser = Auth::user();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#090d10">
+    <meta name="theme-color" content="#080c0e">
     <title><?= e($pageTitle) ?> | WTFCode</title>
     <meta name="description" content="Understand what your AI built before you change it.">
     <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>">
