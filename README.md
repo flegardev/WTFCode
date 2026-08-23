@@ -1,150 +1,103 @@
 # WTFCode
 
-**Know what your AI actually built.**
+Multi-engine static code analysis platform for exploring symbol graphs, AST dependencies, route maps, and security findings across large codebases.
 
-WTFCode is a plain-PHP codebase understanding tool for people who can build quickly with AI but want to understand the application before changing it again. Import a public GitHub repository and it produces a plain-English, evidence-based project map.
+![Product Overview](public/assets/images/product-overview.png)
 
-## Current MVP
+## Overview
 
-- Secure registration, login, logout, CSRF protection, and per-user project ownership.
-- Public GitHub repository import with strict `https://github.com/owner/repository` validation.
-- Restricted Git cloning outside the public web root; hosted clones are temporary and removed after each request.
-- Automatic stack detection for Next.js, React, Vue, FastAPI, Django, Node APIs, PHP, Supabase, Docker, Vercel, and common data-layer signals.
-- File map with routes, API endpoints, authentication, configuration, UI, and data-model roles.
-- Import/include dependency extraction for JavaScript, TypeScript, PHP, and Python.
-- File explanations in plain English and a technical view.
-- Confirmed direct and transitive blast-radius reports, plus clearly-labelled inferred system impact.
-- Clickable architecture nodes that show their exact file evidence; inferred system-to-system links are never presented as confirmed runtime facts.
-- Feature tracing across matching files and confirmed import/include relationships.
-- Rules-based "things to understand before editing" findings for large files, auth surfaces, duplicated content, unresolved local imports, implementation notes, repeated clients, configuration surface, and credential-like patterns.
-- Repository question page that answers only from scanned metadata. It does not use or pretend to use an AI API.
-- Git commit comparison using the repository’s real history, grouped by area with conservative sensitive-path review flags.
-- A safe prompt builder that uses the scanned architecture and actual file paths rather than fabricating project context.
-- An opt-in "Learn my app" checklist with per-user exploration progress.
+**WTFCode** is a web-based static analysis and code intelligence engine. It combines client-side WebAssembly parsing (via Web Tree-Sitter and ast-grep NAPI) with backend graph analysis (PHP 8.2 and Node.js worker threads) to provide interactive symbol graphs, route mapping, dependency tracking, and security auditing for multi-language repositories.
 
-## V3 implementation status
+## Key Features
 
-V3 phases 1 through 10 are implemented without replacing the verified V2 analyzer. Repository scans pass through an analyzer-provider registry and coordinator, preserve per-engine run status, fuse equivalent graph evidence deterministically, and persist source-engine provenance on symbols, relationships, routes, findings, and package inventory. Active precision engines include nikic/PHP-Parser, Tree-sitter WASM grammars, an isolated ts-morph semantic worker, an isolated ast-grep structural worker, and a bounded ripgrep text fallback. Universal Ctags is integrated as an optional fallback.
+* **Interactive Symbol & Dependency Graphing**: Uses Cytoscape.js to render visual call graphs, imports, and symbol relationship hierarchies.
+* **Multi-Engine Parsing**: Combines Web Tree-Sitter Wasm parsers with ast-grep structural patterns for instant AST traversal.
+* **Framework & Route Extraction**: Automatically detects routes, controllers, and middleware across Laravel, Symfony, Express, and Next.js projects.
+* **Security & Finding Auditing**: Runs AST-based security scanners to flag unsafe queries, unvalidated inputs, and secret leaks.
+* **Supabase Integration**: Persists scan snapshots, project metadata, and audit artifacts into Supabase PostgreSQL.
 
-Evidence is ranked conservatively: `confirmed` requires agreement from at least two independent analyzers, a single semantic or direct-syntax analyzer is capped at `strong`, structural patterns remain `likely`, and ripgrep runtime text remains `heuristic`. Security profiles combine redacted Gitleaks results, optional Semgrep code findings, OSV dependency advisories, optional Syft inventory, and optional offline Grype confirmation without treating a finding as proof of exploitability. See `docs/V3-FOUNDATION.md`, `config/tool-manifest.json`, and `THIRD_PARTY.md` for boundaries and provenance.
+## Tech Stack
 
-The Cytoscape graph starts at architecture level and drills through subsystems, features, files, and symbols. It supports local search, confidence/relationship/risk/framework filters, neighbor focus, pan/zoom, and confidence-weighted strongest-path tracing without replacing the server-rendered PHP detail pages.
+**Frontend & Parsing Engine**
+* JavaScript (ES6 Modules), Cytoscape.js
+* Web Tree-Sitter (Wasm), `@ast-grep/napi`
+* `ts-morph` AST engine
 
-The product-intelligence pass enriches fused evidence with multi-signal feature clusters, partial UI/HTTP/control-flow paths, classified database operations, endpoint effects, and runtime-backed service boundaries. It labels partial traces explicitly and never treats README text alone as proof that an integration is active.
+**Backend API & Workers**
+* PHP 8.2 (Modular bootstrap router)
+* Node.js Worker Threads (`workers/typescript-semantic.mjs`, `workers/tree-sitter.mjs`)
+* Composer, Node.js
 
-Change intelligence compares Git text with declaration, route, schema, dependency, security-boundary, environment, and architecture evidence. Optional intended-change text produces a carefully labeled scope-drift review. AI Change Guard stores redacted normalized Before/After snapshots and recommends targeted verification without claiming runtime behavior.
-
-The project workspace is organized around five evidence-first modes: Understand summarizes the app and boundaries, Change builds a target-specific blast-radius plan, Review compares semantic Git evidence, Secure consolidates security providers and critical paths, and Learn teaches from the actual scan rather than generic tutorials.
-
-Explanations use an `ExplanationProviderInterface`. The deterministic provider is the default and requires no AI service. Optional OpenAI-compatible and local Ollama providers receive only a bounded, recursively redacted evidence packet; responses are citation-validated and unsupported sentences are labeled as inference. Provider failure falls back to deterministic output.
-
-Provider output is cached by repository revision, provider ID/version, analysis version, and configuration hash. Small Git changes reanalyze eligible providers on changed files plus their known graph neighborhood; large or unsafe deltas fall back to full analysis. Every scan creates an `analysis_jobs` record with independent provider steps, cache/incremental labels, and terminal state. The registry UI previews Quick, Deep, Security, and Maximum provider sets and exposes live health. Confidence/resolution disagreements are retained as internal diagnostics instead of silently disappearing during fusion.
-
-The fact-level fusion benchmark and its limits are recorded in `tests/reports/v3-fusion-2026-08-19.md`.
-
-## Intentional MVP boundaries
-
-- Only public GitHub repositories are supported. Private repository OAuth is not faked.
-- Source contents are analysed during the scan but are not saved to PostgreSQL. Hosted clones are temporary; source and Git views may re-clone the public repository for that request.
-- Static analysis cannot prove runtime behavior. Dynamic imports, remote services, generated code, environment-specific deployment behavior, and indirect dependencies may not be detected.
-- Imports are capped at a 100 MB cloned repository, 3,000 readable files, 256 KB per readable file, and 20 MB of total readable source per scan. A partial scan is disclosed in the project findings.
-- Security analysis is static and incomplete. It does not prove exploitability or replace tests, manual review, incident response, backups, or Git.
+**Database & Deployment**
+* Supabase PostgreSQL
+* Docker, Vercel (`Dockerfile.vercel`)
 
 ## Architecture
 
-```text
-public/                 Web entry points
-src/Auth.php            Session authentication
-src/RepositoryImporter  URL validation and restricted Git cloning
-src/RepoScanner.php     File discovery, stack detection, dependencies, nodes, findings
-src/Project.php         Project ownership and persistence
-src/ExplorationService  Per-user learning checklist and progress
-src/PromptSafetyService Evidence-backed change-prompt builder
-src/ExplanationService  Plain-English and evidence-based explanations
-src/GitDiffService.php  Safe commit comparison
-storage/repos/          Local-only private clone storage
-supabase/               Canonical PostgreSQL schema and future migrations
-Dockerfile.vercel       Production FrankenPHP container
+```mermaid
+flowchart TD
+    Client["Browser UI (Cytoscape.js + Web Tree-Sitter Wasm)"]
+    API["PHP 8.2 Bootstrap API Server"]
+    Workers["Node.js Worker Threads (ast-grep / ts-morph)"]
+    DB[(Supabase PostgreSQL)]
+
+    Client -->|REST / JSON| API
+    API -->|Dispatch Job| Workers
+    Workers -->|Graph & AST Findings| API
+    API -->|Store Snapshots| DB
 ```
 
-## Production deployment
+## Getting Started
 
-Production uses the root `Dockerfile.vercel`, PHP 8.4 on FrankenPHP, and a backend-only Supabase PostgreSQL connection. It keeps authentication, CSRF, and authorization in PHP; it does not use Supabase Auth or expose a Supabase client key. Start with [Deploy today](docs/DEPLOY-TODAY.md), then use the detailed [Supabase](docs/DEPLOY-SUPABASE.md), [Vercel](docs/DEPLOY-VERCEL.md), [GitHub App](docs/GITHUB-APP.md), and [data ownership](docs/DATA-OWNERSHIP.md) guides.
+### Prerequisites
+* PHP 8.2+
+* Node.js 18+
+* Composer & npm
 
-The hosted default is `quick`. Deep, Security, and Maximum scans are available, but larger repositories may exceed request-duration or memory limits; background jobs are the next architecture step for those profiles.
+### Installation
 
-## Local setup
-
-Requirements:
-
-- PHP 8.3+ with `pdo_mysql`
-- MySQL 8+
-- Git available on the server `PATH`
-
-1. Create the database and tables:
-
-   ```powershell
-   Get-Content database/schema.sql | mysql -u root -p
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/flegardev/WTFCode.git
+   cd WTFCode
    ```
 
-2. Configure the database with shell environment variables from `.env.example`, or copy `config/database.php` to `config/database.local.php` and replace the connection values. `database.local.php` is ignored by Git.
+2. Install Node dependencies:
+   ```bash
+   npm install
+   ```
 
-   If you already created the database from an older project version, apply the numbered SQL files in `database/migrations/` in order, stopping after the newest migration already reflected in your schema.
+3. Install PHP dependencies:
+   ```bash
+   composer install
+   ```
 
-3. Serve `public` as the document root:
+4. Configure environment variables:
+   ```bash
+   cp .env.example .env
+   ```
 
-   ```powershell
+5. Start the PHP development server:
+   ```bash
    php -S localhost:8000 -t public
    ```
 
-4. Open `http://localhost:8000`, create an account, and import a public GitHub repository.
+## Environment Variables
 
-## Security notes
-
-- Every database access uses PDO prepared statements.
-- Every modifying form validates a CSRF token.
-- Project queries include the authenticated user ID before files, scan data, or Git history are accessible.
-- Imports only accept canonical GitHub HTTPS URLs. Private repositories require the read-only GitHub App picker; arbitrary clone targets, credential-bearing URLs, file URLs, SSH URLs, and non-GitHub hosts are rejected.
-- Repository paths are allocated server-side from a project ID; callers never submit a filesystem path.
-- Git runs through argument arrays with the shell bypassed; clone URLs and commit refs are independently allowlisted. Imports disable Git terminal prompts and time out after 90 seconds.
-- Git clone disables submodule recursion. The scanner skips symlinks and ignored dependency/build directories, and no imported repository code is installed or executed.
-- Technical errors are logged privately. Production-facing errors remain generic.
-
-## Tests
-
-The lightweight test file deliberately has no framework dependency:
-
-```powershell
-php tests/UnitTest.php
-php tests/V2AnalysisTest.php
-php tests/V2IntegrationTest.php
-php tests/V3FoundationTest.php
-php tests/V3AstTest.php
-php tests/V3StructuralTest.php
-php tests/V3SecurityTest.php
-php tests/V3GraphTest.php
-php tests/V3FeatureTest.php
-php tests/V3FeatureEvidenceTest.php
-php tests/V3ChangeTest.php
-php tests/V3ModesTest.php
-php tests/V3ExplanationTest.php
-php tests/V3PerformanceTest.php
-php tests/V3FailureIsolationTest.php
-php tests/V3FalsePositiveTest.php
-php tests/V3IntegrationTest.php
-php tests/FusionBenchmark.php
-php tests/Benchmark.php --group=core
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+GITHUB_APP_CLIENT_ID=your_github_app_client_id
+GITHUB_APP_CLIENT_SECRET=your_github_app_client_secret
 ```
 
-`UnitTest.php` covers repository URL restriction, blast-radius explanation behavior, and read-only scanner inspection of imports and symbols. `V3FeatureEvidenceTest.php` separates runtime feature signals from fixtures, analyzer patterns, documentation, and generated artifacts. The V2 and V3 integration suites require the configured database and are exercised against PostgreSQL in the production container gate. `FusionBenchmark.php` compares native, external, and fused evidence on the curated local fixtures. `Benchmark.php` shallow-clones a versioned public-repository suite and reports whether required stack and architecture signals are present; see `tests/benchmarks/README.md` for the human scorecard workflow.
+## Development & Verification
 
-## Near-term priorities
+```bash
+# Validate Node worker threads and syntax
+npm run check:workers
+```
 
-Major feature expansion is frozen for the supervised Alpha. The current priorities are:
+## License
 
-1. Test repository import and evidence comprehension with 5–10 developers using their own projects.
-2. Fix the trust, terminology, and navigation problems those sessions expose.
-3. Improve React and shared-client traces, terminal-effect detection, and partial-scan explanations.
-4. Move larger Deep, Security, and Maximum scans to durable background jobs when synchronous hosting proves unreliable.
-
-Teams, billing, autonomous edits, and a broader V4 analyzer expansion are intentionally deferred until the supervised Alpha validates demand and trust.
+This project is licensed under the MIT License.
