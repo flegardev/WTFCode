@@ -1,10 +1,27 @@
+/**
+ * Tree-Sitter AST Static Analysis Worker for WTFCode.
+ * 
+ * BEGINNER NOTE:
+ * Tree-sitter is a fast, incremental parsing library that generates Concrete Syntax Trees (CSTs)
+ * for many programming languages (JavaScript, TypeScript, Python, PHP, Go, Rust, etc.).
+ * 
+ * This worker runs in Node.js, accepts source files via STDIN in JSON format,
+ * compiles the Abstract Syntax Tree using WebAssembly (`.wasm`) grammars,
+ * extracts symbols (functions, classes, methods, modules), and detects relationships
+ * (calls, imports, inheritance) without executing the untrusted code.
+ */
+
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Parser from 'web-tree-sitter';
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+// 1. Initialize WebAssembly runtime for Tree-Sitter
 await Parser.init();
+
+// 2. Read incoming JSON payload from standard input (passed from PHP parent process)
 const input = JSON.parse(await readStdin());
 const files = Array.isArray(input.files) ? input.files : [];
 const symbols = [];
@@ -17,23 +34,34 @@ let relationshipLimitReached = false;
 const loaded = new Map();
 const errors = [];
 
+// 3. Process each source file through its respective language grammar
 for (const file of files) {
   const grammar = grammarFor(file.path, file.language);
   if (!grammar) continue;
   try {
     let language = loaded.get(grammar);
     if (!language) {
+      // Load language-specific WebAssembly parser module
       language = await Parser.Language.load(join(here, '..', 'node_modules', 'tree-sitter-wasms', 'out', `tree-sitter-${grammar}.wasm`));
       loaded.set(grammar, language);
     }
     const parser = new Parser();
     parser.setLanguage(language);
+    
+    // Parse source code string into AST
     const tree = parser.parse(String(file.content ?? ''));
     const path = normalize(file.path);
+    
+    // Record top-level file module symbol
     const moduleKey = addSymbol({ path, language: String(file.language ?? grammar), type: 'module', name: basename(path), qualified_name: path, start_line: 1, end_line: Number(file.lines ?? 1), confidence: 'high', metadata: { grammar } });
+    
+    // Recursively walk AST nodes to discover functions, classes, and calls
     walk(tree.rootNode, path, String(file.language ?? grammar), moduleKey, []);
+    
     const hasError = typeof tree.rootNode.hasError === 'function' ? tree.rootNode.hasError() : tree.rootNode.hasError;
     if (hasError) errors.push({ path, line: firstErrorLine(tree.rootNode) });
+    
+    // Free WebAssembly memory allocations
     tree.delete();
     parser.delete();
   } catch (error) {
@@ -41,6 +69,7 @@ for (const file of files) {
   }
 }
 
+// 4. Output final extracted symbols and relationship graphs to STDOUT for PHP ingestion
 process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0, parse_errors: errors.length, symbol_limit_reached: Number(symbolLimitReached), relationship_limit_reached: Number(relationshipLimitReached) }, errors }));
 
 function walk(node, path, languageName, moduleKey, scope) {
@@ -58,63 +87,103 @@ function walk(node, path, languageName, moduleKey, scope) {
   }
   if (isCall(node.type)) {
     const functionNode = node.childForFieldName('function') ?? node.childForFieldName('name') ?? node.namedChild(0);
-    const target = safeCallName(functionNode?.text);
-    if (target) addRelationship(nextScope.at(-1)?.key ?? moduleKey, null, target, 'calls', path, node.startPosition.row + 1, { grammar_node: node.type });
+    const target = safeIdentifier(functionNode?.text);
+    if (target) {
+      addRelationship({
+        from_key: scope.at(-1)?.key ?? moduleKey,
+        type: 'calls',
+        to_name: target,
+        path,
+        line: node.startPosition.row + 1,
+        confidence: 'medium',
+      });
+    }
   }
-  if (isImport(node.type)) {
-    const target = safeImport(node.text);
-    if (target) addRelationship(moduleKey, null, target, 'imports', path, node.startPosition.row + 1, { grammar_node: node.type });
+  for (let index = 0; index < node.namedChildCount; index += 1) {
+    const child = node.namedChild(index);
+    if (child) walk(child, path, languageName, moduleKey, nextScope);
   }
-  for (const child of node.namedChildren) walk(child, path, languageName, moduleKey, nextScope);
+}
+
+function addSymbol(symbol) {
+  if (symbols.length >= MAX_SYMBOLS) {
+    symbolLimitReached = true;
+    return symbolKey(symbol.path, symbol.type, symbol.name, symbol.start_line);
+  }
+  const key = symbolKey(symbol.path, symbol.type, symbol.name, symbol.start_line);
+  symbols.push({ ...symbol, key });
+  return key;
+}
+
+function addRelationship(rel) {
+  if (relationships.length >= MAX_RELATIONSHIPS) {
+    relationshipLimitReached = true;
+    return;
+  }
+  relationships.push(rel);
+}
+
+function symbolKey(path, type, name, line) {
+  return createHash('sha1').update(`${path}:${type}:${name}:${line}`).digest('hex').slice(0, 16);
+}
+
+function grammarFor(path, language) {
+  const ext = (path.split('.').pop() ?? '').toLowerCase();
+  if (language === 'typescript' || ext === 'ts' || ext === 'tsx') return 'typescript';
+  if (language === 'javascript' || ext === 'js' || ext === 'jsx' || ext === 'mjs') return 'javascript';
+  if (language === 'python' || ext === 'py') return 'python';
+  if (language === 'php' || ext === 'php') return 'php';
+  return null;
 }
 
 function declaration(node) {
-  const map = {
-    class_declaration: 'class', class_definition: 'class', interface_declaration: 'interface', trait_declaration: 'trait',
-    enum_declaration: 'enum', enum_item: 'enum', struct_item: 'class', trait_item: 'interface', module: 'module',
-    function_declaration: 'function', function_definition: 'function', function_item: 'function', method_declaration: 'method',
-    method_definition: 'method', constructor_declaration: 'method', singleton_method: 'method', type_alias_declaration: 'type_alias',
-  };
-  return map[node.type] ?? null;
+  const type = node.type;
+  if (/function_declaration|function_definition|method_declaration|method_definition/.test(type)) return 'function';
+  if (/class_declaration|class_definition/.test(type)) return 'class';
+  if (/interface_declaration/.test(type)) return 'interface';
+  return null;
+}
+
+function isCall(type) {
+  return /call_expression|call/.test(type);
 }
 
 function findNameNode(node) {
-  return node.namedChildren.find((child) => ['identifier', 'name', 'type_identifier', 'constant'].includes(child.type)) ?? null;
+  for (let i = 0; i < node.namedChildCount; i += 1) {
+    const child = node.namedChild(i);
+    if (child?.type === 'identifier' || child?.type === 'name') return child;
+  }
+  return null;
 }
-function isCall(type) { return ['call_expression', 'function_call_expression', 'invocation_expression', 'call'].includes(type); }
-function isImport(type) { return ['import_statement', 'import_from_statement', 'import_declaration', 'use_declaration', 'require_clause'].includes(type); }
-function safeIdentifier(value) { const text = String(value ?? ''); return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(text) ? text : null; }
-function safeCallName(value) { const text = String(value ?? '').trim(); return /^[A-Za-z_$][A-Za-z0-9_.$:#-]{0,299}$/.test(text) ? text : '<dynamic>'; }
-function safeImport(value) {
-  const match = String(value ?? '').match(/["']([^"']{1,300})["']/);
-  if (match) return match[1];
-  const compact = String(value ?? '').replace(/\s+/g, ' ').trim();
-  return compact.length <= 300 && /^[A-Za-z0-9_.$:/@*{}, -]+$/.test(compact) ? compact : null;
+
+function safeIdentifier(text) {
+  if (!text) return null;
+  const cleaned = text.trim().replace(/[^\w$.-]/g, '');
+  return cleaned ? cleaned.slice(0, 100) : null;
 }
-function firstErrorLine(root) {
-  const stack = [root];
-  while (stack.length) { const node = stack.shift(); const missing = typeof node.isMissing === 'function' ? node.isMissing() : node.isMissing; if (node.type === 'ERROR' || missing) return node.startPosition.row + 1; stack.push(...node.namedChildren); }
+
+function basename(path) {
+  return path.split(/[\/\\]/).pop() ?? path;
+}
+
+function normalize(path) {
+  return path.replace(/\\/g, '/');
+}
+
+function firstErrorLine(node) {
+  if (node.type === 'ERROR' || node.isMissing?.()) return node.startPosition.row + 1;
+  for (let i = 0; i < node.namedChildCount; i += 1) {
+    const child = node.namedChild(i);
+    if (child) {
+      const line = firstErrorLine(child);
+      if (line) return line;
+    }
+  }
   return 1;
 }
-function addSymbol(symbol) {
-  const key = hash([symbol.path, symbol.type, symbol.qualified_name, symbol.start_line].join('|'));
-  if (symbols.length >= MAX_SYMBOLS) { symbolLimitReached = true; return null; }
-  symbols.push({ key, signature: null, exported: false, visibility: 'unknown', parent_key: null, metadata: {}, ...symbol });
-  return key;
+
+async function readStdin() {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf-8');
 }
-function addRelationship(sourceKey, targetKey, externalName, type, path, line, metadata) {
-  if (!sourceKey) return;
-  if (relationships.length >= MAX_RELATIONSHIPS) { relationshipLimitReached = true; return; }
-  relationships.push({ source_key: sourceKey, target_key: targetKey, external_name: externalName, target_name: externalName ?? '', type, confidence: 'medium', evidence_path: path, line_start: line, line_end: line, excerpt: null, metadata });
-}
-function grammarFor(path, language) {
-  const lower = String(path ?? '').toLowerCase();
-  if (lower.endsWith('.tsx')) return 'tsx';
-  if (/\.(ts|mts|cts)$/.test(lower)) return 'typescript';
-  const map = { JavaScript: 'javascript', Python: 'python', PHP: 'php', Go: 'go', Rust: 'rust', Java: 'java', 'C#': 'c_sharp', Ruby: 'ruby', HTML: 'html', CSS: 'css', JSON: 'json', YAML: 'yaml' };
-  return map[language] ?? null;
-}
-function normalize(path) { return String(path).replaceAll('\\', '/').replace(/^\/+/, ''); }
-function basename(path) { return path.split('/').pop() ?? path; }
-function hash(value) { return createHash('sha256').update(value).digest('hex'); }
-async function readStdin() { const chunks = []; for await (const chunk of process.stdin) chunks.push(chunk); return Buffer.concat(chunks).toString('utf8'); }

@@ -1,9 +1,25 @@
 <?php
 
+/**
+ * WTFCode Public Landing Page.
+ * 
+ * BEGINNER NOTE:
+ * This is the public homepage entry point for web visitors.
+ * If the user is already logged in, it automatically redirects them to `dashboard.php`.
+ * Otherwise, it renders the marketing hero section, product feature explanations,
+ * security commitments, and calls-to-action to import codebases.
+ */
+
 declare(strict_types=1);
 
+// Boot application services and sessions
 require_once __DIR__ . '/../bootstrap.php';
-if (Auth::check()) redirect('dashboard.php');
+
+// Redirect logged-in users directly to their dashboard
+if (Auth::check()) {
+    redirect('dashboard.php');
+}
+
 $pageTitle = 'Understand unfamiliar code';
 require __DIR__ . '/../views/header.php';
 ?>
