@@ -1,0 +1,897 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:21:41+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "turborepo",
+        "url": "https://github.com/vercel/turborepo.git",
+        "commit_sha": "0a01c2ded74ebf9f62eb736f4f1e9e16de73fdb0",
+        "size": "large",
+        "primary_language": "Rust",
+        "known_frameworks": [
+            "Turborepo"
+        ],
+        "architecture_type": "multi-language monorepo",
+        "repository_shape": [
+            "large",
+            "new",
+            "well-tested",
+            "many-packages"
+        ],
+        "expected_high_level_systems": [
+            "CLI",
+            "build engine",
+            "workspace packages"
+        ],
+        "why_selected": "Large monorepo with Rust core and TypeScript packages; likely to expose language and truncation limits.",
+        "candidate_kind": "cursed"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 71112,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 69626,
+        "peak_php_memory_bytes": 130023424,
+        "files_discovered": 5541,
+        "repository_bytes": 89005090,
+        "files_analyzed": 3000,
+        "files_skipped": 2541,
+        "stack": [
+            "Next.js",
+            "Database",
+            "Vercel",
+            "Docker"
+        ],
+        "overview": "This repository has 3000 readable project files and appears to use Next.js, Database, Vercel, Docker. It found 5 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "apps/factory/app/api/control-plane/route.ts",
+                    "apps/factory/app/api/harness/runs/route.ts",
+                    "apps/factory/app/api/harness/runs/[sessionId]/route.ts",
+                    "apps/factory/app/layout.tsx",
+                    "apps/factory/app/operator-run.tsx",
+                    "apps/factory/app/page.tsx",
+                    "apps/factory/app/run-maintenance.tsx",
+                    "apps/factory/app/run-observatory.tsx",
+                    "apps/factory/app/run-performance.tsx",
+                    "apps/factory/next.config.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "apps/factory/agent/lib/github.ts",
+                    "apps/factory/agent/lib/harness-agent.ts",
+                    "crates/turborepo-auth/Cargo.toml",
+                    "crates/turborepo-auth/src/auth/login.rs",
+                    "crates/turborepo-auth/src/auth/logout.rs",
+                    "crates/turborepo-auth/src/auth/mod.rs",
+                    "crates/turborepo-auth/src/auth/sso.rs",
+                    "crates/turborepo-auth/src/device_flow.rs",
+                    "crates/turborepo-auth/src/error.rs",
+                    "crates/turborepo-auth/src/lib.rs",
+                    "crates/turborepo-auth/src/ui/messages.rs",
+                    "crates/turborepo-auth/src/ui/mod.rs"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "apps/factory/agent/lib/performance-models.ts",
+                    "crates/turborepo-microfrontends/src/schema.rs",
+                    "crates/turborepo-schema-gen/Cargo.toml",
+                    "crates/turborepo-schema-gen/src/main.rs"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": [
+                    "apps/factory/vercel.json",
+                    "crates/turborepo-vercel-api/Cargo.toml",
+                    "crates/turborepo-vercel-api/src/lib.rs",
+                    "crates/turborepo-vercel-api/src/telemetry.rs",
+                    "crates/turborepo-vercel-api/src/token.rs",
+                    "crates/turborepo-vercel-api-mock/Cargo.toml",
+                    "crates/turborepo-vercel-api-mock/src/lib.rs",
+                    "crates/turborepo-vercel-api-mock/src/main.rs"
+                ]
+            },
+            {
+                "key": "docker",
+                "type": "deployment",
+                "label": "Docker environment",
+                "explanation": "Docker files describe a repeatable way to run parts of this project.",
+                "evidence": [
+                    ".devcontainer/Dockerfile"
+                ]
+            }
+        ],
+        "symbols": 2275,
+        "relationships": 11450,
+        "routes": 54,
+        "route_sample": [
+            {
+                "path": "examples/with-microfrontends/apps/vite/src/main.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/admin",
+                "confidence": "high",
+                "line": 12
+            },
+            {
+                "path": "examples/with-microfrontends/apps/vite/src/main.tsx",
+                "framework": "React Router",
+                "method": "GET",
+                "route_path": "/admin/nested",
+                "confidence": "high",
+                "line": 13
+            },
+            {
+                "path": "apps/factory/agent/tools/create_pull_request.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/git/blobs",
+                "confidence": "medium",
+                "line": 291
+            },
+            {
+                "path": "apps/factory/agent/tools/create_pull_request.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/git/trees",
+                "confidence": "medium",
+                "line": 311
+            },
+            {
+                "path": "apps/factory/agent/tools/create_pull_request.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/git/commits",
+                "confidence": "medium",
+                "line": 382
+            },
+            {
+                "path": "apps/factory/agent/tools/create_pull_request.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/git/refs",
+                "confidence": "medium",
+                "line": 395
+            },
+            {
+                "path": "apps/factory/agent/tools/create_pull_request.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/pulls",
+                "confidence": "medium",
+                "line": 407
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/main.ts",
+                "confidence": "medium",
+                "line": 38
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/main.ts",
+                "confidence": "medium",
+                "line": 50
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/button.tsx",
+                "confidence": "medium",
+                "line": 73
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/circular.ts",
+                "confidence": "medium",
+                "line": 86
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/invalid.ts",
+                "confidence": "medium",
+                "line": 99
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/main.ts",
+                "confidence": "medium",
+                "line": 122
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/require_example.js",
+                "confidence": "medium",
+                "line": 141
+            },
+            {
+                "path": "crates/turborepo/tests/turbo_trace_test.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/main.ts",
+                "confidence": "medium",
+                "line": 154
+            },
+            {
+                "path": "crates/turborepo-boundaries/src/lib.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/bad",
+                "confidence": "medium",
+                "line": 873
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/sub",
+                "confidence": "medium",
+                "line": 694
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/escape/pwned",
+                "confidence": "medium",
+                "line": 704
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/\\u{FF0E}\\u{FF0E}/escape",
+                "confidence": "medium",
+                "line": 1496
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/caf\\u{00E9}",
+                "confidence": "medium",
+                "line": 1550
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/caf\\u{00E9}/file_nfc",
+                "confidence": "medium",
+                "line": 1553
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/cafe\\u{0301}/file_nfd",
+                "confidence": "medium",
+                "line": 1557
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/legit/\\u{202E}dcba/file",
+                "confidence": "medium",
+                "line": 1628
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/shared",
+                "confidence": "medium",
+                "line": 1792
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/shared/safe_file",
+                "confidence": "medium",
+                "line": 1794
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/shared",
+                "confidence": "medium",
+                "line": 1800
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/shared/another_file",
+                "confidence": "medium",
+                "line": 1802
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/escape",
+                "confidence": "medium",
+                "line": 1861
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/escape/payload",
+                "confidence": "medium",
+                "line": 1863
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/link",
+                "confidence": "medium",
+                "line": 1916
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/helper",
+                "confidence": "medium",
+                "line": 1945
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/dist",
+                "confidence": "medium",
+                "line": 1972
+            },
+            {
+                "path": "crates/turborepo-cache/src/cache_archive/restore.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/legitimate_file",
+                "confidence": "medium",
+                "line": 2219
+            },
+            {
+                "path": "crates/turborepo-lockfiles/src/bun/types.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/packages/ui",
+                "confidence": "medium",
+                "line": 583
+            },
+            {
+                "path": "crates/turborepo-scm/src/lib.rs",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/bad-\\\\xff",
+                "confidence": "medium",
+                "line": 674
+            },
+            {
+                "path": "examples/with-mcp-servers/apps/mcp-client/src/index.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/.",
+                "confidence": "medium",
+                "line": 73
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/file.txt",
+                "confidence": "medium",
+                "line": 64
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/../secret.txt",
+                "confidence": "medium",
+                "line": 76
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/escape.txt",
+                "confidence": "medium",
+                "line": 102
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/large.txt",
+                "confidence": "medium",
+                "line": 114
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/missing.txt",
+                "confidence": "medium",
+                "line": 126
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/.",
+                "confidence": "medium",
+                "line": 138
+            },
+            {
+                "path": "examples/with-mcp-servers/packages/mcp-file-reader/src/server.test.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/..",
+                "confidence": "medium",
+                "line": 154
+            },
+            {
+                "path": "examples/with-npm/packages/ui/turbo/generators/config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/{{pascalCase name}}.tsx",
+                "confidence": "medium",
+                "line": 19
+            },
+            {
+                "path": "examples/with-npm/packages/ui/turbo/generators/config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/index.tsx",
+                "confidence": "medium",
+                "line": 24
+            },
+            {
+                "path": "examples/with-prisma/packages/database/prisma.config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/prisma/migrations",
+                "confidence": "medium",
+                "line": 7
+            },
+            {
+                "path": "examples/with-typeorm/packages/ui/turbo/generators/config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/src/{{kebabCase name}}.tsx",
+                "confidence": "medium",
+                "line": 19
+            },
+            {
+                "path": "examples/with-typeorm/packages/ui/turbo/generators/config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/package.json",
+                "confidence": "medium",
+                "line": 24
+            },
+            {
+                "path": "examples/with-vitest/packages/ui/turbo/generators/config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/src/{{kebabCase name}}.tsx",
+                "confidence": "medium",
+                "line": 19
+            },
+            {
+                "path": "examples/with-vitest/packages/ui/turbo/generators/config.ts",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/package.json",
+                "confidence": "medium",
+                "line": 24
+            }
+        ],
+        "features": 0,
+        "feature_clusters": [],
+        "services": [],
+        "tables": [
+            "User"
+        ],
+        "packages": 0,
+        "security_findings": 1546,
+        "findings": 1915,
+        "finding_types": {
+            "database_operation": 30,
+            "database_write": 4,
+            "dependency_vulnerability": 1532,
+            "destructive_database_operation": 8,
+            "duplicate_content": 1,
+            "environment_access": 76,
+            "environment_surface": 1,
+            "file_operation": 8,
+            "http_call": 22,
+            "implementation_notes": 9,
+            "large_file": 147,
+            "possible_exposed_secret": 3,
+            "possible_secret": 1,
+            "possible_unused_dependency": 8,
+            "process_execution": 11,
+            "process_or_dynamic_execution": 14,
+            "scan_limit": 1,
+            "sensitive_system": 13,
+            "ui_handler": 9,
+            "unresolved_local_import": 17
+        },
+        "finding_severities": {
+            "attention": 924,
+            "info": 309,
+            "risk": 682
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "turborepo-release.yml is large enough to be risky to edit",
+                "path": ".github/workflows/turborepo-release.yml"
+            },
+            {
+                "severity": "info",
+                "type": "implementation_notes",
+                "title": "turborepo-release.yml contains several implementation notes",
+                "path": ".github/workflows/turborepo-release.yml"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "turborepo-test.yml is large enough to be risky to edit",
+                "path": ".github/workflows/turborepo-test.yml"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/agent.ts",
+                "path": "apps/factory/agent/agent.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/agent.ts",
+                "path": "apps/factory/agent/agent.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/github.ts",
+                "path": "apps/factory/agent/channels/github.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/operator.ts",
+                "path": "apps/factory/agent/channels/operator.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/operator.ts",
+                "path": "apps/factory/agent/channels/operator.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/operator.ts",
+                "path": "apps/factory/agent/channels/operator.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/operator.ts",
+                "path": "apps/factory/agent/channels/operator.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/operator.ts",
+                "path": "apps/factory/agent/channels/operator.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/operator.ts",
+                "path": "apps/factory/agent/channels/operator.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/channels/slack.ts",
+                "path": "apps/factory/agent/channels/slack.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/factory/agent/lib/github.ts",
+                "path": "apps/factory/agent/lib/github.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in apps/factory/agent/lib/harness-agent.ts",
+                "path": "apps/factory/agent/lib/harness-agent.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/lib/performance-validation.ts",
+                "path": "apps/factory/agent/lib/performance-validation.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/lib/performance-validation.ts",
+                "path": "apps/factory/agent/lib/performance-validation.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/schedules/daily_example_maintenance.ts",
+                "path": "apps/factory/agent/schedules/daily_example_maintenance.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/agent/schedules/daily_performance_improvement.ts",
+                "path": "apps/factory/agent/schedules/daily_performance_improvement.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from apps/factory/app/layout.tsx",
+                "path": "apps/factory/app/layout.tsx"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic",
+            "syft"
+        ],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 468,
+                "message": null,
+                "symbols": 1843,
+                "relationships": 8286,
+                "routes": 54,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 1019,
+                "message": "14 file(s) contained syntax the worker could not fully parse. Worker input was capped at 600 files or 6291456 bytes.",
+                "symbols": 1142,
+                "relationships": 3893,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 2048,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 1311,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 130,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 805,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 52,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 2290,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 3,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 94,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "failed",
+                "duration_ms": 14033,
+                "message": "Syft failed or exceeded its output limit.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 40981,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 3032,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 3000
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "grype",
+            "duration_ms": 40981
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "The scanner stopped after the 3,000-file MVP limit. The results still describe scanned files, but omitted files may affect the application.",
+            "Partial analyzer providers: tree-sitter.",
+            "Failed analyzer providers: typescript-semantic, syft.",
+            "Graph or enrichment limits: product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

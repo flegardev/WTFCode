@@ -1,0 +1,483 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:21:57+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "svelte-realworld",
+        "url": "https://github.com/sveltejs/realworld.git",
+        "commit_sha": "df796708040f5200ec572b28ab7f88ecee5794dd",
+        "size": "small",
+        "primary_language": "Svelte",
+        "known_frameworks": [
+            "SvelteKit"
+        ],
+        "architecture_type": "full-stack web application",
+        "repository_shape": [
+            "small",
+            "new",
+            "tested"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "server routes",
+            "authentication",
+            "API client"
+        ],
+        "why_selected": "Real application behavior in SvelteKit with UI actions and auth flows.",
+        "candidate_kind": "application"
+    },
+    "status": "success",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 532,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "success",
+        "scan_duration_ms": 202,
+        "peak_php_memory_bytes": 8388608,
+        "files_discovered": 62,
+        "repository_bytes": 195090,
+        "files_analyzed": 51,
+        "files_skipped": 11,
+        "stack": [
+            "SvelteKit",
+            "Vercel"
+        ],
+        "overview": "This repository has 51 readable project files and appears to use SvelteKit, Vercel. It found 2 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Svelte frontend",
+                "explanation": "This part renders screens with Svelte components.",
+                "evidence": [
+                    "src/lib/api.js",
+                    "src/lib/ArticleList/ArticlePreview.svelte",
+                    "src/lib/ArticleList/index.svelte",
+                    "src/lib/constants.js",
+                    "src/lib/ListErrors.svelte",
+                    "src/routes/+error.svelte",
+                    "src/routes/+layout.server.js",
+                    "src/routes/+layout.svelte",
+                    "src/routes/+page.server.js",
+                    "src/routes/+page.svelte",
+                    "src/routes/article/[slug]/+page.server.js",
+                    "src/routes/article/[slug]/+page.svelte"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": []
+            }
+        ],
+        "symbols": 88,
+        "relationships": 652,
+        "routes": 0,
+        "route_sample": [],
+        "features": 2,
+        "feature_clusters": [
+            {
+                "label": "Profile",
+                "confidence": "likely",
+                "score": 42,
+                "symbols": 7,
+                "evidence": [
+                    {
+                        "path": "src/routes/profile/+page.js",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/routes/profile/+page.js",
+                        "line": 3,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/routes/profile/@[user]/+layout.server.js",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/routes/profile/@[user]/+layout.server.js",
+                        "line": 3,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/routes/profile/@[user]/+layout.svelte",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "likely",
+                "score": 24,
+                "symbols": 4,
+                "evidence": [
+                    {
+                        "path": "src/routes/login/+page.server.js",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/routes/login/+page.server.js",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "src/routes/login/+page.svelte",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [],
+        "tables": [],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 16,
+        "finding_types": {
+            "database_operation": 1,
+            "duplicate_content": 1,
+            "http_call": 1,
+            "large_file": 1,
+            "navigation": 12
+        },
+        "finding_severities": {
+            "attention": 2,
+            "info": 14
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "pnpm-lock.yaml is large enough to be risky to edit",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "src/routes/profile/@[user]/+page.svelte"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Browser or server HTTP request",
+                "path": "src/lib/api.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/article/[slug]/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/article/[slug]/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/editor/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/editor/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/editor/[slug]/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/editor/[slug]/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/login/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/login/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/profile/+page.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/register/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/register/+page.server.js"
+            },
+            {
+                "severity": "info",
+                "type": "navigation",
+                "title": "Application redirect",
+                "path": "src/routes/settings/+page.server.js"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "src/routes/settings/+page.server.js"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 64,
+                "relationships": 303,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 44,
+                "relationships": 250,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 37,
+                "relationships": 151,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 14,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "wtfcode-native",
+            "duration_ms": 0
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": []
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

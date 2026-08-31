@@ -1,0 +1,15 @@
+{
+	admin off
+	auto_https off
+	frankenphp
+}
+
+:{$PORT:8080} {
+	root * /app/public
+	encode zstd gzip
+
+	@health path /health
+	rewrite @health /health.php
+
+	php_server
+}

@@ -1,0 +1,906 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:22:17+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "vercel-ai-chatbot",
+        "url": "https://github.com/vercel/ai-chatbot.git",
+        "commit_sha": "c2f8235e1f3ea903ad8b7f61447c4f74164b5c58",
+        "size": "medium",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Next.js",
+            "Vercel AI SDK",
+            "Postgres"
+        ],
+        "architecture_type": "AI chat web application",
+        "repository_shape": [
+            "medium",
+            "new",
+            "AI-application",
+            "well-documented"
+        ],
+        "expected_high_level_systems": [
+            "chat UI",
+            "AI route",
+            "authentication",
+            "database"
+        ],
+        "why_selected": "Maintained AI application for prompt, provider, data-flow, and auth tracing.",
+        "candidate_kind": "ai-application"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 2131,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 1793,
+        "peak_php_memory_bytes": 52428800,
+        "files_discovered": 179,
+        "repository_bytes": 1177934,
+        "files_analyzed": 166,
+        "files_skipped": 13,
+        "stack": [
+            "Next.js",
+            "Auth.js",
+            "Drizzle",
+            "Database",
+            "Vercel"
+        ],
+        "overview": "This repository has 166 readable project files and appears to use Next.js, Auth.js, Drizzle, Database, Vercel. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "app/(auth)/actions.ts",
+                    "app/(auth)/api/auth/guest/route.ts",
+                    "app/(auth)/api/auth/[...nextauth]/route.ts",
+                    "app/(auth)/auth.config.ts",
+                    "app/(auth)/auth.ts",
+                    "app/(auth)/layout.tsx",
+                    "app/(auth)/login/page.tsx",
+                    "app/(auth)/register/page.tsx",
+                    "app/(chat)/actions.ts",
+                    "app/(chat)/api/chat/route.ts",
+                    "app/(chat)/api/chat/schema.ts",
+                    "app/(chat)/api/chat/[id]/stream/route.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "app/(auth)/actions.ts",
+                    "app/(auth)/auth.config.ts",
+                    "app/(auth)/auth.ts",
+                    "app/(auth)/layout.tsx",
+                    "components/chat/auth-form.tsx"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "app/(chat)/api/chat/schema.ts",
+                    "app/(chat)/api/models/route.ts",
+                    "lib/ai/models.mock.ts",
+                    "lib/ai/models.test.ts",
+                    "lib/ai/models.ts",
+                    "lib/db/migrations/0000_initial.sql",
+                    "lib/db/migrations/meta/_journal.json",
+                    "lib/db/schema.ts"
+                ]
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": [
+                    "vercel-template.json",
+                    "vercel.json"
+                ]
+            }
+        ],
+        "symbols": 1275,
+        "relationships": 9435,
+        "routes": 20,
+        "route_sample": [
+            {
+                "path": "app/(auth)/api/auth/guest/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/auth/guest",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(auth)/api/auth/[...nextauth]/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/auth/:nextauth*",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(auth)/login/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/login",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(auth)/register/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/register",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/chat/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/chat",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/chat/route.ts",
+                "framework": "Next.js",
+                "method": "DELETE",
+                "route_path": "/api/chat",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/chat/[id]/stream/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/chat/:id/stream",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/document/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/document",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/document/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/document",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/document/route.ts",
+                "framework": "Next.js",
+                "method": "DELETE",
+                "route_path": "/api/document",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/files/upload/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/files/upload",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/history/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/history",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/history/route.ts",
+                "framework": "Next.js",
+                "method": "DELETE",
+                "route_path": "/api/history",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/messages/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/messages",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/models/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/models",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/suggestions/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/suggestions",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/vote/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/vote",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/api/vote/route.ts",
+                "framework": "Next.js",
+                "method": "PATCH",
+                "route_path": "/api/vote",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/chat/[id]/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/chat/:id",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(chat)/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 1
+            }
+        ],
+        "features": 3,
+        "feature_clusters": [
+            {
+                "label": "AI chat",
+                "confidence": "strong",
+                "score": 1123,
+                "symbols": 162,
+                "evidence": [
+                    {
+                        "path": "app/(auth)/layout.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(auth)/login/page.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(auth)/register/page.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(chat)/actions.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(chat)/actions.ts",
+                        "line": 18,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(chat)/actions.ts",
+                        "line": 42,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(chat)/api/chat/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(chat)/api/chat/route.ts",
+                        "line": 54,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(chat)/api/chat/route.ts",
+                        "line": 60,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(chat)/api/chat/route.ts",
+                        "line": 70,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 73,
+                "symbols": 9,
+                "evidence": [
+                    {
+                        "path": "app/(auth)/actions.ts",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(auth)/actions.ts",
+                        "line": 14,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(auth)/actions.ts",
+                        "line": 44,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(auth)/api/auth/guest/route.ts",
+                        "line": 6,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(auth)/login/page.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(auth)/login/page.tsx",
+                        "line": 13,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(auth)/login/page.tsx",
+                        "line": 41,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            },
+            {
+                "label": "Upload",
+                "confidence": "strong",
+                "score": 71,
+                "symbols": 10,
+                "evidence": [
+                    {
+                        "path": "app/(chat)/api/files/upload/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(chat)/api/files/upload/route.ts",
+                        "line": 18,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "components/chat/artifact.tsx",
+                        "line": 40,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/chat/multimodal-input.tsx",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/chat/multimodal-input.tsx",
+                        "line": 67,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/chat/preview-attachment.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/chat/shell.tsx",
+                        "line": 29,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "lib/types.ts",
+                        "line": 59,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "ai-gateway.vercel.sh",
+            "chat.vercel.ai",
+            "Postgres",
+            "Redis"
+        ],
+        "tables": [
+            "Chat",
+            "Document",
+            "Message_v2",
+            "Stream",
+            "Suggestion",
+            "User",
+            "Vote_v2"
+        ],
+        "packages": 891,
+        "security_findings": 90,
+        "findings": 284,
+        "finding_types": {
+            "database_operation": 45,
+            "database_write": 1,
+            "dependency_vulnerability": 89,
+            "duplicate_content": 1,
+            "environment_access": 105,
+            "environment_surface": 1,
+            "http_call": 19,
+            "large_file": 7,
+            "possible_unused_dependency": 2,
+            "process_or_dynamic_execution": 1,
+            "sensitive_system": 5,
+            "ui_handler": 3,
+            "unresolved_local_import": 5
+        },
+        "finding_severities": {
+            "attention": 113,
+            "info": 139,
+            "risk": 32
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in app/(auth)/actions.ts",
+                "path": "app/(auth)/actions.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in app/(auth)/auth.config.ts",
+                "path": "app/(auth)/auth.config.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in app/(auth)/auth.ts",
+                "path": "app/(auth)/auth.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in app/(auth)/layout.tsx",
+                "path": "app/(auth)/layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from app/layout.tsx",
+                "path": "app/layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "code-block.tsx is large enough to be risky to edit",
+                "path": "components/ai-elements/code-block.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "prompt-input.tsx is large enough to be risky to edit",
+                "path": "components/ai-elements/prompt-input.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/chat/auth-form.tsx",
+                "path": "components/chat/auth-form.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "icons.tsx is large enough to be risky to edit",
+                "path": "components/chat/icons.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "multimodal-input.tsx is large enough to be risky to edit",
+                "path": "components/chat/multimodal-input.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "toolbar.tsx is large enough to be risky to edit",
+                "path": "components/chat/toolbar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "sidebar.tsx is large enough to be risky to edit",
+                "path": "components/ui/sidebar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "queries.ts is large enough to be risky to edit",
+                "path": "lib/db/queries.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from lib/types.ts",
+                "path": "lib/types.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from lib/types.ts",
+                "path": "lib/types.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from lib/types.ts",
+                "path": "lib/types.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from lib/types.ts",
+                "path": "lib/types.ts"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "app/(chat)/chat/[id]/page.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "environment_surface",
+                "title": "This project relies on many environment variables",
+                "path": null
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@opentelemetry/api has no obvious readable-file reference",
+                "path": "package.json"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 776,
+                "relationships": 5127,
+                "routes": 20,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 671,
+                "relationships": 3837,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 1095,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 166
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 120,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 54,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 891,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 89,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 1095
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Failed analyzer providers: typescript-semantic."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

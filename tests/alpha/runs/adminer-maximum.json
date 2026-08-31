@@ -1,0 +1,786 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:18:52+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "adminer",
+        "url": "https://github.com/vrana/adminer.git",
+        "commit_sha": "0bd9ef73c795e94f839578460aeaf4cddf82b480",
+        "size": "medium",
+        "primary_language": "PHP",
+        "known_frameworks": [
+            "plain PHP"
+        ],
+        "architecture_type": "legacy database administration application",
+        "repository_shape": [
+            "medium",
+            "old",
+            "large-files",
+            "few-framework-conventions"
+        ],
+        "expected_high_level_systems": [
+            "web entrypoints",
+            "database adapters",
+            "authentication"
+        ],
+        "why_selected": "Mature plain-PHP code with unusually large files and database-heavy behavior.",
+        "candidate_kind": "cursed"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 17053,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 16702,
+        "peak_php_memory_bytes": 119537664,
+        "files_discovered": 277,
+        "repository_bytes": 2809517,
+        "files_analyzed": 265,
+        "files_skipped": 12,
+        "stack": [
+            "PHP",
+            "Database"
+        ],
+        "overview": "This repository has 265 readable project files and appears to use PHP, Database. It found 3 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "api",
+                "type": "server",
+                "label": "PHP project",
+                "explanation": "This PHP codebase contains server-side source and may handle pages, requests, or application rules.",
+                "evidence": [
+                    "adminer/call.inc.php",
+                    "adminer/check.inc.php",
+                    "adminer/create.inc.php",
+                    "adminer/database.inc.php",
+                    "adminer/db.inc.php",
+                    "adminer/designs.php",
+                    "adminer/download.inc.php",
+                    "adminer/drivers/mssql.inc.php",
+                    "adminer/drivers/mysql.inc.php",
+                    "adminer/drivers/oracle.inc.php",
+                    "adminer/drivers/pgsql.inc.php",
+                    "adminer/drivers/sqlite.inc.php"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "adminer/include/auth.inc.php",
+                    "adminer/include/bootstrap.inc.php",
+                    "adminer/include/functions.inc.php",
+                    "adminer/include/password.inc.php",
+                    "adminer/upload.inc.php",
+                    "plugins/drivers/igdb.php",
+                    "plugins/login-passkey.php",
+                    "plugins/login-table.php"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "adminer/database.inc.php",
+                    "adminer/schema.inc.php",
+                    "plugins/database-hide.php"
+                ]
+            }
+        ],
+        "symbols": 5337,
+        "relationships": 16273,
+        "routes": 0,
+        "route_sample": [],
+        "features": 3,
+        "feature_clusters": [
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 1049,
+                "symbols": 171,
+                "evidence": [
+                    {
+                        "path": "adminer/drivers/sqlite.inc.php",
+                        "line": 129,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/adminer.inc.php",
+                        "line": 182,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/auth.inc.php",
+                        "line": 12,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/auth.inc.php",
+                        "line": 45,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/auth.inc.php",
+                        "line": 196,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/password.inc.php",
+                        "line": 29,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "editor/example.php",
+                        "line": 20,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "editor/include/adminer.inc.php",
+                        "line": 120,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/drivers/elastic.php",
+                        "line": 172,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/drivers/simpledb.php",
+                        "line": 113,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Upload",
+                "confidence": "strong",
+                "score": 160,
+                "symbols": 26,
+                "evidence": [
+                    {
+                        "path": "adminer/include/functions.inc.php",
+                        "line": 720,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/html.inc.php",
+                        "line": 223,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/upload.inc.php",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 11,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 12,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 19,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 25,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 31,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/file-upload.php",
+                        "line": 47,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 42,
+                "symbols": 7,
+                "evidence": [
+                    {
+                        "path": "adminer/include/editing.inc.php",
+                        "line": 13,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/include/html.inc.php",
+                        "line": 420,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "adminer/type.inc.php",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "editor/db.inc.php",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "editor/include/adminer.inc.php",
+                        "line": 401,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "plugins/drivers/igdb.php",
+                        "line": 368,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "MongoDB",
+            "MySQL",
+            "Postgres",
+            "Redis"
+        ],
+        "tables": [
+            "adminer",
+            "all_tables",
+            "all_tab_columns",
+            "all_views",
+            "AND",
+            "dba_segments",
+            "dba_users",
+            "DUAL",
+            "dual",
+            "fn_helpcollations",
+            "fn_listextendedproperty",
+            "IF",
+            "information_schema.COLUMNS",
+            "information_schema.EVENTS",
+            "information_schema.ROUTINES",
+            "information_schema.SCHEMATA",
+            "INFORMATION_SCHEMA.TABLES",
+            "information_schema.TABLES",
+            "information_schema.tables",
+            "information_schema.triggered_update_columns",
+            "information_schema.triggers",
+            "INFORMATION_SCHEMA.VIEWS",
+            "login",
+            "mysql.",
+            "nls_database_parameters",
+            "ONLY",
+            "ORDER",
+            "pg_am",
+            "pg_attribute",
+            "pg_catalog.pg_depend",
+            "pg_catalog.pg_indexes",
+            "pg_catalog.pg_language",
+            "pg_catalog.pg_opclass",
+            "pg_class",
+            "pg_collation",
+            "pg_constraint",
+            "pg_database",
+            "pg_enum",
+            "pg_inherits",
+            "pg_namespace",
+            "pg_opclass",
+            "pg_partitioned_table",
+            "pg_sequences",
+            "pg_stat_activity",
+            "pg_type",
+            "plan_table",
+            "rdb",
+            "Select",
+            "SQL",
+            "sqlite_master",
+            "sqlite_sequence",
+            "sqlite_stat1",
+            "statements",
+            "sys.all_objects",
+            "sys.computed_columns",
+            "sys.databases",
+            "sys.schemas",
+            "system.databases",
+            "system.data_skipping_indices",
+            "system.settings",
+            "system.tables",
+            "system.table_engines",
+            "t",
+            "table",
+            "the",
+            "user_indexes",
+            "user_segments",
+            "user_tablespaces",
+            "v",
+            "without"
+        ],
+        "packages": 3,
+        "security_findings": 7,
+        "findings": 84,
+        "finding_types": {
+            "database_operation": 1,
+            "environment_access": 41,
+            "http_call": 2,
+            "large_file": 18,
+            "possible_exposed_secret": 2,
+            "process_or_dynamic_execution": 7,
+            "sensitive_system": 8,
+            "unresolved_local_import": 5
+        },
+        "finding_severities": {
+            "attention": 32,
+            "info": 43,
+            "risk": 9
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "mssql.inc.php is large enough to be risky to edit",
+                "path": "adminer/drivers/mssql.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "mysql.inc.php is large enough to be risky to edit",
+                "path": "adminer/drivers/mysql.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "oracle.inc.php is large enough to be risky to edit",
+                "path": "adminer/drivers/oracle.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "pgsql.inc.php is large enough to be risky to edit",
+                "path": "adminer/drivers/pgsql.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "sqlite.inc.php is large enough to be risky to edit",
+                "path": "adminer/drivers/sqlite.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "adminer.inc.php is large enough to be risky to edit",
+                "path": "adminer/include/adminer.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in adminer/include/auth.inc.php",
+                "path": "adminer/include/auth.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in adminer/include/bootstrap.inc.php",
+                "path": "adminer/include/bootstrap.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from adminer/include/bootstrap.inc.php",
+                "path": "adminer/include/bootstrap.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from adminer/include/bootstrap.inc.php",
+                "path": "adminer/include/bootstrap.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from adminer/include/bootstrap.inc.php",
+                "path": "adminer/include/bootstrap.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "editing.inc.php is large enough to be risky to edit",
+                "path": "adminer/include/editing.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "functions.inc.php is large enough to be risky to edit",
+                "path": "adminer/include/functions.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in adminer/include/functions.inc.php",
+                "path": "adminer/include/functions.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "html.inc.php is large enough to be risky to edit",
+                "path": "adminer/include/html.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in adminer/include/password.inc.php",
+                "path": "adminer/include/password.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from adminer/include/plugins.inc.php",
+                "path": "adminer/include/plugins.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "select.inc.php is large enough to be risky to edit",
+                "path": "adminer/select.inc.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "editing.js is large enough to be risky to edit",
+                "path": "adminer/static/editing.js"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "functions.js is large enough to be risky to edit",
+                "path": "adminer/static/functions.js"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [
+            "php-parser",
+            "tree-sitter",
+            "typescript-semantic"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 344,
+                "message": null,
+                "symbols": 2373,
+                "relationships": 16000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "partial",
+                "duration_ms": 1776,
+                "message": "Provider evidence was compacted to the platform fusion budget.",
+                "symbols": 2054,
+                "relationships": 5000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 1035,
+                "message": "11 file(s) contained syntax the worker could not fully parse. Worker evidence reached the bounded fusion output budget.",
+                "symbols": 1530,
+                "relationships": 4000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "partial",
+                "duration_ms": 1862,
+                "message": "Worker evidence reached the bounded fusion output budget.",
+                "symbols": 154,
+                "relationships": 4000,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 468,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 4,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 120,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 47,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 803,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 2,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 95,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 983,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 3,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 1490,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 265
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 1862
+        },
+        "graph_truncation": {
+            "relationship_limit_reached": 1
+        },
+        "product_intelligence_truncation": true,
+        "partial_reasons": [
+            "Partial analyzer providers: php-parser, tree-sitter, typescript-semantic.",
+            "Graph or enrichment limits: relationship_limit_reached, product_intelligence_limited."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

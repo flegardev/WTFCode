@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../bootstrap.php';
+if (Auth::check()) redirect('dashboard.php');
+$pageTitle = 'Understand unfamiliar code';
+require __DIR__ . '/../views/header.php';
+?>
+<section class="landing-hero">
+    <div class="landing-copy"><p class="landing-kicker">Evidence-backed repository intelligence</p><h1>Stop asking “WTF does this code do?”</h1><p>Map unfamiliar repositories, trace how systems connect, and see what can break before you change them.</p><div class="hero-actions"><a class="button button-primary" href="<?= e(url('register.php')) ?>">Import repository</a><a class="button button-secondary" href="#how-it-works">See how it works</a></div><p class="hero-note">No agents run imported code. Analysis is static and evidence-backed.</p></div>
+    <figure class="product-shot"><div class="product-shot-bar"><span aria-hidden="true"><i></i><i></i><i></i></span><b>Project overview</b><em>Product interface</em></div><img src="<?= e(url('assets/images/product-overview.png')) ?>" width="1440" height="900" alt="WTFCode project overview for an analyzed repository, with project navigation, scan state, and repository findings." loading="eager" fetchpriority="high"><figcaption>WTFCode overview for an analyzed repository.</figcaption></figure>
+</section>
+<section class="landing-section story-section" id="how-it-works"><div class="section-intro"><p class="landing-kicker">From repository to evidence</p><h2>Stop guessing which file does what.</h2><p>Import a repository and get explanations tied to source structure and relationships that were actually detected.</p></div><div class="story-grid"><article><strong>Index</strong><h3>Read the structure</h3><p>WTFCode identifies frameworks, routes, configuration, authentication clues, data layers, and deployment files.</p></article><article><strong>Connect</strong><h3>Follow relationships</h3><p>Static imports and includes become a dependency map with direct and transitive blast radius.</p></article><article><strong>Plan</strong><h3>Change with context</h3><p>Build a bounded prompt, then review its Git change set against the affected systems.</p></article></div></section>
+<section class="landing-section feature-split"><div><p class="landing-kicker">The evidence stays visible</p><h2>Every answer has a trail.</h2><p>Open detected architecture, inspect static paths, and keep each change grounded in repository evidence.</p></div><div class="feature-list"><div><span>Evidence map</span><p>Click a system to see the scanned files that supported its detection.</p></div><div><span>Honest blast radius</span><p>Direct and transitive chains are confirmed static evidence. System effects stay labeled as inferred.</p></div><div><span>Git review</span><p>Compare real commits, group changed files, and surface sensitive paths for review.</p></div></div></section>
+<section class="landing-section security-section" id="security"><p class="landing-kicker">Privacy by design</p><h2>Analysis, not surveillance.</h2><div class="security-points"><p>Public GitHub URLs are restricted to github.com.</p><p>Hosted clones are temporary and removed after each scan.</p><p>Complete source files are not retained; bounded signatures and evidence excerpts can be stored.</p><p>External explanation providers are used only when an operator configures one.</p></div></section>
+<section class="landing-cta"><div><h2>Change code with context.</h2><p>Start by understanding one repository end to end.</p></div><a class="button button-light" href="<?= e(url('register.php')) ?>">Import repository</a></section>
+<?php require __DIR__ . '/../views/footer.php'; ?>

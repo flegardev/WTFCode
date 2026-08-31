@@ -1,0 +1,9 @@
+check-for-app-update: false
+package:
+  cataloger:
+    java-archive:
+      use-network: false
+    javascript:
+      search-remote-licenses: false
+    python:
+      search-remote-licenses: false

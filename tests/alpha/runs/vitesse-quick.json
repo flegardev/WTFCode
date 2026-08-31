@@ -1,0 +1,211 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:23:51+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "quick",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "vitesse",
+        "url": "https://github.com/antfu/vitesse.git",
+        "commit_sha": "8a01bc9283fedcd63e750af55a75496361789a81",
+        "size": "small",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Vue",
+            "Vite"
+        ],
+        "architecture_type": "single-page application starter",
+        "repository_shape": [
+            "small",
+            "new",
+            "well-documented"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "routing",
+            "state"
+        ],
+        "why_selected": "Modern Vue composition and auto-generated conventions without a backend.",
+        "candidate_kind": "framework-starter"
+    },
+    "status": "success",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 2372,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "success",
+        "scan_duration_ms": 2068,
+        "peak_php_memory_bytes": 14680064,
+        "files_discovered": 79,
+        "repository_bytes": 585926,
+        "files_analyzed": 66,
+        "files_skipped": 13,
+        "stack": [
+            "Vue",
+            "Docker"
+        ],
+        "overview": "This repository has 66 readable project files and appears to use Vue, Docker. It found 2 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Vue frontend",
+                "explanation": "This part of the project renders screens with Vue components.",
+                "evidence": [
+                    "src/App.vue",
+                    "src/auto-imports.d.ts",
+                    "src/components/TheCounter.vue",
+                    "src/components/TheFooter.vue",
+                    "src/components/TheInput.vue",
+                    "src/components.d.ts",
+                    "src/composables/dark.ts",
+                    "src/layouts/404.vue",
+                    "src/layouts/default.vue",
+                    "src/layouts/home.vue",
+                    "src/main.ts",
+                    "src/modules/i18n.ts"
+                ]
+            },
+            {
+                "key": "docker",
+                "type": "deployment",
+                "label": "Docker environment",
+                "explanation": "Docker files describe a repeatable way to run parts of this project.",
+                "evidence": [
+                    "Dockerfile"
+                ]
+            }
+        ],
+        "symbols": 104,
+        "relationships": 1309,
+        "routes": 0,
+        "route_sample": [],
+        "features": 0,
+        "feature_clusters": [],
+        "services": [],
+        "tables": [],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 3,
+        "finding_types": {
+            "environment_access": 1,
+            "large_file": 1,
+            "unresolved_local_import": 1
+        },
+        "finding_severities": {
+            "attention": 2,
+            "info": 1
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "auto-imports.d.ts is large enough to be risky to edit",
+                "path": "src/auto-imports.d.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from src/main.ts",
+                "path": "src/main.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Build-time environment access",
+                "path": "src/main.ts"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 85,
+                "relationships": 903,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 66
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 16,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 66
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 580,
+                "message": null,
+                "symbols": 61,
+                "relationships": 814,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 66
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 961,
+                "message": null,
+                "symbols": 38,
+                "relationships": 191,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 66
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 203,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 1,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 66
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 961
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": []
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

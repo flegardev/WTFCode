@@ -1,0 +1,905 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:20:21+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "supabase-payments",
+        "url": "https://github.com/supabase-community/nextjs-subscription-payments.git",
+        "commit_sha": "3aa0d956fb46dda45a6676f74ffa77eb0fe10a11",
+        "size": "medium",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Next.js",
+            "Supabase",
+            "Stripe"
+        ],
+        "architecture_type": "full-stack subscription application",
+        "repository_shape": [
+            "medium",
+            "rapid-development-candidate",
+            "integration-heavy"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "authentication",
+            "database",
+            "payments"
+        ],
+        "why_selected": "Combines Next.js, Supabase, and Stripe with runtime integration evidence.",
+        "candidate_kind": "rapid-development-candidate"
+    },
+    "status": "success",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 7052,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "success",
+        "scan_duration_ms": 6726,
+        "peak_php_memory_bytes": 16777216,
+        "files_discovered": 90,
+        "repository_bytes": 778231,
+        "files_analyzed": 73,
+        "files_skipped": 17,
+        "stack": [
+            "Next.js",
+            "Supabase",
+            "Database"
+        ],
+        "overview": "This repository has 73 readable project files and appears to use Next.js, Supabase, Database. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "app/account/page.tsx",
+                    "app/api/webhooks/route.ts",
+                    "app/auth/callback/route.ts",
+                    "app/auth/reset_password/route.ts",
+                    "app/layout.tsx",
+                    "app/page.tsx",
+                    "app/signin/page.tsx",
+                    "app/signin/[id]/page.tsx"
+                ]
+            },
+            {
+                "key": "supabase",
+                "type": "service",
+                "label": "Supabase",
+                "explanation": "Supabase is connected as an external service for data, authentication, or both.",
+                "evidence": [
+                    "supabase/config.toml",
+                    "supabase/migrations/20230530034630_init.sql",
+                    "supabase/seed.sql",
+                    "utils/supabase/admin.ts",
+                    "utils/supabase/client.ts",
+                    "utils/supabase/middleware.ts",
+                    "utils/supabase/queries.ts",
+                    "utils/supabase/server.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "components/ui/AuthForms/EmailSignIn.tsx",
+                    "components/ui/AuthForms/ForgotPassword.tsx",
+                    "components/ui/AuthForms/OauthSignIn.tsx",
+                    "components/ui/AuthForms/PasswordSignIn.tsx",
+                    "components/ui/AuthForms/Separator.tsx",
+                    "components/ui/AuthForms/Signup.tsx",
+                    "components/ui/AuthForms/UpdatePassword.tsx",
+                    "components/ui/Navbar/Navbar.tsx",
+                    "utils/auth-helpers/client.ts",
+                    "utils/auth-helpers/server.ts",
+                    "utils/auth-helpers/settings.ts",
+                    "utils/stripe/server.ts"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "schema.sql",
+                    "supabase/migrations/20230530034630_init.sql"
+                ]
+            }
+        ],
+        "symbols": 478,
+        "relationships": 2112,
+        "routes": 7,
+        "route_sample": [
+            {
+                "path": "app/account/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/account",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/webhooks/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/webhooks",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/auth/callback/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/auth/callback",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/auth/reset_password/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/auth/reset_password",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/signin/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/signin",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/signin/[id]/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/signin/:id",
+                "confidence": "high",
+                "line": 1
+            }
+        ],
+        "features": 6,
+        "feature_clusters": [
+            {
+                "label": "Payments",
+                "confidence": "strong",
+                "score": 244,
+                "symbols": 34,
+                "evidence": [
+                    {
+                        "path": "app/api/webhooks/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/api/webhooks/route.ts",
+                        "line": 27,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/AccountForms/CustomerPortalForm.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/Pricing/Pricing.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/stripe/client.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "utils/stripe/client.ts",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/stripe/client.ts",
+                        "line": 8,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/stripe/client.ts",
+                        "line": 9,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/stripe/config.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "utils/stripe/config.ts",
+                        "line": 3,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Admin",
+                "confidence": "strong",
+                "score": 150,
+                "symbols": 25,
+                "evidence": [
+                    {
+                        "path": "app/api/webhooks/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/stripe/server.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 7,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 8,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 16,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 17,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 20,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 76,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/supabase/admin.ts",
+                        "line": 86,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Registration",
+                "confidence": "strong",
+                "score": 83,
+                "symbols": 11,
+                "evidence": [
+                    {
+                        "path": "components/ui/AuthForms/Signup.tsx",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/AuthForms/Signup.tsx",
+                        "line": 12,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/AuthForms/Signup.tsx",
+                        "line": 16,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/AuthForms/Signup.tsx",
+                        "line": 20,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "utils/auth-helpers/server.ts",
+                        "line": 166,
+                        "signals": [
+                            "source",
+                            "identity",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/signin/[id]/page.tsx",
+                        "line": 19,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 76,
+                "symbols": 8,
+                "evidence": [
+                    {
+                        "path": "app/signin/page.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/signin/page.tsx",
+                        "line": 5,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/signin/[id]/page.tsx",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "identity",
+                            "route"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/signin/[id]/page.tsx",
+                        "line": 19,
+                        "signals": [
+                            "source",
+                            "identity",
+                            "route"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/signin/[id]/page.tsx",
+                        "line": 2,
+                        "signals": [
+                            "source",
+                            "identity",
+                            "route"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            },
+            {
+                "label": "Billing",
+                "confidence": "strong",
+                "score": 33,
+                "symbols": 5,
+                "evidence": [
+                    {
+                        "path": "components/ui/AccountForms/CustomerPortalForm.tsx",
+                        "line": 11,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/Pricing/Pricing.tsx",
+                        "line": 14,
+                        "signals": [
+                            "source",
+                            "identity"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "components/ui/Pricing/Pricing.tsx",
+                        "line": 23,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Checkout",
+                "confidence": "likely",
+                "score": 6,
+                "symbols": 1,
+                "evidence": [
+                    {
+                        "path": "utils/stripe/server.ts",
+                        "line": 21,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "Stripe",
+            "Supabase"
+        ],
+        "tables": [
+            "customers",
+            "prices",
+            "products",
+            "public.users",
+            "subscriptions",
+            "users"
+        ],
+        "packages": 0,
+        "security_findings": 0,
+        "findings": 114,
+        "finding_types": {
+            "authentication_boundary": 19,
+            "database_operation": 25,
+            "database_write": 4,
+            "duplicate_content": 1,
+            "environment_access": 32,
+            "environment_surface": 1,
+            "http_call": 1,
+            "navigation": 6,
+            "possible_exposed_secret": 2,
+            "possible_unused_dependency": 1,
+            "repeated_client_setup": 1,
+            "sensitive_system": 13,
+            "ui_handler": 3,
+            "unresolved_local_import": 5
+        },
+        "finding_severities": {
+            "attention": 66,
+            "info": 46,
+            "risk": 2
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/EmailSignIn.tsx",
+                "path": "components/ui/AuthForms/EmailSignIn.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/ForgotPassword.tsx",
+                "path": "components/ui/AuthForms/ForgotPassword.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/OauthSignIn.tsx",
+                "path": "components/ui/AuthForms/OauthSignIn.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/PasswordSignIn.tsx",
+                "path": "components/ui/AuthForms/PasswordSignIn.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/Separator.tsx",
+                "path": "components/ui/AuthForms/Separator.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/Signup.tsx",
+                "path": "components/ui/AuthForms/Signup.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/AuthForms/UpdatePassword.tsx",
+                "path": "components/ui/AuthForms/UpdatePassword.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from components/ui/Button/Button.tsx",
+                "path": "components/ui/Button/Button.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from components/ui/Input/Input.tsx",
+                "path": "components/ui/Input/Input.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from components/ui/LoadingDots/LoadingDots.tsx",
+                "path": "components/ui/LoadingDots/LoadingDots.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in components/ui/Navbar/Navbar.tsx",
+                "path": "components/ui/Navbar/Navbar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from components/ui/Navbar/Navbar.tsx",
+                "path": "components/ui/Navbar/Navbar.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from components/ui/Navbar/Navlinks.tsx",
+                "path": "components/ui/Navbar/Navlinks.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in utils/auth-helpers/client.ts",
+                "path": "utils/auth-helpers/client.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in utils/auth-helpers/server.ts",
+                "path": "utils/auth-helpers/server.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in utils/auth-helpers/settings.ts",
+                "path": "utils/auth-helpers/settings.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in utils/stripe/server.ts",
+                "path": "utils/stripe/server.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in utils/supabase/queries.ts",
+                "path": "utils/supabase/queries.ts"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": "schema.sql"
+            },
+            {
+                "severity": "info",
+                "type": "environment_surface",
+                "title": "This project relies on many environment variables",
+                "path": null
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 24,
+                "message": null,
+                "symbols": 297,
+                "relationships": 902,
+                "routes": 7,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 17,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 899,
+                "message": null,
+                "symbols": 153,
+                "relationships": 648,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 1117,
+                "message": null,
+                "symbols": 186,
+                "relationships": 730,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 202,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 74,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 127,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 16,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 606,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 2,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 97,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 959,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 1508,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 73
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "grype",
+            "duration_ms": 1508
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": []
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

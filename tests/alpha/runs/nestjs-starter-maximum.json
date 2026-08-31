@@ -1,0 +1,401 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:21:56+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "nestjs-starter",
+        "url": "https://github.com/nestjs/typescript-starter.git",
+        "commit_sha": "c4d9330f5513eda0fb5df594f6b34a11fde1a934",
+        "size": "tiny",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "NestJS"
+        ],
+        "architecture_type": "decorator-based API starter",
+        "repository_shape": [
+            "tiny",
+            "new",
+            "tested",
+            "well-documented"
+        ],
+        "expected_high_level_systems": [
+            "API",
+            "controllers",
+            "services"
+        ],
+        "why_selected": "Small NestJS app tests decorator routing and dependency injection understanding.",
+        "candidate_kind": "framework-starter"
+    },
+    "status": "success",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 476,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "success",
+        "scan_duration_ms": 152,
+        "peak_php_memory_bytes": 4194304,
+        "files_discovered": 16,
+        "repository_bytes": 401331,
+        "files_analyzed": 12,
+        "files_skipped": 4,
+        "stack": [
+            "NestJS"
+        ],
+        "overview": "This repository has 12 readable project files and appears to use NestJS. It found 1 connected system to explain.",
+        "architecture_nodes": [
+            {
+                "key": "api",
+                "type": "api",
+                "label": "NestJS API",
+                "explanation": "This TypeScript server organizes request handlers into controllers and services.",
+                "evidence": [
+                    "src/app.controller.spec.ts",
+                    "src/app.controller.ts",
+                    "src/app.module.ts",
+                    "src/app.service.ts"
+                ]
+            }
+        ],
+        "symbols": 26,
+        "relationships": 89,
+        "routes": 0,
+        "route_sample": [],
+        "features": 0,
+        "feature_clusters": [],
+        "services": [],
+        "tables": [],
+        "packages": 99,
+        "security_findings": 13,
+        "findings": 22,
+        "finding_types": {
+            "dependency_vulnerability": 13,
+            "possible_exposed_secret": 1,
+            "possible_unused_dependency": 8
+        },
+        "finding_severities": {
+            "attention": 5,
+            "info": 10,
+            "risk": 7
+        },
+        "finding_sample": [
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@nestjs/platform-express has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "reflect-metadata has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "rxjs has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@eslint/eslintrc has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@eslint/js has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@nestjs/cli has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@swc/cli has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "info",
+                "type": "possible_unused_dependency",
+                "title": "@swc/core has no obvious readable-file reference",
+                "path": "package.json"
+            },
+            {
+                "severity": "risk",
+                "type": "possible_exposed_secret",
+                "title": "Possible exposed secret",
+                "path": "README.md"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-j3q9-mxjg-w52f affects path-to-regexp",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-j3q9-mxjg-w52f affects path-to-regexp",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-5528-5vmv-3xc2 affects multer",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-v52c-386h-88mc affects multer",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-xf7r-hgr6-v32p affects multer",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-72gw-mp4g-v24j affects multer",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "attention",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-q8mj-m7cp-5q26 affects qs",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "attention",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-27v5-c462-wpq7 affects path-to-regexp",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "attention",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-27v5-c462-wpq7 affects path-to-regexp",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "info",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-w7fw-mjwx-w883 affects qs",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "attention",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-3p4h-7m6x-2hcm affects multer",
+                "path": "package-lock.json"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 10,
+                "relationships": 56,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 18,
+                "relationships": 48,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 13,
+                "relationships": 48,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 1,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 99,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 13,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "wtfcode-native",
+            "duration_ms": 0
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": []
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

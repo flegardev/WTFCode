@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types=1);
+
+final class SafeProcessRunner
+{
+    public function run(ProcessRunRequest $request): ProcessRunResult
+    {
+        $tempDirectory = sys_get_temp_dir();
+        if (!is_dir($tempDirectory) && !mkdir($tempDirectory, 0700, true) && !is_dir($tempDirectory)) {
+            throw new RuntimeException('Unable to create the isolated analyzer temporary directory.');
+        }
+        $stdoutFile = tempnam($tempDirectory, 'wtfcode-stdout-');
+        $stderrFile = tempnam($tempDirectory, 'wtfcode-stderr-');
+        $stdinFile = null;
+        if ($request->stdin !== null) {
+            $stdinFile = tempnam($tempDirectory, 'wtfcode-stdin-');
+            if ($stdinFile !== false) file_put_contents($stdinFile, $request->stdin, LOCK_EX);
+        }
+        if ($stdoutFile === false || $stderrFile === false || ($request->stdin !== null && $stdinFile === false)) {
+            throw new RuntimeException('Unable to allocate isolated analyzer output files.');
+        }
+        $nullDevice = PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null';
+        $descriptors = [
+            0 => ['file', $stdinFile ?? $nullDevice, 'r'],
+            1 => ['file', $stdoutFile, 'w'],
+            2 => ['file', $stderrFile, 'w'],
+        ];
+        $started = hrtime(true);
+        $process = @proc_open(
+            $request->command,
+            $descriptors,
+            $pipes,
+            $request->workingDirectory,
+            $request->environment,
+            ['bypass_shell' => true, 'suppress_errors' => true],
+        );
+        if (!is_resource($process)) {
+            @unlink($stdoutFile);
+            @unlink($stderrFile);
+            if ($stdinFile !== null) @unlink($stdinFile);
+            throw new RuntimeException('Unable to start analyzer process.');
+        }
+
+        $stdout = '';
+        $stderr = '';
+        $stdoutTruncated = false;
+        $stderrTruncated = false;
+        $timedOut = false;
+        $lastStatus = ['exitcode' => -1, 'running' => true];
+
+        try {
+            while (true) {
+                clearstatcache(true, $stdoutFile);
+                clearstatcache(true, $stderrFile);
+                $stdoutTruncated = $stdoutTruncated || (int) @filesize($stdoutFile) > $request->stdoutLimitBytes;
+                $stderrTruncated = $stderrTruncated || (int) @filesize($stderrFile) > $request->stderrLimitBytes;
+                $lastStatus = proc_get_status($process);
+                if (!$lastStatus['running']) break;
+                if ($stdoutTruncated || $stderrTruncated) {
+                    proc_terminate($process);
+                    usleep(100_000);
+                    $status = proc_get_status($process);
+                    if ($status['running']) proc_terminate($process, 9);
+                    break;
+                }
+                if ((hrtime(true) - $started) / 1_000_000_000 >= $request->timeoutSeconds) {
+                    $timedOut = true;
+                    proc_terminate($process);
+                    usleep(100_000);
+                    $status = proc_get_status($process);
+                    if ($status['running']) proc_terminate($process, 9);
+                    break;
+                }
+                usleep(10_000);
+            }
+        } finally {
+            clearstatcache(true, $stdoutFile);
+            clearstatcache(true, $stderrFile);
+            $stdoutTruncated = $stdoutTruncated || (int) @filesize($stdoutFile) > $request->stdoutLimitBytes;
+            $stderrTruncated = $stderrTruncated || (int) @filesize($stderrFile) > $request->stderrLimitBytes;
+            $stdout = (string) file_get_contents($stdoutFile, false, null, 0, $request->stdoutLimitBytes);
+            $stderr = (string) file_get_contents($stderrFile, false, null, 0, $request->stderrLimitBytes);
+        }
+
+        $reportedExit = (int) ($lastStatus['exitcode'] ?? -1);
+        $closedExit = proc_close($process);
+        @unlink($stdoutFile);
+        @unlink($stderrFile);
+        if ($stdinFile !== null) @unlink($stdinFile);
+        $exitCode = $reportedExit >= 0 ? $reportedExit : $closedExit;
+        if ($timedOut) $exitCode = -1;
+        return new ProcessRunResult(
+            $request->command,
+            $exitCode,
+            $stdout,
+            $stderr,
+            (int) round((hrtime(true) - $started) / 1_000_000),
+            $timedOut,
+            $stdoutTruncated,
+            $stderrTruncated,
+        );
+    }
+}

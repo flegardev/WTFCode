@@ -1,0 +1,665 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:22:18+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "langchain-nextjs",
+        "url": "https://github.com/langchain-ai/langchain-nextjs-template.git",
+        "commit_sha": "5f8b3b9407b410bb1eb7c0e93516884c118f5f78",
+        "size": "small",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Next.js",
+            "LangChain"
+        ],
+        "architecture_type": "AI web application template",
+        "repository_shape": [
+            "small",
+            "new",
+            "AI-application",
+            "few-tests"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "AI routes",
+            "retrieval integrations"
+        ],
+        "why_selected": "Compact RAG and agent patterns test provable AI data-flow explanations.",
+        "candidate_kind": "ai-application"
+    },
+    "status": "success",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 543,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "success",
+        "scan_duration_ms": 238,
+        "peak_php_memory_bytes": 14680064,
+        "files_discovered": 65,
+        "repository_bytes": 14359946,
+        "files_analyzed": 52,
+        "files_skipped": 13,
+        "stack": [
+            "Next.js",
+            "Supabase",
+            "Database"
+        ],
+        "overview": "This repository has 52 readable project files and appears to use Next.js, Supabase, Database. It found 3 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "app/agents/page.tsx",
+                    "app/ai_sdk/agent/action.ts",
+                    "app/ai_sdk/agent/page.tsx",
+                    "app/ai_sdk/page.tsx",
+                    "app/api/chat/agents/route.ts",
+                    "app/api/chat/retrieval/route.ts",
+                    "app/api/chat/retrieval_agents/route.ts",
+                    "app/api/chat/route.ts",
+                    "app/api/chat/structured_output/route.ts",
+                    "app/api/retrieval/ingest/route.ts",
+                    "app/langgraph/agent/agent.ts",
+                    "app/langgraph/agent/langgraph.json"
+                ]
+            },
+            {
+                "key": "supabase",
+                "type": "service",
+                "label": "Supabase",
+                "explanation": "Supabase is connected as an external service for data, authentication, or both.",
+                "evidence": []
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": []
+            }
+        ],
+        "symbols": 211,
+        "relationships": 1674,
+        "routes": 15,
+        "route_sample": [
+            {
+                "path": "app/agents/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/agents",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/ai_sdk/agent/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/ai_sdk/agent",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/ai_sdk/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/ai_sdk",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/ai_sdk/tools/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/ai_sdk/tools",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/chat/agents/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/chat/agents",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/chat/retrieval/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/chat/retrieval",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/chat/retrieval_agents/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/chat/retrieval_agents",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/chat/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/chat",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/chat/structured_output/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/chat/structured_output",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/retrieval/ingest/route.ts",
+                "framework": "Next.js",
+                "method": "POST",
+                "route_path": "/api/retrieval/ingest",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/langgraph/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/langgraph",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/retrieval/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/retrieval",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/retrieval_agents/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/retrieval_agents",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/structured_output/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/structured_output",
+                "confidence": "high",
+                "line": 1
+            }
+        ],
+        "features": 1,
+        "feature_clusters": [
+            {
+                "label": "AI chat",
+                "confidence": "strong",
+                "score": 655,
+                "symbols": 66,
+                "evidence": [
+                    {
+                        "path": "app/ai_sdk/agent/action.ts",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/api/chat/agents/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/agents/route.ts",
+                        "line": 18,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/agents/route.ts",
+                        "line": 24,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/agents/route.ts",
+                        "line": 34,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/agents/route.ts",
+                        "line": 56,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/agents/route.ts",
+                        "line": 71,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/retrieval/route.ts",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/retrieval/route.ts",
+                        "line": 18,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/api/chat/retrieval/route.ts",
+                        "line": 23,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "OpenAI",
+            "Supabase"
+        ],
+        "tables": [],
+        "packages": 622,
+        "security_findings": 5,
+        "findings": 35,
+        "finding_types": {
+            "database_operation": 3,
+            "dependency_vulnerability": 5,
+            "environment_access": 17,
+            "http_call": 3,
+            "large_file": 1,
+            "repeated_client_setup": 1,
+            "ui_handler": 4,
+            "unresolved_local_import": 1
+        },
+        "finding_severities": {
+            "attention": 7,
+            "info": 25,
+            "risk": 3
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from app/layout.tsx",
+                "path": "app/layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "DefaultRetrievalText.ts is large enough to be risky to edit",
+                "path": "data/DefaultRetrievalText.ts"
+            },
+            {
+                "severity": "info",
+                "type": "repeated_client_setup",
+                "title": "Several database or service clients appear to be created",
+                "path": null
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "app/ai_sdk/agent/action.ts"
+            },
+            {
+                "severity": "info",
+                "type": "ui_handler",
+                "title": "Form submission handler",
+                "path": "app/ai_sdk/agent/page.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "app/ai_sdk/tools/action.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "app/ai_sdk/tools/action.ts"
+            },
+            {
+                "severity": "info",
+                "type": "ui_handler",
+                "title": "Form submission handler",
+                "path": "app/ai_sdk/tools/page.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/chat/retrieval/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/chat/retrieval/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/chat/retrieval_agents/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/chat/retrieval_agents/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/retrieval/ingest/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/retrieval/ingest/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "app/api/retrieval/ingest/route.ts"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Browser or server HTTP request",
+                "path": "components/ChatWindow.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Browser or server HTTP request",
+                "path": "components/ChatWindow.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "ui_handler",
+                "title": "Form submission handler",
+                "path": "components/ChatWindow.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Browser or server HTTP request",
+                "path": "components/UploadDocumentsForm.tsx"
+            },
+            {
+                "severity": "info",
+                "type": "ui_handler",
+                "title": "Form submission handler",
+                "path": "components/UploadDocumentsForm.tsx"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 144,
+                "relationships": 889,
+                "routes": 15,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 89,
+                "relationships": 505,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 104,
+                "relationships": 606,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 18,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 9,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 622,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 5,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "wtfcode-native",
+            "duration_ms": 0
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": []
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

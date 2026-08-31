@@ -1,0 +1,580 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:18:59+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "next-postgres-auth",
+        "url": "https://github.com/vercel/nextjs-postgres-nextauth-tailwindcss-template.git",
+        "commit_sha": "fe026711c19ac3ee4589c86a738f59b84e611559",
+        "size": "small",
+        "primary_language": "TypeScript",
+        "known_frameworks": [
+            "Next.js",
+            "Auth.js",
+            "Postgres"
+        ],
+        "architecture_type": "full-stack web application",
+        "repository_shape": [
+            "small",
+            "new",
+            "well-documented"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "server routes",
+            "authentication",
+            "database"
+        ],
+        "why_selected": "Compact Next.js application combining authentication and SQL data access.",
+        "candidate_kind": "application-template"
+    },
+    "status": "success",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 6976,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "success",
+        "scan_duration_ms": 6664,
+        "peak_php_memory_bytes": 14680064,
+        "files_discovered": 45,
+        "repository_bytes": 207285,
+        "files_analyzed": 41,
+        "files_skipped": 4,
+        "stack": [
+            "Next.js",
+            "Auth.js",
+            "Drizzle",
+            "Database",
+            "Vercel"
+        ],
+        "overview": "This repository has 41 readable project files and appears to use Next.js, Auth.js, Drizzle, Database, Vercel. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Next.js frontend",
+                "explanation": "This is the part of the project that renders screens in the browser.",
+                "evidence": [
+                    "app/(dashboard)/actions.ts",
+                    "app/(dashboard)/customers/page.tsx",
+                    "app/(dashboard)/error.tsx",
+                    "app/(dashboard)/layout.tsx",
+                    "app/(dashboard)/nav-item.tsx",
+                    "app/(dashboard)/page.tsx",
+                    "app/(dashboard)/product.tsx",
+                    "app/(dashboard)/products-table.tsx",
+                    "app/(dashboard)/providers.tsx",
+                    "app/(dashboard)/search.tsx",
+                    "app/(dashboard)/user.tsx",
+                    "app/api/auth/[...nextauth]/route.ts"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "lib/auth.ts"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": []
+            },
+            {
+                "key": "deployment",
+                "type": "deployment",
+                "label": "Vercel deployment",
+                "explanation": "This configuration tells Vercel how to build or serve the project.",
+                "evidence": []
+            }
+        ],
+        "symbols": 132,
+        "relationships": 887,
+        "routes": 5,
+        "route_sample": [
+            {
+                "path": "app/(dashboard)/customers/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/customers",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/(dashboard)/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/auth/[...nextauth]/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/auth/:nextauth*",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/api/seed/route.ts",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/api/seed",
+                "confidence": "high",
+                "line": 1
+            },
+            {
+                "path": "app/login/page.tsx",
+                "framework": "Next.js",
+                "method": "GET",
+                "route_path": "/login",
+                "confidence": "high",
+                "line": 1
+            }
+        ],
+        "features": 2,
+        "feature_clusters": [
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 53,
+                "symbols": 4,
+                "evidence": [
+                    {
+                        "path": "app/login/page.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/login/page.tsx",
+                        "line": 11,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 48,
+                "symbols": 7,
+                "evidence": [
+                    {
+                        "path": "app/(dashboard)/layout.tsx",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(dashboard)/search.tsx",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(dashboard)/search.tsx",
+                        "line": 9,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(dashboard)/search.tsx",
+                        "line": 13,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/(dashboard)/search.tsx",
+                        "line": 13,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/(dashboard)/search.tsx",
+                        "line": 9,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "Postgres"
+        ],
+        "tables": [
+            "users"
+        ],
+        "packages": 304,
+        "security_findings": 62,
+        "findings": 71,
+        "finding_types": {
+            "database_operation": 4,
+            "dependency_vulnerability": 62,
+            "environment_access": 2,
+            "large_file": 1,
+            "sensitive_system": 1,
+            "unresolved_local_import": 1
+        },
+        "finding_severities": {
+            "attention": 32,
+            "info": 5,
+            "risk": 34
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "unresolved_local_import",
+                "title": "A local import could not be resolved from app/layout.tsx",
+                "path": "app/layout.tsx"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in lib/auth.ts",
+                "path": "lib/auth.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "pnpm-lock.yaml is large enough to be risky to edit",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "lib/db.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "lib/db.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "lib/db.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "database_operation",
+                "title": "Database operation",
+                "path": "lib/db.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "lib/db.ts"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "lib/db.ts"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-c4j6-fc7j-m34r affects next",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-5j98-mcp5-4vw2 affects glob",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-267c-6grr-h53f affects next",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-p9j2-gv94-2wf4 affects next",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-8fpg-xm3f-6cx3 affects next-auth",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-mg66-mrh9-m8jx affects next",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-492v-c6pp-mqqv affects next",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-7rqj-j65f-68wh affects @auth/core",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-7rqj-j65f-68wh affects next-auth",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-m99w-x7hq-7vfj affects next",
+                "path": "pnpm-lock.yaml"
+            },
+            {
+                "severity": "risk",
+                "type": "dependency_vulnerability",
+                "title": "GHSA-36qx-fr4f-26g5 affects next",
+                "path": "pnpm-lock.yaml"
+            }
+        ],
+        "provider_failures": [],
+        "partial_providers": [],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 15,
+                "message": null,
+                "symbols": 78,
+                "relationships": 507,
+                "routes": 5,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 17,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "success",
+                "duration_ms": 1149,
+                "message": null,
+                "symbols": 73,
+                "relationships": 246,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "success",
+                "duration_ms": 1042,
+                "message": null,
+                "symbols": 73,
+                "relationships": 422,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 159,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 5,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 53,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 1,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 593,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 95,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 1048,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 304,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 1699,
+                "message": null,
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 62,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 41
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "grype",
+            "duration_ms": 1699
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": []
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}

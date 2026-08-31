@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireLogin();
+$projectId = filter_var($_GET['project'] ?? null, FILTER_VALIDATE_INT);
+$fileId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+$project = $projectId === false || $projectId === null ? null : Project::findForUser((int) $projectId, Auth::id());
+$file = $project === null || $fileId === false || $fileId === null ? null : Project::file((int) $project['id'], (int) $fileId);
+if ($project === null || $file === null) { http_response_code(404); exit('File not found.'); }
+$imports = Project::imports((int) $file['id']);
+$dependents = Project::dependents((int) $file['id']);
+$transitive = Project::transitiveDependents((int) $project['id'], (int) $file['id']);
+$explanation = ExplanationService::explainFile($file, $imports, $dependents, $transitive);
+$systems = ExplanationService::inferredSystems(array_merge($dependents, $transitive));
+$symbols = json_decode((string) ($file['symbols_json'] ?? '[]'), true) ?: [];
+$normalizedSymbols = SymbolRepository::fileSymbols((int) $project['id'], (int) $file['id']);
+$pageTitle = $file['path'];
+$activePage = 'dashboard';
+$activeProjectSection = 'files';
+require __DIR__ . '/../views/header.php';
+?>
+<section class="app-shell file-page">
+    <div class="breadcrumb"><a href="<?= e(url('dashboard.php')) ?>">Projects</a><span>/</span><a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>"><?= e($project['name']) ?></a><span>/</span><span><?= e($file['path']) ?></span></div>
+    <div class="file-heading"><div><span><?= e($file['role_name']) ?></span><h1><?= e($file['path']) ?></h1><p><?= e($file['language']) ?>, <?= (int) $file['line_count'] ?> lines, <?= (int) $file['file_size'] ?> bytes</p></div><a class="button button-quiet" href="<?= e(url('map.php?id=' . (int) $project['id'])) ?>">Open symbol graph</a></div>
+    <?php require __DIR__ . '/../views/project-nav.php'; ?>
+    <section class="explain-grid"><article class="explanation-card primary"><p class="landing-kicker">Explain like I am learning</p><h2><?= e($explanation['human']) ?></h2><p><?= e($explanation['advice']) ?></p></article><article class="explanation-card"><p class="landing-kicker">Technical view</p><p><?= e($explanation['technical']) ?></p><?php if ($symbols !== []): ?><div class="symbol-list"><b>Detected symbols</b><span><?= e(implode(', ', $symbols)) ?></span></div><?php endif; ?></article></section>
+    <section class="content-grid file-connections"><article class="panel"><div class="section-row"><div><p class="landing-kicker">Confirmed blast radius</p><h2>Files that directly import this</h2></div><span class="count-mark"><?= count($dependents) ?> direct</span></div><?php if ($dependents === []): ?><div class="empty-inline">No direct file importers were detected. Runtime, configuration, and dynamic behavior can still create effects outside this file.</div><?php else: ?><div class="connection-list"><?php foreach ($dependents as $dependent): ?><a href="<?= e(url('file.php?project=' . (int) $project['id'] . '&id=' . (int) $dependent['id'])) ?>"><strong><?= e($dependent['path']) ?></strong><span><?= e($dependent['role_name']) ?></span></a><?php endforeach; ?></div><?php endif; ?></article><article class="panel"><div class="section-row"><div><p class="landing-kicker">Confirmed dependencies</p><h2>What this file uses</h2></div><span class="count-mark"><?= count($imports) ?> detected</span></div><?php if ($imports === []): ?><div class="empty-inline">No supported import or include statements were detected in this file.</div><?php else: ?><div class="connection-list"><?php foreach ($imports as $import): ?><?php if ($import['target_id']): ?><a href="<?= e(url('file.php?project=' . (int) $project['id'] . '&id=' . (int) $import['target_id'])) ?>"><?php else: ?><div><?php endif; ?><strong><?= e($import['target_path']) ?></strong><span><?= e($import['relationship_type']) ?><?= $import['role_name'] ? ', ' . e($import['role_name']) : '' ?></span><?php if ($import['target_id']): ?></a><?php else: ?></div><?php endif; ?><?php endforeach; ?></div><?php endif; ?></article></section>
+    <section class="content-grid file-connections"><article class="panel"><div class="section-row"><div><p class="landing-kicker">Confirmed transitive path</p><h2>Additional reachable files</h2></div><span class="count-mark"><?= count($transitive) ?> indirect</span></div><?php if ($transitive === []): ?><div class="empty-inline">No additional static dependent chain was found within the eight-hop analysis limit.</div><?php else: ?><div class="connection-list"><?php foreach ($transitive as $dependent): ?><a href="<?= e(url('file.php?project=' . (int) $project['id'] . '&id=' . (int) $dependent['id'])) ?>"><strong><?= e($dependent['path']) ?></strong><span><?= e($dependent['role_name']) ?>, <?= (int) $dependent['depth'] ?> hops away</span></a><?php endforeach; ?></div><?php endif; ?></article><article class="panel before-edit"><p class="landing-kicker">Before you edit</p><h2>Keep the next change safe</h2><ol><li>Read the direct dependents above.</li><li>Check the imported files and detected symbols.</li><li>Make one behavior change, then run the project’s own checks.</li><li>Review the Git diff for unexpected configuration or data changes.</li></ol><?php if ($systems !== []): ?><p class="evidence-note">Likely affected systems <em>(inferred from confirmed file roles)</em>: <?= e(implode(', ', $systems)) ?>.</p><?php endif; ?></article></section>
+    <section class="panel source-outline-panel"><div class="section-row"><div><h2>Source outline</h2><p>Normalized declarations and boundaries, ordered by source line.</p></div><span class="count-mark"><?= count($normalizedSymbols) ?> symbols</span></div><?php if ($normalizedSymbols === []): ?><div class="empty-state-v2"><strong>No V2 outline is available for this file.</strong><p>The file can be configuration, documentation, unsupported syntax, or part of a pre-V2 scan.</p></div><?php else: ?><div class="source-outline"><?php foreach ($normalizedSymbols as $outlineSymbol): ?><a href="<?= e(url('symbol.php?project=' . (int) $project['id'] . '&id=' . (int) $outlineSymbol['id'])) ?>"><span><?= (int) $outlineSymbol['start_line'] ?></span><b><?= e(str_replace('_', ' ', $outlineSymbol['symbol_type'])) ?></b><strong><?= e($outlineSymbol['name']) ?></strong><small><?= (int) $outlineSymbol['incoming_count'] ?> in, <?= (int) $outlineSymbol['outgoing_count'] ?> out</small><em class="confidence <?= e($outlineSymbol['confidence']) ?>"><?= e($outlineSymbol['confidence']) ?></em></a><?php endforeach; ?></div><?php endif; ?></section>
+</section>
+<?php require __DIR__ . '/../views/footer.php'; ?>

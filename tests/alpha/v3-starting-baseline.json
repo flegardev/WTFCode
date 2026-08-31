@@ -1,0 +1,57 @@
+{
+  "baseline": "WTFCode V3 final acceptance",
+  "recorded_at": "2026-08-19T19:41:03Z",
+  "commit_sha": "2b67622919015cbb2feb01eed5d8e310eff5e25d",
+  "analysis_version": "v3.10-jobs",
+  "regression": {
+    "php_test_suites_passed": 18,
+    "worker_syntax_checks": "passed",
+    "gitleaks_worktree_findings": 0
+  },
+  "analyzers": {
+    "PHP": { "status": "ready", "version": "8.4.24" },
+    "Composer": { "status": "ready", "version": "2.10.2" },
+    "MySQL": { "status": "ready", "version": "8.4.11" },
+    "Git": { "status": "ready", "version": "2.55.0.windows.3" },
+    "Node": { "status": "ready", "version": "24.19.0" },
+    "PHP Parser": { "status": "ready", "version": "5.8.0" },
+    "Tree-sitter": { "status": "ready", "version": "0.20.8 + grammar bundle 0.1.13" },
+    "TypeScript Semantic": { "status": "ready", "version": "ts-morph 28.0.0 + TypeScript 6.0.2" },
+    "ast-grep": { "status": "ready", "version": "@ast-grep/napi 0.45.1" },
+    "Semgrep": { "status": "optional_unavailable", "version": null },
+    "ctags": { "status": "optional_unavailable", "version": null },
+    "Gitleaks": { "status": "ready", "version": "8.30.1" },
+    "OSV-Scanner": { "status": "ready", "version": "2.5.1" },
+    "ripgrep": { "status": "ready", "version": "15.2.0" },
+    "Syft": { "status": "ready", "version": "1.51.0" },
+    "Grype": { "status": "ready", "version": "0.117.0" }
+  },
+  "benchmark": {
+    "curated_positive_facts": 27,
+    "curated_forbidden_facts": 4,
+    "fixtures": 6,
+    "native": { "true_positive": 27, "false_positive_curated": 0, "recall": 1.0, "curated_precision": 1.0, "duration_ms": 13 },
+    "best_single_external": { "provider": "php-parser", "true_positive": 4, "false_positive_curated": 0, "recall": 0.1481, "curated_precision": 1.0, "duration_ms": 37 },
+    "fused": { "true_positive": 27, "false_positive_curated": 0, "recall": 1.0, "curated_precision": 1.0, "duration_ms": 2793, "confirmed_facts": 77, "multi_engine_facts": 27 },
+    "qualification": "Curated precision measures only enumerated forbidden facts. Fusion matched native recall and curated precision; its observed benefit was corroboration and evidence depth, not a measured accuracy gain."
+  },
+  "self_dogfood": {
+    "quick": { "files": 183, "symbols": 2465, "relationships": 13331, "routes": 26, "features": 11, "findings": 10, "packages": 0, "disagreements": 883, "duration_ms": 759, "peak_php_memory_bytes": 77594624 },
+    "deep": { "files": 183, "symbols": 2465, "relationships": 13331, "routes": 26, "features": 11, "findings": 32, "packages": 0, "disagreements": 883, "duration_ms": 4584, "peak_php_memory_bytes": 127926272 },
+    "security": { "files": 183, "symbols": 27, "relationships": 1971, "routes": 0, "features": 1, "findings": 8, "packages": 27, "disagreements": 0, "duration_ms": 4183, "peak_php_memory_bytes": 130023424 },
+    "maximum": { "files": 183, "symbols": 2465, "relationships": 13331, "routes": 26, "features": 11, "findings": 32, "packages": 27, "disagreements": 883, "duration_ms": 8503, "peak_php_memory_bytes": 132120576 }
+  },
+  "known_limitations": [
+    "Maximum self-analysis reaches 132120576 bytes under PHP's 128 MiB binary ceiling, leaving little memory headroom.",
+    "Tree-sitter is partial on one self-analysis file and its evidence is compacted to the fusion budget.",
+    "product_intelligence_limited is set because the derived-relationship budget is reached.",
+    "Semgrep and ctags are optional and unavailable on the baseline machine.",
+    "Curated benchmark precision is not whole-repository precision and the fixture sample is too small for statistical significance.",
+    "Static analysis cannot prove every dynamic relationship; absence of a detected reference does not mean safe deletion."
+  ],
+  "preserved_reports": [
+    "tests/reports/v3-final-acceptance-2026-08-19.md",
+    "tests/reports/v3-dogfood-2026-08-19.md",
+    "tests/reports/v3-fusion-2026-08-19.md"
+  ]
+}

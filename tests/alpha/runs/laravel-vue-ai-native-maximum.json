@@ -1,0 +1,963 @@
+{
+    "schema_version": 3,
+    "generated_at": "2026-08-20T08:21:55+00:00",
+    "analysis_version": "alpha.10",
+    "profile": "maximum",
+    "static_analysis_only": true,
+    "repository": {
+        "name": "laravel-vue-ai-native",
+        "url": "https://github.com/gdarko/laravel-vue-starter.git",
+        "commit_sha": "2b8eb53292ad2a66aa608289c70e04252fffa6c5",
+        "size": "medium",
+        "primary_language": "PHP",
+        "known_frameworks": [
+            "Laravel",
+            "Vue",
+            "Sanctum"
+        ],
+        "architecture_type": "full-stack SPA monolith",
+        "repository_shape": [
+            "medium",
+            "new",
+            "AI-native-documented",
+            "auth-heavy"
+        ],
+        "expected_high_level_systems": [
+            "frontend",
+            "API",
+            "authentication",
+            "database"
+        ],
+        "why_selected": "Repository explicitly describes itself as AI-native and includes agent-oriented project guidance.",
+        "candidate_kind": "documented-ai-native"
+    },
+    "status": "partial",
+    "import": {
+        "clone_duration_ms": 0,
+        "workspace_reused": true
+    },
+    "time_to_first_result_ms": 1858,
+    "time_to_first_useful_insight_ms": null,
+    "machine": {
+        "status": "partial",
+        "scan_duration_ms": 1475,
+        "peak_php_memory_bytes": 31457280,
+        "files_discovered": 292,
+        "repository_bytes": 1317442,
+        "files_analyzed": 276,
+        "files_skipped": 16,
+        "stack": [
+            "Vue",
+            "PHP",
+            "Laravel",
+            "Database"
+        ],
+        "overview": "This repository has 276 readable project files and appears to use Vue, PHP, Laravel, Database. It found 4 connected systems to explain.",
+        "architecture_nodes": [
+            {
+                "key": "frontend",
+                "type": "frontend",
+                "label": "Vue frontend",
+                "explanation": "This part of the project renders screens with Vue components.",
+                "evidence": [
+                    "resources/app/views/components/Alert.vue",
+                    "resources/app/views/components/Badge.vue",
+                    "resources/app/views/components/filters/Filters.vue",
+                    "resources/app/views/components/filters/FiltersCol.vue",
+                    "resources/app/views/components/filters/FiltersRow.vue",
+                    "resources/app/views/components/Form.vue",
+                    "resources/app/views/components/icons/Avatar.vue",
+                    "resources/app/views/components/icons/Icon.vue",
+                    "resources/app/views/components/icons/Spinner.vue",
+                    "resources/app/views/components/input/Button.vue",
+                    "resources/app/views/components/input/Dropdown.vue",
+                    "resources/app/views/components/input/FileInput.vue"
+                ]
+            },
+            {
+                "key": "api",
+                "type": "server",
+                "label": "Laravel application",
+                "explanation": "This PHP application uses Laravel for routes and server-side behavior.",
+                "evidence": [
+                    "app/Actions/Fortify/CreateNewUser.php",
+                    "app/Actions/Fortify/PasswordValidationRules.php",
+                    "app/Actions/Fortify/ResetUserPassword.php",
+                    "app/Actions/Fortify/UpdateUserPassword.php",
+                    "app/Actions/Fortify/UpdateUserProfileInformation.php",
+                    "app/Http/Controllers/AuthController.php",
+                    "app/Http/Controllers/Controller.php",
+                    "app/Http/Controllers/RoleController.php",
+                    "app/Http/Controllers/SpaController.php",
+                    "app/Http/Controllers/TokenController.php",
+                    "app/Http/Controllers/UserController.php",
+                    "app/Http/Middleware/ApplyLocale.php"
+                ]
+            },
+            {
+                "key": "auth",
+                "type": "auth",
+                "label": "Authentication",
+                "explanation": "This part decides who is signed in and which requests are allowed.",
+                "evidence": [
+                    "app/Http/Controllers/AuthController.php",
+                    "config/auth.php",
+                    "config/sanctum.php",
+                    "lang/en/auth.php",
+                    "resources/app/services/AuthService.ts",
+                    "resources/app/stores/auth.js",
+                    "resources/app/views/layouts/Auth.vue",
+                    "resources/app/views/pages/auth/forgot-password/Form.vue",
+                    "resources/app/views/pages/auth/forgot-password/Main.vue",
+                    "resources/app/views/pages/auth/login/Form.vue",
+                    "resources/app/views/pages/auth/login/Main.vue",
+                    "resources/app/views/pages/auth/register/Form.vue"
+                ]
+            },
+            {
+                "key": "database",
+                "type": "database",
+                "label": "Application data",
+                "explanation": "This is where the application keeps durable information.",
+                "evidence": [
+                    "app/Models/Role.php",
+                    "app/Models/User.php",
+                    "config/database.php",
+                    "database/factories/UserFactory.php",
+                    "database/migrations/0001_01_01_000000_create_users_table.php",
+                    "database/migrations/0001_01_01_000001_create_cache_table.php",
+                    "database/migrations/0001_01_01_000002_create_jobs_table.php",
+                    "database/migrations/2022_11_18_212346_create_bouncer_tables.php",
+                    "database/migrations/2023_10_07_114319_create_media_table.php",
+                    "database/migrations/2026_04_01_081055_add_two_factor_columns_to_users_table.php",
+                    "database/migrations/2026_04_01_081430_create_personal_access_tokens_table.php",
+                    "database/seeders/BouncerSeeder.php"
+                ]
+            }
+        ],
+        "symbols": 988,
+        "relationships": 4281,
+        "routes": 19,
+        "route_sample": [
+            {
+                "path": "routes/api.php",
+                "framework": "Laravel",
+                "method": "POST",
+                "route_path": "/sanctum/token",
+                "confidence": "high",
+                "line": 20
+            },
+            {
+                "path": "routes/api.php",
+                "framework": "Laravel",
+                "method": "GET",
+                "route_path": "/users/auth",
+                "confidence": "high",
+                "line": 27
+            },
+            {
+                "path": "routes/api.php",
+                "framework": "Laravel",
+                "method": "PUT",
+                "route_path": "/users/{user}/avatar",
+                "confidence": "high",
+                "line": 32
+            },
+            {
+                "path": "routes/api.php",
+                "framework": "Laravel",
+                "method": "RESOURCE",
+                "route_path": "/users",
+                "confidence": "high",
+                "line": 33
+            },
+            {
+                "path": "routes/api.php",
+                "framework": "Laravel",
+                "method": "GET",
+                "route_path": "/roles/search",
+                "confidence": "high",
+                "line": 38
+            },
+            {
+                "path": "routes/web.php",
+                "framework": "Laravel",
+                "method": "GET",
+                "route_path": "/{path}",
+                "confidence": "high",
+                "line": 17
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/",
+                "confidence": "medium",
+                "line": 18
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/panel",
+                "confidence": "medium",
+                "line": 24
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/dashboard",
+                "confidence": "medium",
+                "line": 28
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/profile",
+                "confidence": "medium",
+                "line": 34
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/components",
+                "confidence": "medium",
+                "line": 40
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/users",
+                "confidence": "medium",
+                "line": 45
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/list",
+                "confidence": "medium",
+                "line": 49
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/login",
+                "confidence": "medium",
+                "line": 58
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/register",
+                "confidence": "medium",
+                "line": 64
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/reset-password",
+                "confidence": "medium",
+                "line": 70
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/forgot-password",
+                "confidence": "medium",
+                "line": 76
+            },
+            {
+                "path": "resources/app/router/routes.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/:catchAll(.*)",
+                "confidence": "medium",
+                "line": 82
+            },
+            {
+                "path": "resources/app/stores/auth.js",
+                "framework": "Vue Router",
+                "method": "GET",
+                "route_path": "/login",
+                "confidence": "medium",
+                "line": 84
+            }
+        ],
+        "features": 5,
+        "feature_clusters": [
+            {
+                "label": "Profile",
+                "confidence": "strong",
+                "score": 209,
+                "symbols": 32,
+                "evidence": [
+                    {
+                        "path": "app/Http/Controllers/UserController.php",
+                        "line": 139,
+                        "signals": [
+                            "source",
+                            "route"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/Models/User.php",
+                        "line": 85,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/Models/User.php",
+                        "line": 95,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/Models/User.php",
+                        "line": 110,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/App.vue",
+                        "line": 1,
+                        "signals": [
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/router/routes.js",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/views/components/icons/Avatar.vue",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/views/pages/private/profile/Main.vue",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source",
+                            "graph"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/views/pages/private/profile/Main.vue",
+                        "line": 175,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/views/pages/private/profile/Main.vue",
+                        "line": 188,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Login",
+                "confidence": "strong",
+                "score": 132,
+                "symbols": 19,
+                "evidence": [
+                    {
+                        "path": "resources/app/router/routes.js",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/stores/auth.js",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/views/pages/auth/login/Form.vue",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/views/pages/auth/login/Form.vue",
+                        "line": 24,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/views/pages/auth/login/Main.vue",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/stores/auth.js",
+                        "line": 9,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/views/pages/auth/login/Main.vue",
+                        "line": 1,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/services/AuthService.ts",
+                        "line": 69,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "resources/app/stores/auth.js",
+                        "line": 17,
+                        "signals": [
+                            "identity",
+                            "graph",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "resources/app/stores/auth.js",
+                        "line": 31,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Search",
+                "confidence": "strong",
+                "score": 57,
+                "symbols": 9,
+                "evidence": [
+                    {
+                        "path": "app/Http/Controllers/RoleController.php",
+                        "line": 34,
+                        "signals": [
+                            "identity",
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "strong"
+                    },
+                    {
+                        "path": "app/Services/Role/RoleService.php",
+                        "line": 16,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/Services/User/UserService.php",
+                        "line": 52,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "routes/api.php",
+                        "line": 1,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "app/Http/Controllers/RoleController.php",
+                        "line": 34,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "routes/api.php",
+                        "line": 22,
+                        "signals": [
+                            "route",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Notifications",
+                "confidence": "strong",
+                "score": 12,
+                "symbols": 2,
+                "evidence": [
+                    {
+                        "path": "config/mail.php",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    },
+                    {
+                        "path": "config/mail.php",
+                        "line": 17,
+                        "signals": [
+                            "identity",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            },
+            {
+                "label": "Registration",
+                "confidence": "likely",
+                "score": 6,
+                "symbols": 1,
+                "evidence": [
+                    {
+                        "path": "config/fortify.php",
+                        "line": 1,
+                        "signals": [
+                            "graph",
+                            "source"
+                        ],
+                        "confidence": "likely"
+                    }
+                ]
+            }
+        ],
+        "services": [
+            "Postgres",
+            "Redis"
+        ],
+        "tables": [
+            "abilities",
+            "assigned_roles",
+            "permissions",
+            "Role",
+            "roles",
+            "User",
+            "users"
+        ],
+        "packages": 236,
+        "security_findings": 45,
+        "findings": 75,
+        "finding_types": {
+            "database_operation": 3,
+            "dependency_vulnerability": 45,
+            "destructive_database_operation": 1,
+            "duplicate_content": 1,
+            "environment_access": 2,
+            "http_call": 2,
+            "large_file": 1,
+            "possible_exposed_secret": 5,
+            "sensitive_system": 15
+        },
+        "finding_severities": {
+            "attention": 45,
+            "info": 6,
+            "risk": 24
+        },
+        "finding_sample": [
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in app/Http/Controllers/AuthController.php",
+                "path": "app/Http/Controllers/AuthController.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in config/auth.php",
+                "path": "config/auth.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in config/sanctum.php",
+                "path": "config/sanctum.php"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in lang/en/auth.php",
+                "path": "lang/en/auth.php"
+            },
+            {
+                "severity": "attention",
+                "type": "large_file",
+                "title": "package-lock.json is large enough to be risky to edit",
+                "path": "package-lock.json"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/services/AuthService.ts",
+                "path": "resources/app/services/AuthService.ts"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/stores/auth.js",
+                "path": "resources/app/stores/auth.js"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/layouts/Auth.vue",
+                "path": "resources/app/views/layouts/Auth.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/forgot-password/Form.vue",
+                "path": "resources/app/views/pages/auth/forgot-password/Form.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/forgot-password/Main.vue",
+                "path": "resources/app/views/pages/auth/forgot-password/Main.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/login/Form.vue",
+                "path": "resources/app/views/pages/auth/login/Form.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/login/Main.vue",
+                "path": "resources/app/views/pages/auth/login/Main.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/register/Form.vue",
+                "path": "resources/app/views/pages/auth/register/Form.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/register/Main.vue",
+                "path": "resources/app/views/pages/auth/register/Main.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/reset-password/Form.vue",
+                "path": "resources/app/views/pages/auth/reset-password/Form.vue"
+            },
+            {
+                "severity": "attention",
+                "type": "sensitive_system",
+                "title": "Authentication is present in resources/app/views/pages/auth/reset-password/Main.vue",
+                "path": "resources/app/views/pages/auth/reset-password/Main.vue"
+            },
+            {
+                "severity": "info",
+                "type": "duplicate_content",
+                "title": "Similar code appears in more than one file",
+                "path": ".cursor/mcp.json"
+            },
+            {
+                "severity": "info",
+                "type": "environment_access",
+                "title": "Environment configuration access",
+                "path": "resources/app/helpers/api.js"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Axios HTTP request",
+                "path": "resources/app/services/BaseService.ts"
+            },
+            {
+                "severity": "info",
+                "type": "http_call",
+                "title": "Axios HTTP request",
+                "path": "resources/app/services/BaseService.ts"
+            }
+        ],
+        "provider_failures": [
+            "typescript-semantic"
+        ],
+        "partial_providers": [
+            "tree-sitter"
+        ],
+        "providers": [
+            {
+                "engine": "wtfcode-native",
+                "engine_version": "2.1.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 621,
+                "relationships": 2509,
+                "routes": 19,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "php-parser",
+                "engine_version": "5.8.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 422,
+                "relationships": 1162,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "tree-sitter",
+                "engine_version": "web-tree-sitter-0.20.8+grammars-0.1.13",
+                "status": "partial",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 308,
+                "relationships": 638,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "typescript-semantic",
+                "engine_version": "ts-morph-28.0.0+typescript-6.0.2",
+                "status": "failed",
+                "duration_ms": 864,
+                "message": "Node worker exited with code 1.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 276
+            },
+            {
+                "engine": "ast-grep",
+                "engine_version": "napi-0.45.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 7,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ripgrep",
+                "engine_version": "15.2.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 1,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "gitleaks",
+                "engine_version": "8.30.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 5,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "semgrep",
+                "engine_version": "cli",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "osv-scanner",
+                "engine_version": "2.5.1",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "syft",
+                "engine_version": "1.51.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 236,
+                "findings": 0,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "grype",
+                "engine_version": "0.117.0",
+                "status": "success",
+                "duration_ms": 0,
+                "message": "Reused content-addressed provider cache.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 45,
+                "cache_hit": true,
+                "incremental": false,
+                "files_analyzed": 0
+            },
+            {
+                "engine": "ctags",
+                "engine_version": "unavailable",
+                "status": "unavailable",
+                "duration_ms": 0,
+                "message": "Analyzer is not installed or not supported on this machine.",
+                "symbols": 0,
+                "relationships": 0,
+                "routes": 0,
+                "packages": 0,
+                "findings": 0,
+                "cache_hit": false,
+                "incremental": false,
+                "files_analyzed": 0
+            }
+        ],
+        "slowest_provider": {
+            "engine": "typescript-semantic",
+            "duration_ms": 864
+        },
+        "graph_truncation": [],
+        "product_intelligence_truncation": false,
+        "partial_reasons": [
+            "Partial analyzer providers: tree-sitter.",
+            "Failed analyzer providers: typescript-semantic."
+        ]
+    },
+    "human_review": "UNSCORED",
+    "best_insight": "UNSCORED"
+}
