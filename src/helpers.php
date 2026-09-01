@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-function app_config(): array
+function app_config(bool $fresh = false): array
 {
     static $config = null;
-    if ($config === null) {
+    if ($config === null || $fresh) {
         $config = require __DIR__ . '/../config/database.php';
         $local = __DIR__ . '/../config/database.local.php';
         if (is_file($local)) {

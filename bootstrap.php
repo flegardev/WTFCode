@@ -20,6 +20,10 @@ declare(strict_types=1);
  *    Configures `HttpOnly`, `SameSite=Lax`, and strict cookie flags to prevent session hijacking.
  */
 
+if (PHP_SAPI === 'cli' || (int) ini_get('memory_limit') < 512) {
+    @ini_set('memory_limit', '512M');
+}
+
 $composerAutoload = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 if (is_file($composerAutoload)) {
     require_once $composerAutoload;

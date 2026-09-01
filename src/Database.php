@@ -12,7 +12,7 @@ final class Database
             return self::$connection;
         }
 
-        $config = app_config();
+        $config = app_config(true);
         $driver = (string) ($config['driver'] ?? 'mysql');
 
         $dsn = match ($driver) {
@@ -22,7 +22,10 @@ final class Database
         };
 
         try {
-            self::$connection = new PDO($dsn, $config['username'] ?? null, $config['password'] ?? null, [
+            $user = $driver === 'sqlite' ? null : ($config['username'] ?? null);
+            $pass = $driver === 'sqlite' ? null : ($config['password'] ?? null);
+
+            self::$connection = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
@@ -33,12 +36,14 @@ final class Database
                 self::$connection->exec("SET statement_timeout = '120s'");
             } elseif ($driver === 'sqlite') {
                 self::$connection->exec('PRAGMA foreign_keys = ON;');
-                self::$connection->exec('PRAGMA journal_mode = WAL;');
+                if ($config['database'] !== ':memory:') {
+                    self::$connection->exec('PRAGMA journal_mode = WAL;');
+                }
             }
         } catch (PDOException $exception) {
             Logger::error('Database connection failed', ['code' => $exception->getCode(), 'driver' => $driver]);
             self::$connection = null;
-            throw new RuntimeException('WTFCode could not connect to its database.', 0, $exception);
+            throw new RuntimeException('WTFCode could not connect to its database: ' . $exception->getMessage(), 0, $exception);
         }
 
         return self::$connection;
@@ -47,11 +52,12 @@ final class Database
     public static function setConnection(?PDO $pdo): void
     {
         self::$connection = $pdo;
+        app_config(true);
     }
 
     public static function driver(): string
     {
-        return (string) app_config()['driver'];
+        return (string) app_config(true)['driver'];
     }
 
     public static function isPostgres(): bool
