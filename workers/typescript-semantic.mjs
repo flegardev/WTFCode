@@ -48,6 +48,7 @@ const nodeKeys = new Map();
 const moduleKeys = new Map();
 const modulePathKeys = new Map();
 
+// Pass 1: Extract all modules and declarations into nodeKeys
 for (const source of project.getSourceFiles()) {
   const path = normalize(source.getFilePath().replace(/^\/repo\//, ''));
   const moduleKey = addSymbol({ path, language: language(path), type: 'module', name: basename(path), qualified_name: path, start_line: 1, end_line: source.getEndLineNumber(), confidence: 'high', metadata: { semantic: true } });
@@ -81,6 +82,14 @@ for (const source of project.getSourceFiles()) {
     });
     if (key) nodeKeys.set(declaration, key);
   }
+}
+
+// Pass 2: Resolve all calls, imports, and cross-file relationships with complete nodeKeys index
+const typeChecker = project.getTypeChecker();
+
+for (const source of project.getSourceFiles()) {
+  const path = normalize(source.getFilePath().replace(/^\/repo\//, ''));
+  const moduleKey = moduleKeys.get(source) ?? null;
 
   for (const call of source.getDescendantsOfKind(SyntaxKind.CallExpression)) {
     const callerDeclaration = call.getFirstAncestor((ancestor) => nodeKeys.has(ancestor));
@@ -90,9 +99,29 @@ for (const source of project.getSourceFiles()) {
     if (!targetName) continue;
     let targetKey = null;
     try {
-      const symbol = call.getExpression().getSymbol();
-      const declaration = symbol?.getDeclarations()?.[0];
-      if (declaration && nodeKeys.has(declaration)) targetKey = nodeKeys.get(declaration);
+      const expr = call.getExpression();
+      const symbol = expr.getSymbol();
+      if (symbol) {
+        const decls = symbol.getDeclarations() ?? [];
+        for (const decl of decls) {
+          if (nodeKeys.has(decl)) {
+            targetKey = nodeKeys.get(decl);
+            break;
+          }
+          if (Node.isImportSpecifier(decl) || Node.isImportClause(decl)) {
+            try {
+              const aliased = typeChecker.getAliasedSymbol(symbol);
+              const aliasedDecls = aliased?.getDeclarations() ?? [];
+              for (const aDecl of aliasedDecls) {
+                if (nodeKeys.has(aDecl)) {
+                  targetKey = nodeKeys.get(aDecl);
+                  break;
+                }
+              }
+            } catch {}
+          }
+        }
+      }
     } catch {}
     addRelationship(callerKey, targetKey, targetKey ? null : targetName, 'calls', path, call.getStartLineNumber(), { semantic: true });
   }
