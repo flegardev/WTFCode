@@ -2,6 +2,24 @@
 
 declare(strict_types=1);
 
+/**
+ * 🎓 BEGINNER NOTE: Multi-Engine Static Analysis Evidence Fusion
+ * 
+ * Why Fuse Multiple Static Analysis Engines?
+ * 1. Complementary Strengths:
+ *    - Tree-Sitter WASM is lightning-fast and creates rich Abstract Syntax Trees (AST).
+ *    - ast-grep specializes in structural code pattern matching and security lint rules.
+ *    - ctags excels at cross-language symbol indexing.
+ *    - gitleaks / osv-scanner detect hardcoded secrets and known CVE vulnerabilities.
+ * 2. Deduplication & Provenance:
+ *    When two different tools find the same function (e.g. `UserController.login`),
+ *    `EvidenceFusion` normalizes their identities and merges them into a single canonical symbol node,
+ *    attaching provenance metadata so you know which engines confirmed the fact.
+ * 3. Confidence Weighting:
+ *    Corroborated facts (found by $\ge 2$ independent tools) receive `high` confidence,
+ *    reducing false positives.
+ */
+
 final class EvidenceFusion
 {
     private const MAX_SYMBOLS = 8000;
