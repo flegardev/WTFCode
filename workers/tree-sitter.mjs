@@ -11,6 +11,9 @@
  * 3. IPC Streaming (Inter-Process Communication):
  *    The PHP backend spawns this Node.js worker subprocess, pipes project source code via
  *    `stdin` JSON, and receives structured symbol relationship graphs via `stdout`.
+ * 4. Performance Modernization:
+ *    Reuses a single persistent Parser instance across files rather than repeatedly
+ *    allocating and deleting WASM memory buffers per file.
  */
 
 import { createHash } from 'node:crypto';
@@ -19,8 +22,23 @@ import { fileURLToPath } from 'node:url';
 import Parser from 'web-tree-sitter';
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+let input;
+try {
+  const raw = await readStdin();
+  input = raw ? JSON.parse(raw) : { files: [] };
+} catch (parseError) {
+  process.stdout.write(JSON.stringify({
+    symbols: [],
+    relationships: [],
+    routes: [],
+    stats: { symbols: 0, relationships: 0, routes: 0, parse_errors: 1, symbol_limit_reached: 0, relationship_limit_reached: 0 },
+    errors: [{ path: '<stdin>', line: 1, error: parseError?.name ?? 'JSONError', message: String(parseError?.message ?? '') }],
+  }));
+  process.exit(0);
+}
+
 await Parser.init();
-const input = JSON.parse(await readStdin());
 const files = Array.isArray(input.files) ? input.files : [];
 const symbols = [];
 const relationships = [];
@@ -32,27 +50,40 @@ let relationshipLimitReached = false;
 const loaded = new Map();
 const errors = [];
 
-for (const file of files) {
-  const grammar = grammarFor(file.path, file.language);
-  if (!grammar) continue;
-  try {
-    let language = loaded.get(grammar);
-    if (!language) {
-      language = await Parser.Language.load(join(here, '..', 'node_modules', 'tree-sitter-wasms', 'out', `tree-sitter-${grammar}.wasm`));
-      loaded.set(grammar, language);
+// Reuse a single Parser instance across all parsed files to avoid WASM re-allocation overhead
+const parser = new Parser();
+let currentGrammar = null;
+
+try {
+  for (const file of files) {
+    const grammar = grammarFor(file.path, file.language);
+    if (!grammar) continue;
+    try {
+      let language = loaded.get(grammar);
+      if (!language) {
+        language = await Parser.Language.load(join(here, '..', 'node_modules', 'tree-sitter-wasms', 'out', `tree-sitter-${grammar}.wasm`));
+        loaded.set(grammar, language);
+      }
+      if (currentGrammar !== grammar) {
+        parser.setLanguage(language);
+        currentGrammar = grammar;
+      }
+      const tree = parser.parse(String(file.content ?? ''));
+      const path = normalize(file.path);
+      const moduleKey = addSymbol({ path, language: String(file.language ?? grammar), type: 'module', name: basename(path), qualified_name: path, start_line: 1, end_line: Number(file.lines ?? 1), confidence: 'high', metadata: { grammar } });
+      walk(tree.rootNode, path, String(file.language ?? grammar), moduleKey, []);
+      const hasError = typeof tree.rootNode.hasError === 'function' ? tree.rootNode.hasError() : tree.rootNode.hasError;
+      if (hasError) errors.push({ path, line: firstErrorLine(tree.rootNode) });
+      tree.delete();
+    } catch (error) {
+      errors.push({ path: normalize(file.path), line: 1, error: error?.name ?? 'TreeSitterError', message: String(error?.message ?? '').slice(0, 300) });
     }
-    const parser = new Parser();
-    parser.setLanguage(language);
-    const tree = parser.parse(String(file.content ?? ''));
-    const path = normalize(file.path);
-    const moduleKey = addSymbol({ path, language: String(file.language ?? grammar), type: 'module', name: basename(path), qualified_name: path, start_line: 1, end_line: Number(file.lines ?? 1), confidence: 'high', metadata: { grammar } });
-    walk(tree.rootNode, path, String(file.language ?? grammar), moduleKey, []);
-    const hasError = typeof tree.rootNode.hasError === 'function' ? tree.rootNode.hasError() : tree.rootNode.hasError;
-    if (hasError) errors.push({ path, line: firstErrorLine(tree.rootNode) });
-    tree.delete();
+  }
+} finally {
+  try {
     parser.delete();
-  } catch (error) {
-    errors.push({ path: normalize(file.path), line: 1, error: error?.name ?? 'TreeSitterError', message: String(error?.message ?? '').slice(0, 300) });
+  } catch {
+    // Ignore cleanup on shutdown
   }
 }
 

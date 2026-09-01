@@ -3,7 +3,22 @@ import tsMorph from 'ts-morph';
 
 const { Node, Project, SyntaxKind, ts } = tsMorph;
 
-const input = JSON.parse(await readStdin());
+let input;
+try {
+  const raw = await readStdin();
+  input = raw ? JSON.parse(raw) : { files: [] };
+} catch (parseError) {
+  process.stdout.write(JSON.stringify({
+    symbols: [],
+    relationships: [],
+    routes: [],
+    findings: [],
+    stats: { symbols: 0, relationships: 0, routes: 0, findings: 0, parse_errors: 1 },
+    errors: [{ path: '<stdin>', line: 1, error: parseError?.name ?? 'JSONError', message: String(parseError?.message ?? '') }],
+  }));
+  process.exit(0);
+}
+
 const files = Array.isArray(input.files) ? input.files.filter((file) => /\.(?:[cm]?[jt]sx?)$/i.test(file.path ?? '')) : [];
 const project = new Project({
   useInMemoryFileSystem: true,
@@ -59,61 +74,101 @@ for (const source of project.getSourceFiles()) {
       parent_key: parentKey,
       start_line: declaration.getStartLineNumber(),
       end_line: declaration.getEndLineNumber(),
-      confidence: 'high',
+      signature: signature(declaration),
       exported: isExported(declaration),
-      visibility: visibility(declaration),
-      metadata: {
-        semantic: true,
-        syntax_kind: declaration.getKindName(),
-        type: safeType(declaration),
-      },
+      confidence: 'high',
+      metadata: { semantic: true, kind: declaration.getKindName() },
     });
-    nodeKeys.set(declaration, key);
-
-    if (Node.isClassDeclaration(declaration) || Node.isInterfaceDeclaration(declaration)) {
-      for (const heritage of [...(declaration.getExtends?.() ?? []), ...(declaration.getImplements?.() ?? [])]) {
-        addRelationship(key, null, safeName(heritage.getExpression?.().getText?.() ?? heritage.getText()), 'inherits', path, heritage.getStartLineNumber(), { semantic: true });
-      }
-    }
-  }
-
-  for (const importDeclaration of source.getImportDeclarations()) {
-    addRelationship(moduleKey, null, importDeclaration.getModuleSpecifierValue(), 'imports', path, importDeclaration.getStartLineNumber(), { semantic: true });
-  }
-  for (const exportDeclaration of source.getExportDeclarations()) {
-    const target = exportDeclaration.getModuleSpecifierValue();
-    if (target) addRelationship(moduleKey, null, target, 're_exports', path, exportDeclaration.getStartLineNumber(), { semantic: true });
+    if (key) nodeKeys.set(declaration, key);
   }
 
   for (const call of source.getDescendantsOfKind(SyntaxKind.CallExpression)) {
-    const expression = call.getExpression();
-    const sourceDeclaration = call.getFirstAncestor((ancestor) => nodeKeys.has(ancestor));
-    const sourceKey = sourceDeclaration ? nodeKeys.get(sourceDeclaration) : moduleKey;
+    const callerDeclaration = call.getFirstAncestor((ancestor) => nodeKeys.has(ancestor));
+    const callerKey = callerDeclaration ? nodeKeys.get(callerDeclaration) : moduleKey;
+    const text = call.getExpression().getText();
+    const targetName = safeCallName(text);
+    if (!targetName) continue;
     let targetKey = null;
-    let targetSymbol = expression.getSymbol?.() ?? (Node.isPropertyAccessExpression(expression) ? expression.getNameNode().getSymbol?.() : null);
-    if (targetSymbol?.isAlias?.()) targetSymbol = targetSymbol.getAliasedSymbol?.() ?? targetSymbol;
-    for (const declaration of targetSymbol?.getDeclarations?.() ?? []) {
-      if (nodeKeys.has(declaration)) { targetKey = nodeKeys.get(declaration); break; }
-      const owner = declaration.getFirstAncestor?.((ancestor) => nodeKeys.has(ancestor));
-      if (owner) { targetKey = nodeKeys.get(owner); break; }
-    }
-    addRelationship(sourceKey, targetKey, targetKey ? null : safeName(expression.getText()), 'calls', path, call.getStartLineNumber(), { semantic: targetKey !== null });
+    try {
+      const symbol = call.getExpression().getSymbol();
+      const declaration = symbol?.getDeclarations()?.[0];
+      if (declaration && nodeKeys.has(declaration)) targetKey = nodeKeys.get(declaration);
+    } catch {}
+    addRelationship(callerKey, targetKey, targetKey ? null : targetName, 'calls', path, call.getStartLineNumber(), { semantic: true });
   }
 
-  const jsxNodes = [
-    ...source.getDescendantsOfKind(SyntaxKind.JsxOpeningElement),
-    ...source.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement),
-  ];
-  for (const jsx of jsxNodes) {
-    const tag = jsx.getTagNameNode().getText();
-    if (!/^[A-Z]/.test(tag)) continue;
-    const sourceDeclaration = jsx.getFirstAncestor((ancestor) => nodeKeys.has(ancestor));
-    addRelationship(sourceDeclaration ? nodeKeys.get(sourceDeclaration) : moduleKey, null, tag, 'renders', path, jsx.getStartLineNumber(), { semantic: false });
+  for (const imp of source.getImportDeclarations()) {
+    const target = imp.getModuleSpecifierValue();
+    if (!target) continue;
+    addRelationship(moduleKey, null, target, 'imports', path, imp.getStartLineNumber(), { semantic: true });
   }
 }
 
-resolveRelationships();
-process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0, symbol_limit_reached: Number(symbolLimitReached), relationship_limit_reached: Number(relationshipLimitReached) } }));
+for (const source of project.getSourceFiles()) {
+  const path = normalize(source.getFilePath().replace(/^\/repo\//, ''));
+  const nextAppRoute = routeFromNextAppPath(path);
+  if (nextAppRoute) {
+    const moduleKey = modulePathKeys.get(path) ?? null;
+    for (const exp of source.getExportedDeclarations().keys()) {
+      const verb = String(exp).toUpperCase();
+      if (['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'].includes(verb)) {
+        routes.push({
+          path: nextAppRoute,
+          method: verb,
+          framework: 'nextjs',
+          handler_symbol_key: moduleKey,
+          confidence: 'high',
+          evidence_path: path,
+          line: 1,
+          metadata: { app_router: true },
+        });
+      }
+    }
+  }
+}
+
+process.stdout.write(JSON.stringify({ symbols, relationships, routes, findings: [], stats: { symbols: symbols.length, relationships: relationships.length, routes: routes.length, findings: 0, symbol_limit_reached: Number(symbolLimitReached), relationship_limit_reached: Number(relationshipLimitReached) } }));
+
+function declarationType(node) {
+  if (Node.isClassDeclaration(node)) return 'class';
+  if (Node.isInterfaceDeclaration(node)) return 'interface';
+  if (Node.isEnumDeclaration(node)) return 'enum';
+  if (Node.isTypeAliasDeclaration(node)) return 'type_alias';
+  if (Node.isFunctionDeclaration(node)) return 'function';
+  if (Node.isMethodDeclaration(node)) return 'method';
+  if (Node.isConstructorDeclaration(node)) return 'method';
+  if (Node.isVariableDeclaration(node)) {
+    const init = node.getInitializer();
+    if (init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))) return 'function';
+  }
+  return null;
+}
+
+function declarationName(node) {
+  if (Node.isVariableDeclaration(node) || Node.isClassDeclaration(node) || Node.isInterfaceDeclaration(node) || Node.isEnumDeclaration(node) || Node.isTypeAliasDeclaration(node) || Node.isFunctionDeclaration(node) || Node.isMethodDeclaration(node)) {
+    const text = node.getName?.() ?? node.getNameNode?.()?.getText();
+    return safeIdentifier(text);
+  }
+  if (Node.isConstructorDeclaration(node)) return 'constructor';
+  return null;
+}
+
+function isExported(node) {
+  if (Node.isExportable(node)) return node.isExported();
+  const parent = node.getParent();
+  return parent && Node.isExportable(parent) ? parent.isExported() : false;
+}
+
+function classify(descriptor, name) {
+  if (descriptor === 'function' && /^use[A-Z0-9]/.test(name)) return 'hook';
+  if (descriptor === 'function' && /^[A-Z][A-Za-z0-9]*$/.test(name)) return 'component';
+  return descriptor;
+}
+
+function signature(node) {
+  const text = node.getText().split('\n')[0]?.trim() ?? '';
+  return text.length <= 200 ? text.replace(/\s*\{.*$/, '') : null;
+}
 
 function addSymbol(symbol) {
   const key = hash([symbol.path, symbol.type, symbol.qualified_name, symbol.start_line].join('|'));
@@ -123,102 +178,29 @@ function addSymbol(symbol) {
 }
 
 function addRelationship(sourceKey, targetKey, externalName, type, path, line, metadata) {
-  if (!sourceKey || (!targetKey && !externalName)) return;
+  if (!sourceKey) return;
   if (relationships.length >= MAX_RELATIONSHIPS) { relationshipLimitReached = true; return; }
-  relationships.push({ source_key: sourceKey, target_key: targetKey, external_name: externalName, target_name: externalName ?? '', type, confidence: targetKey ? 'high' : 'medium', evidence_path: path, line_start: line, line_end: line, excerpt: null, metadata });
+  relationships.push({ source_key: sourceKey, target_key: targetKey, external_name: externalName, target_name: externalName ?? '', type, confidence: 'high', evidence_path: path, line_start: line, line_end: line, excerpt: null, metadata });
 }
 
-function resolveRelationships() {
-  const byName = new Map();
-  for (const symbol of symbols) {
-    if (symbol.type === 'module') continue;
-    const list = byName.get(symbol.name) ?? [];
-    list.push(symbol.key);
-    byName.set(symbol.name, list);
-  }
-  for (const edge of relationships) {
-    if (edge.target_key || !edge.external_name) continue;
-    if (edge.type === 'imports' || edge.type === 're_exports') {
-      const target = resolveModule(edge.evidence_path, edge.external_name);
-      if (target) {
-        edge.target_key = target;
-        edge.external_name = null;
-        edge.confidence = 'high';
-        edge.metadata.semantic = true;
-      }
-      continue;
-    }
-    if (edge.type !== 'calls' && edge.type !== 'renders') continue;
-    const shortName = edge.external_name.split(/[.:#]/).pop();
-    const candidates = byName.get(shortName) ?? [];
-    if (candidates.length === 1) {
-      edge.target_key = candidates[0];
-      edge.external_name = null;
-      edge.target_name = shortName;
-      edge.confidence = 'high';
-      edge.metadata.semantic = true;
-      edge.metadata.resolution = 'unique-project-symbol';
-    }
-  }
+function routeFromNextAppPath(path) {
+  const match = path.match(/^app\/(.+)\/route\.(?:[jt]sx?)$/i);
+  if (!match) return null;
+  const raw = '/' + match[1].replace(/\/page$/, '').replace(/\/route$/, '');
+  return raw.replace(/\[\.\.\.([^\]]+)\]/g, '*$1').replace(/\[([^\]]+)\]/g, ':$1');
 }
 
-function resolveModule(sourcePath, specifier) {
-  if (!specifier.startsWith('.')) return null;
-  const parts = sourcePath.split('/');
-  parts.pop();
-  for (const part of specifier.split('/')) {
-    if (!part || part === '.') continue;
-    if (part === '..') parts.pop(); else parts.push(part);
-  }
-  const base = parts.join('/');
-  for (const candidate of [base, `${base}.ts`, `${base}.tsx`, `${base}.js`, `${base}.jsx`, `${base}/index.ts`, `${base}/index.tsx`, `${base}/index.js`]) {
-    if (modulePathKeys.has(candidate)) return modulePathKeys.get(candidate);
-  }
-  return null;
+function language(path) {
+  const lower = String(path ?? '').toLowerCase();
+  if (lower.endsWith('.tsx')) return 'TSX';
+  if (lower.endsWith('.jsx')) return 'JSX';
+  if (/\.(ts|mts|cts)$/.test(lower)) return 'TypeScript';
+  return 'JavaScript';
 }
 
-function declarationType(node) {
-  if (Node.isClassDeclaration(node)) return 'class';
-  if (Node.isInterfaceDeclaration(node)) return 'interface';
-  if (Node.isEnumDeclaration(node)) return 'enum';
-  if (Node.isTypeAliasDeclaration(node)) return 'type_alias';
-  if (Node.isFunctionDeclaration(node)) return 'function';
-  if (Node.isMethodDeclaration(node) || Node.isConstructorDeclaration(node)) return 'method';
-  if (Node.isPropertyDeclaration(node)) return 'property';
-  if (Node.isVariableDeclaration(node) && (Node.isArrowFunction(node.getInitializer()) || Node.isFunctionExpression(node.getInitializer()))) return 'function';
-  return null;
-}
-
-function declarationName(node) {
-  if (Node.isConstructorDeclaration(node)) return 'constructor';
-  return node.getName?.() ?? null;
-}
-
-function classify(type, name) {
-  if (type === 'function' && /^use[A-Z0-9]/.test(name)) return 'hook';
-  if (type === 'function' && /^[A-Z]/.test(name)) return 'component';
-  return type;
-}
-
-function isExported(node) { return Boolean(node.isExported?.() || node.isDefaultExport?.()); }
-function visibility(node) {
-  const scope = node.getScope?.();
-  return ['public', 'protected', 'private'].includes(scope) ? scope : 'unknown';
-}
-function safeType(node) {
-  const text = node.getTypeNode?.()?.getText?.();
-  return text ? text.slice(0, 300) : null;
-}
-function safeName(value) {
-  const name = String(value ?? '').trim();
-  return /^[A-Za-z_$][A-Za-z0-9_.$#:/@-]{0,299}$/.test(name) ? name : '<dynamic>';
-}
-function language(path) { return /\.(?:tsx?|mts|cts)$/i.test(path) ? 'TypeScript' : 'JavaScript'; }
+function safeIdentifier(value) { const text = String(value ?? '').trim(); return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(text) ? text : null; }
+function safeCallName(value) { const text = String(value ?? '').trim(); return /^[A-Za-z_$][A-Za-z0-9_.$:#-]{0,299}$/.test(text) ? text : null; }
 function normalize(path) { return String(path).replaceAll('\\', '/').replace(/^\/+/, ''); }
 function basename(path) { return path.split('/').pop() ?? path; }
 function hash(value) { return createHash('sha256').update(value).digest('hex'); }
-async function readStdin() {
-  const chunks = [];
-  for await (const chunk of process.stdin) chunks.push(chunk);
-  return Buffer.concat(chunks).toString('utf8');
-}
+async function readStdin() { const chunks = []; for await (const chunk of process.stdin) chunks.push(chunk); return Buffer.concat(chunks).toString('utf8'); }

@@ -1,6 +1,21 @@
 import astGrep from '@ast-grep/napi';
 
-const input = JSON.parse(await readStdin());
+let input;
+try {
+  const raw = await readStdin();
+  input = raw ? JSON.parse(raw) : { files: [] };
+} catch (parseError) {
+  process.stdout.write(JSON.stringify({
+    symbols: [],
+    relationships: [],
+    routes: [],
+    findings: [],
+    stats: { symbols: 0, relationships: 0, routes: 0, findings: 0, parse_errors: 1 },
+    errors: [{ path: '<stdin>', line: 1, error: parseError?.name ?? 'JSONError', message: String(parseError?.message ?? '') }],
+  }));
+  process.exit(0);
+}
+
 const files = Array.isArray(input.files) ? input.files : [];
 const findings = [];
 const seen = new Set();
