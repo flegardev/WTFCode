@@ -1,11 +1,24 @@
-/**
- * 🎓 BEGINNER NOTE: WTFCode Codebase Archaeologist
- * Multi-engine static code analysis platform for exploring symbols, AST dependencies, route maps, and security findings across large codebases.
- * Tech Stack: PHP 8.4, Node.js, Web-Tree-Sitter (WASM), Cytoscape.js, SQLite/PostgreSQL, ast-grep
- */
 <?php
 
 declare(strict_types=1);
+
+/**
+ * 🎓 BEGINNER NOTE: Application Bootstrap & Environment Initialization
+ * 
+ * This file is the global entry point for all HTTP and CLI requests in WTFCode.
+ * 
+ * Core Architectural Responsibilities:
+ * 1. PSR-4 / Fallback Class Autoloading:
+ *    Registers `spl_autoload_register` so PHP classes in `/src` and `/src/Analysis`
+ *    are automatically imported into memory on first reference without manual `require` statements.
+ * 2. Centralized Exception & Crash Handler (`set_exception_handler`):
+ *    Intercepts uncaught runtime errors, logs stack traces via `Logger::error`,
+ *    and sanitizes sensitive database passwords or credentials using `SensitiveDataSanitizer`.
+ * 3. HTTP Security Headers:
+ *    Injects Content-Security-Policy (CSP), Strict-Transport-Security (HSTS), and X-Frame-Options.
+ * 4. Hardened PHP Sessions:
+ *    Configures `HttpOnly`, `SameSite=Lax`, and strict cookie flags to prevent session hijacking.
+ */
 
 $composerAutoload = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 if (is_file($composerAutoload)) {
@@ -87,4 +100,3 @@ foreach ([
 ] as $file) {
     require_once __DIR__ . DIRECTORY_SEPARATOR . $file;
 }
-

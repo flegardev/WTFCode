@@ -1,3 +1,18 @@
+/**
+ * 🎓 BEGINNER NOTE: WebAssembly Tree-Sitter AST Static Analysis Worker
+ * 
+ * How Multi-Language AST Parsing Works:
+ * 1. Tree-Sitter & WebAssembly (WASM):
+ *    Tree-Sitter compiles formal language grammars (C, Python, JS, PHP, Go, Rust) into
+ *    high-speed WebAssembly binaries (`.wasm`).
+ * 2. Abstract Syntax Tree (AST):
+ *    Parses source code text into a concrete syntax tree representing classes, functions,
+ *    method invocations, imports, and variables with exact line/column byte offsets.
+ * 3. IPC Streaming (Inter-Process Communication):
+ *    The PHP backend spawns this Node.js worker subprocess, pipes project source code via
+ *    `stdin` JSON, and receives structured symbol relationship graphs via `stdout`.
+ */
+
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
