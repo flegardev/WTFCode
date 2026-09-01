@@ -1,3 +1,8 @@
+/**
+ * 🎓 BEGINNER NOTE: WTFCode Codebase Archaeologist
+ * Multi-engine static code analysis platform for exploring symbols, AST dependencies, route maps, and security findings across large codebases.
+ * Tech Stack: PHP 8.4, Node.js, Web-Tree-Sitter (WASM), Cytoscape.js, SQLite/PostgreSQL, ast-grep
+ */
 <?php
 
 declare(strict_types=1);
@@ -82,3 +87,4 @@ foreach ([
 ] as $file) {
     require_once __DIR__ . DIRECTORY_SEPARATOR . $file;
 }
+
