@@ -11,17 +11,23 @@ final class AnalysisCoordinator
     ) {
     }
 
-    /** @return array<string, mixed> */
-    public function analyze(AnalysisRequest $request): array
+    /**
+     * @param null|callable(string, int, int): void $checkpoint
+     * @return array<string, mixed>
+     */
+    public function analyze(AnalysisRequest $request, ?callable $checkpoint = null): array
     {
         $results = [];
-        foreach ($this->registry->all() as $index => $provider) {
+        $providers = $this->registry->all();
+        $providerTotal = count($providers);
+        foreach ($providers as $index => $provider) {
             $id = 'provider-' . $index;
             $version = 'unknown';
             try {
                 $id = $provider->id();
                 $version = $provider->version();
                 if (!AnalysisProfile::includes($request->profile(), $id)) continue;
+                if ($checkpoint !== null) $checkpoint($id, $index + 1, $providerTotal);
                 if (!$provider->isAvailable()) {
                     $results[] = AnalyzerResult::unavailable($id, $version, 'Analyzer is not installed or not supported on this machine.');
                     continue;
@@ -46,6 +52,8 @@ final class AnalysisCoordinator
                 $result = new AnalyzerResult($result->engine, $result->engineVersion, $result->status, $result->graph, $result->findings, $result->durationMs, $result->message, $execution);
                 $this->cache->save($request, $provider, $result);
                 $results[] = $result;
+            } catch (ScanLeaseLostException $exception) {
+                throw $exception;
             } catch (Throwable $exception) {
                 $results[] = AnalyzerResult::failed($id, $version, 'Analyzer failed independently: ' . get_class($exception));
             }

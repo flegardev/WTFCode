@@ -21,7 +21,7 @@ $finder = Finder::create()
 return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
-        '@PER-CS2.0' => true,
+        '@PER-CS2x0' => true,
         'array_syntax' => ['syntax' => 'short'],
         'declare_strict_types' => true,
         'no_unused_imports' => true,

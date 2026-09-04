@@ -100,8 +100,9 @@ require __DIR__ . '/../views/header.php';
     <section class="scan-summary-line" aria-label="Latest scan status" data-scan-progress data-scan-project="<?= (int) $project['id'] ?>" data-scan-endpoint="<?= e(url('scan-status.php?id=' . (int) $project['id'])) ?>">
         <span class="scan-state <?= e((string) ($latestJob['state'] ?? $project['status'])) ?>" data-scan-state><?= e(ucfirst((string) ($latestJob['state'] ?? $project['status']))) ?></span>
         <strong data-scan-stage><?= e($jobSummary) ?></strong>
-        <span class="scan-progress-count" data-scan-count><?= $latestJob !== null && (int) ($latestJob['progress_total'] ?? 0) > 0 ? (int) ($latestJob['progress_current'] ?? 0) . ' of ' . (int) $latestJob['progress_total'] : '' ?></span>
-        <progress data-scan-meter max="<?= max(1, (int) ($latestJob['progress_total'] ?? 1)) ?>" value="<?= max(0, (int) ($latestJob['progress_current'] ?? 0)) ?>"<?= $latestJob === null || (int) ($latestJob['progress_total'] ?? 0) < 1 ? ' hidden' : '' ?>>Analysis progress</progress>
+        <?php $latestJobTerminal = $latestJob !== null && in_array((string) ($latestJob['state'] ?? ''), ['completed', 'partial', 'failed'], true); ?>
+        <span class="scan-progress-count" data-scan-count><?= $latestJob !== null && !$latestJobTerminal && (int) ($latestJob['progress_total'] ?? 0) > 0 ? (int) ($latestJob['progress_current'] ?? 0) . ' of ' . (int) $latestJob['progress_total'] . ' scan stages' : '' ?></span>
+        <progress data-scan-meter max="<?= max(1, (int) ($latestJob['progress_total'] ?? 1)) ?>" value="<?= max(0, (int) ($latestJob['progress_current'] ?? 0)) ?>"<?= $latestJob === null || $latestJobTerminal || (int) ($latestJob['progress_total'] ?? 0) < 1 ? ' hidden' : '' ?>>Scan-stage progress</progress>
         <span class="scan-progress-error" data-scan-error role="alert" hidden></span>
         <a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>" data-scan-reload hidden>Refresh evidence</a>
         <a href="<?= e(url('analyzers.php?id=' . (int) $project['id'])) ?>">Scan details</a>

@@ -4,12 +4,6 @@ on:
   push:
   pull_request:
   workflow_dispatch:
-    inputs:
-      run_database_tests:
-        description: Run the disposable PostgreSQL integration tier
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -72,11 +66,10 @@ jobs:
       - name: Check formatting
         run: composer format:check
 
-  postgres-integration:
-    name: Disposable PostgreSQL integration
-    if: github.event_name == 'workflow_dispatch' && inputs.run_database_tests
+  full-suite:
+    name: Database, security, and E2E suite
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     services:
       postgres:
         image: postgres:17
@@ -109,16 +102,25 @@ jobs:
           coverage: none
           tools: composer:v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install analysis worker dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install pinned security analyzers
+        run: bash tools/install-security-tools.sh
 
       - name: Apply canonical PostgreSQL schema
         env:
           PGPASSWORD: postgres
         run: psql --host=127.0.0.1 --username=postgres --dbname=wtfcode --set=ON_ERROR_STOP=1 --file=supabase/production-schema.sql
 
-      - name: Run database integration tier
-        run: composer test:integration
-
-      - name: Verify production database contracts
-        run: composer test:production
+      - name: Run the complete reproducible test matrix
+        run: composer test:all

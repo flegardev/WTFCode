@@ -72,6 +72,7 @@ abstract class NodeWorkerAnalyzerProvider implements AnalyzerProviderInterface
             if (!is_array($graph) || !is_array($graph['symbols'] ?? null) || !is_array($graph['relationships'] ?? null) || !is_array($graph['routes'] ?? null)) {
                 throw new UnexpectedValueException('Worker returned an invalid graph envelope.');
             }
+            $graph['relationships'] = $this->normalizeRelationships($graph['relationships']);
             $errors = is_array($graph['errors'] ?? null) ? $graph['errors'] : [];
             $findings = is_array($graph['findings'] ?? null) ? $graph['findings'] : [];
             unset($graph['errors']);
@@ -95,6 +96,55 @@ abstract class NodeWorkerAnalyzerProvider implements AnalyzerProviderInterface
     private function root(): string
     {
         return dirname(__DIR__, 2);
+    }
+
+    /**
+     * Keep the analyzer boundary compatible with older pinned workers while
+     * exposing one relationship contract to evidence fusion and persistence.
+     *
+     * @param array<int, mixed> $relationships
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeRelationships(array $relationships): array
+    {
+        $normalized = [];
+        foreach ($relationships as $relationship) {
+            if (!is_array($relationship)) continue;
+
+            $sourceKey = $relationship['source_key'] ?? $relationship['from_key'] ?? null;
+            $targetKey = $relationship['target_key'] ?? $relationship['to_key'] ?? null;
+            $targetName = (string) ($relationship['target_name'] ?? $relationship['to_name'] ?? $relationship['external_name'] ?? '');
+            $externalName = array_key_exists('external_name', $relationship)
+                ? $relationship['external_name']
+                : ($targetKey === null && $targetName !== '' ? $targetName : null);
+            $evidencePath = str_replace('\\', '/', (string) ($relationship['evidence_path'] ?? $relationship['path'] ?? ''));
+            $lineStart = max(1, (int) ($relationship['line_start'] ?? $relationship['line'] ?? 1));
+            $lineEnd = max($lineStart, (int) ($relationship['line_end'] ?? $lineStart));
+            $metadata = is_array($relationship['metadata'] ?? null) ? $relationship['metadata'] : [];
+
+            unset(
+                $relationship['from_key'],
+                $relationship['to_key'],
+                $relationship['to_name'],
+                $relationship['path'],
+                $relationship['line'],
+            );
+            $normalized[] = [
+                'source_key' => $sourceKey === null ? null : (string) $sourceKey,
+                'target_key' => $targetKey === null ? null : (string) $targetKey,
+                'external_name' => $externalName === null ? null : (string) $externalName,
+                'target_name' => $targetName,
+                'type' => (string) ($relationship['type'] ?? 'relationship'),
+                'confidence' => (string) ($relationship['confidence'] ?? 'medium'),
+                'evidence_path' => $evidencePath,
+                'line_start' => $lineStart,
+                'line_end' => $lineEnd,
+                'excerpt' => isset($relationship['excerpt']) ? (string) $relationship['excerpt'] : null,
+                'metadata' => $metadata,
+            ] + $relationship;
+        }
+
+        return $normalized;
     }
 
     /** @return array<string, mixed> */

@@ -121,7 +121,7 @@ WTFCode/
    php -S localhost:8000 -t public
    ```
 
-6. Open [http://localhost:8000](http://localhost:8000) in your browser.
+8. Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ## Configuration
 
@@ -154,16 +154,19 @@ WTF_CODE_OLLAMA_ENDPOINT=http://127.0.0.1:11434/api/chat
 | Command | Description |
 |---|---|
 | `composer test` | Runs PHPUnit plus the portable regression suite; no database or external analyzer binary is required |
+| `composer test:all` | Runs every tier after PostgreSQL, Node dependencies, security tools, Git, and outbound test access are available |
 | `composer test:analyzers` | Runs AST worker integration checks after `npm ci` |
 | `composer test:integration` | Runs tests that require a disposable migrated PostgreSQL database |
 | `composer test:security` | Runs PostgreSQL security tests with the binaries pinned in `config/tool-manifest.json` |
-| `composer test:e2e` | Runs the opt-in public GitHub import check, which requires outbound network access |
+| `composer test:e2e` | Runs the public GitHub import check, which requires outbound network access |
 | `composer lint` | Syntax-checks every project PHP file without executing application code |
 | `composer analyse` | Runs PHPStan against the application, entrypoints, and tools |
 | `composer format:check` | Reports formatting differences in new PSR-4 code and PHPUnit tests |
 | `composer verify` | Runs the portable lint, test, static-analysis, and formatting gates |
 | `composer worker` | Runs the durable scan worker loop; deploy this as a separate long-running process |
 | `composer worker:once` | Claims and processes at most one available scan job |
+| `pwsh tools/install-security-tools.ps1` | Installs hash-pinned Windows security analyzers into the ignored `tools/bin` directory |
+| `bash tools/install-security-tools.sh` | Installs hash-pinned Linux security analyzers for local or CI use |
 | `npm run check:workers` | Validates syntax and loading of all Node.js AST worker threads |
 | `php -S localhost:8000 -t public` | Starts local PHP development server on port 8000 |
 | `composer validate --strict` | Validates `composer.json` and its lock file |

@@ -26,7 +26,7 @@ if (is_post()) {
 }
 if (!in_array($targetType, $targetTypes, true)) $targetType = 'feature';
 
-$impact = $target === '' ? null : (new ChangeImpactService())->forTarget((int) $project['id'], $target);
+$impact = $target === '' ? null : (new ChangeImpactService())->forTarget((int) $project['id'], $target, $targetType);
 $trace = $impact['trace'] ?? null;
 $promptRequest = $request !== '' ? $request : ($target === '' ? '' : 'Change ' . $targetType . ' "' . $target . '" safely.');
 $safePrompt = $promptRequest === '' ? null : PromptSafetyService::build((int) $project['id'], $promptRequest);

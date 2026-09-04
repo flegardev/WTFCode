@@ -9,12 +9,62 @@ function change_assert(bool $condition, string $message): void
     if (!$condition) throw new RuntimeException($message);
 }
 
-$repository = realpath(__DIR__ . '/..');
-change_assert(is_string($repository), 'Repository path must resolve');
-$semantic = new ReflectionMethod(GitDiffService::class, 'semanticDelta');
-$delta = $semantic->invoke(null, $repository, '8ea9276', '8f62122', ['composer.json', 'package.json', 'src/Analysis/AnalyzerRegistry.php', 'workers/typescript-semantic.mjs']);
-change_assert(isset($delta['dependencies'], $delta['architecture'], $delta['security']), 'Semantic diff must cover dependencies, architecture, and security');
-change_assert($delta['dependencies']['added'] !== [] || $delta['dependencies']['removed'] !== [], 'AST engine checkpoint should expose dependency change evidence');
+function change_git(string $directory, array $arguments): string
+{
+    $result = (new SafeProcessRunner())->run(new ProcessRunRequest(array_merge(['git', '-C', $directory], $arguments), $directory, 20, 1_048_576, 262_144));
+    if (!$result->succeeded()) throw new RuntimeException('The isolated Git fixture command failed.');
+
+    return trim($result->stdout);
+}
+
+function change_remove_directory(string $directory): void
+{
+    $temporaryRoot = rtrim(str_replace('\\', '/', sys_get_temp_dir()), '/');
+    $normalized = str_replace('\\', '/', $directory);
+    $allowed = str_starts_with($normalized, $temporaryRoot . '/wtfcode-diff-')
+        || str_starts_with($normalized, $temporaryRoot . '/wtfcode-change-');
+    if (!$allowed || !is_dir($directory)) return;
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST,
+    );
+    foreach ($iterator as $item) {
+        if ($item->isDir()) {
+            @chmod($item->getPathname(), 0700);
+            @rmdir($item->getPathname());
+        } else {
+            @chmod($item->getPathname(), 0600);
+            @unlink($item->getPathname());
+        }
+    }
+    @chmod($directory, 0700);
+    @rmdir($directory);
+}
+
+$diffDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wtfcode-diff-' . bin2hex(random_bytes(6));
+mkdir($diffDirectory, 0700, true);
+try {
+    change_git($diffDirectory, ['init', '--quiet']);
+    change_git($diffDirectory, ['config', 'user.name', 'WTFCode test']);
+    change_git($diffDirectory, ['config', 'user.email', 'test@wtfcode.local']);
+    file_put_contents($diffDirectory . DIRECTORY_SEPARATOR . 'composer.json', "{\n  \"require\": {\n    \"php\": \"^8.3\"\n  }\n}\n");
+    change_git($diffDirectory, ['add', 'composer.json']);
+    change_git($diffDirectory, ['commit', '--quiet', '-m', 'baseline dependencies']);
+    $fromRevision = change_git($diffDirectory, ['rev-parse', 'HEAD']);
+
+    file_put_contents($diffDirectory . DIRECTORY_SEPARATOR . 'composer.json', "{\n  \"require\": {\n    \"php\": \"^8.3\",\n    \"nikic/php-parser\": \"^5.0\"\n  }\n}\n");
+    change_git($diffDirectory, ['add', 'composer.json']);
+    change_git($diffDirectory, ['commit', '--quiet', '-m', 'add parser dependency']);
+    $toRevision = change_git($diffDirectory, ['rev-parse', 'HEAD']);
+
+    $semantic = new ReflectionMethod(GitDiffService::class, 'semanticDelta');
+    $delta = $semantic->invoke(null, $diffDirectory, $fromRevision, $toRevision, ['composer.json']);
+    change_assert(isset($delta['dependencies'], $delta['architecture'], $delta['security']), 'Semantic diff must cover dependencies, architecture, and security');
+    change_assert($delta['dependencies']['added'] !== [] || $delta['dependencies']['removed'] !== [], 'AST engine checkpoint should expose dependency change evidence');
+} finally {
+    change_remove_directory($diffDirectory);
+}
 
 $scope = new ReflectionMethod(GitDiffService::class, 'scopeDrift');
 $scopeResult = $scope->invoke(null, 'Add Google login', ['Authentication and access', 'Data and schema', 'Tests'], ['architecture' => []]);
@@ -32,9 +82,25 @@ mkdir($directory, 0700, true);
 $userId = null;
 try {
     file_put_contents($directory . DIRECTORY_SEPARATOR . 'route.php', "<?php\nfunction health() { return ['ok' => true]; }\n");
+    mkdir($directory . DIRECTORY_SEPARATOR . 'routes', 0700, true);
+    mkdir($directory . DIRECTORY_SEPARATOR . 'src', 0700, true);
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'routes' . DIRECTORY_SEPARATOR . 'billing.ts', "import { BillingService } from '../src/BillingService';\nrouter.post('/billing/invoices', BillingService.createInvoice);\n");
+    file_put_contents($directory . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'BillingService.ts', "export class BillingService {\n  createInvoice() {\n    const stripe = new StripeClient();\n    return stripe.invoices.create({ customer: 'runtime' });\n  }\n}\n");
     $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Change test', 'email' => 'change-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
     $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Change fixture', 'repository_url' => 'https://github.com/wtfcode-change/' . $token . '.git', 'local_path' => $directory, 'status' => 'scanning']);
     (new RepoScanner())->scan($projectId, $directory, AnalysisProfile::QUICK);
+    $changeImpact = new \WTFCode\Application\ChangeImpactService();
+    $symbolImpact = $changeImpact->forTarget($projectId, 'BillingService', 'symbol');
+    change_assert(in_array('Stripe', array_column($symbolImpact['services'], 'name'), true), 'Symbol impact must aggregate external services reached through blast-radius evidence');
+    change_assert($symbolImpact['risk']['level'] === 'high', 'External-service boundaries must escalate change risk');
+    change_assert((bool) array_filter($symbolImpact['recommendations'], static fn(string $item): bool => str_contains($item, 'timeout')), 'External-service impact must recommend timeout and retry verification');
+
+    $fileImpact = $changeImpact->forTarget($projectId, 'routes/billing.ts', 'file');
+    change_assert($fileImpact['target_type'] === 'file' && $fileImpact['files'] !== [], 'File targets must resolve as files instead of generic feature searches');
+    change_assert($fileImpact['routes'] !== [], 'A route file target must retain its affected HTTP route');
+
+    $routeImpact = $changeImpact->forTarget($projectId, 'POST /billing/invoices', 'route');
+    change_assert($routeImpact['target_type'] === 'route' && count($routeImpact['routes']) === 1, 'Method-qualified route targets must resolve only the selected route');
     $before = ChangeGuardService::capture($projectId, $userId, 'before', 'before', 'Add status route');
     try {
         ChangeGuardService::capture($projectId, $userId, 'after', 'after', 'Add status route', (int) $before['id']);
@@ -55,8 +121,7 @@ try {
     change_assert(!preg_match('/github_pat_|sk-proj-|PRIVATE KEY/', $stored), 'Change Guard snapshots must not contain secret-shaped values');
 } finally {
     if ($userId !== null) $pdo->prepare('DELETE FROM users WHERE id = :id')->execute(['id' => $userId]);
-    foreach (glob($directory . DIRECTORY_SEPARATOR . '*') ?: [] as $file) @unlink($file);
-    @rmdir($directory);
+    change_remove_directory($directory);
 }
 
 echo "WTFCode V3 change intelligence checks passed.\n";

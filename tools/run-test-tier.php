@@ -26,6 +26,7 @@ $tiers = [
         'tests/V3ChangeTest.php',
         'tests/V3ExplanationTest.php',
         'tests/V3PerformanceTest.php',
+        'tests/QueueRuntimeTest.php',
     ],
     'security' => [
         'tests/V3SecurityTest.php',

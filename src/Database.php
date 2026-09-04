@@ -29,11 +29,35 @@ final class Database
             }
         } catch (PDOException $exception) {
             Logger::error('Database connection failed', ['code' => $exception->getCode()]);
-            self::$connection = null;
+            self::disconnect();
             throw new RuntimeException('WTFCode could not connect to its database.', 0, $exception);
         }
 
         return self::$connection;
+    }
+
+    /**
+     * Release the cached connection so a supervised worker or a later request
+     * cannot keep reusing a broken PDO handle. Any open transaction is rolled
+     * back when the connection is still healthy enough to do so.
+     */
+    public static function disconnect(): void
+    {
+        $connection = self::$connection;
+        self::$connection = null;
+
+        if (!$connection instanceof PDO) {
+            return;
+        }
+
+        try {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+        } catch (Throwable) {
+            // A broken connection may not be able to report or roll back its
+            // transaction. Dropping the final handle still prevents reuse.
+        }
     }
 
     public static function driver(): string

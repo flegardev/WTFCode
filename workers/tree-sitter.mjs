@@ -32,6 +32,7 @@ const MAX_RELATIONSHIPS = 4000;
 let symbolLimitReached = false;
 let relationshipLimitReached = false;
 const loaded = new Map();
+const modulePathKeys = new Map();
 const errors = [];
 
 // 3. Process each source file through its respective language grammar
@@ -54,6 +55,12 @@ for (const file of files) {
     
     // Record top-level file module symbol
     const moduleKey = addSymbol({ path, language: String(file.language ?? grammar), type: 'module', name: basename(path), qualified_name: path, start_line: 1, end_line: Number(file.lines ?? 1), confidence: 'high', metadata: { grammar } });
+    modulePathKeys.set(path, moduleKey);
+
+    // Import relationships are derived from parsed statement nodes only. The
+    // worker records module specifiers as evidence, but never loads or executes
+    // the imported code.
+    extractModuleRelationships(tree.rootNode, path, grammar, moduleKey);
     
     // Recursively walk AST nodes to discover functions, classes, and calls
     walk(tree.rootNode, path, String(file.language ?? grammar), moduleKey, []);
@@ -70,6 +77,7 @@ for (const file of files) {
 }
 
 // 4. Output final extracted symbols and relationship graphs to STDOUT for PHP ingestion
+resolveRelationships();
 process.stdout.write(JSON.stringify({ symbols, relationships, routes, stats: { symbols: symbols.length, relationships: relationships.length, routes: 0, parse_errors: errors.length, symbol_limit_reached: Number(symbolLimitReached), relationship_limit_reached: Number(relationshipLimitReached) }, errors }));
 
 function walk(node, path, languageName, moduleKey, scope) {
@@ -90,12 +98,17 @@ function walk(node, path, languageName, moduleKey, scope) {
     const target = safeIdentifier(functionNode?.text);
     if (target) {
       addRelationship({
-        from_key: scope.at(-1)?.key ?? moduleKey,
+        source_key: scope.at(-1)?.key ?? moduleKey,
+        target_key: null,
+        external_name: target,
+        target_name: target,
         type: 'calls',
-        to_name: target,
-        path,
-        line: node.startPosition.row + 1,
         confidence: 'medium',
+        evidence_path: path,
+        line_start: node.startPosition.row + 1,
+        line_end: node.startPosition.row + 1,
+        excerpt: null,
+        metadata: { syntax: true, grammar_node: node.type },
       });
     }
   }
@@ -116,11 +129,128 @@ function addSymbol(symbol) {
 }
 
 function addRelationship(rel) {
+  if (!rel.source_key || (!rel.target_key && !rel.external_name)) return;
   if (relationships.length >= MAX_RELATIONSHIPS) {
     relationshipLimitReached = true;
     return;
   }
   relationships.push(rel);
+}
+
+function extractModuleRelationships(root, path, grammar, moduleKey) {
+  const visit = (node) => {
+    const relationship = moduleRelationship(node, grammar);
+    if (relationship) {
+      addRelationship({
+        source_key: moduleKey,
+        target_key: null,
+        external_name: relationship.specifier,
+        target_name: relationship.specifier,
+        type: relationship.type,
+        confidence: 'medium',
+        evidence_path: path,
+        line_start: node.startPosition.row + 1,
+        line_end: node.endPosition.row + 1,
+        excerpt: null,
+        metadata: { syntax: true, grammar_node: node.type },
+      });
+    }
+    for (let index = 0; index < node.namedChildCount; index += 1) {
+      const child = node.namedChild(index);
+      if (child) visit(child);
+    }
+  };
+  visit(root);
+}
+
+function moduleRelationship(node, grammar) {
+  if (grammar === 'typescript' || grammar === 'javascript') {
+    if (node.type !== 'import_statement' && node.type !== 'export_statement') return null;
+    const source = node.childForFieldName('source');
+    const specifier = staticModuleSpecifier(source?.text ?? moduleSpecifierFromStatement(node.text));
+    if (!specifier) return null;
+    return { type: node.type === 'export_statement' ? 're_exports' : 'imports', specifier };
+  }
+
+  if (grammar === 'python') {
+    if (node.type === 'import_from_statement') {
+      const moduleNode = node.childForFieldName('module_name') ?? node.childForFieldName('module');
+      const specifier = bareModuleSpecifier(moduleNode?.text ?? node.text.match(/^\s*from\s+([^\s]+)\s+import\b/)?.[1]);
+      return specifier ? { type: 'imports', specifier } : null;
+    }
+    if (node.type === 'import_statement') {
+      const specifier = bareModuleSpecifier(node.text.match(/^\s*import\s+([^,\s]+)/)?.[1]);
+      return specifier ? { type: 'imports', specifier } : null;
+    }
+  }
+
+  if (grammar === 'php' && /^(?:include|include_once|require|require_once)_expression$/.test(node.type)) {
+    const specifier = staticModuleSpecifier(node.text.match(/[('"`]([^'"`]+)['"`]/)?.[0]);
+    return specifier ? { type: 'imports', specifier } : null;
+  }
+
+  return null;
+}
+
+function moduleSpecifierFromStatement(text) {
+  return String(text ?? '').match(/(?:\bfrom\s*|^\s*import\s*)['"`]([^'"`]+)['"`]/)?.[1] ?? null;
+}
+
+function staticModuleSpecifier(value) {
+  const text = String(value ?? '').trim();
+  if (!text || text.length > 302 || text.includes('\0')) return null;
+  const quote = text[0];
+  if ((quote === "'" || quote === '"' || quote === '`') && text.at(-1) === quote) {
+    const content = text.slice(1, -1);
+    if (quote === '`' && content.includes('${')) return null;
+    return bareModuleSpecifier(content);
+  }
+  return bareModuleSpecifier(text);
+}
+
+function bareModuleSpecifier(value) {
+  const text = String(value ?? '').trim();
+  if (!text || text.length > 300 || /[\r\n\0]/.test(text)) return null;
+  return text;
+}
+
+function resolveRelationships() {
+  for (const edge of relationships) {
+    if (edge.target_key || !edge.external_name) continue;
+    if (edge.type !== 'imports' && edge.type !== 're_exports') continue;
+    const targetKey = resolveModule(edge.evidence_path, edge.external_name);
+    if (!targetKey) continue;
+    edge.target_key = targetKey;
+    edge.external_name = null;
+    edge.confidence = 'high';
+    edge.metadata.resolution = 'relative-project-module';
+  }
+}
+
+function resolveModule(sourcePath, specifier) {
+  if (!specifier.startsWith('.')) return null;
+  const parts = normalize(sourcePath).split('/');
+  parts.pop();
+  for (const part of specifier.split('/')) {
+    if (!part || part === '.') continue;
+    if (part === '..') {
+      if (parts.length === 0) return null;
+      parts.pop();
+    } else {
+      parts.push(part);
+    }
+  }
+  const base = parts.join('/');
+  const extensions = ['', '.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs', '.py', '.php'];
+  for (const extension of extensions) {
+    const candidate = `${base}${extension}`;
+    if (modulePathKeys.has(candidate)) return modulePathKeys.get(candidate);
+  }
+  for (const extension of extensions.slice(1)) {
+    const candidate = `${base}/index${extension}`;
+    if (modulePathKeys.has(candidate)) return modulePathKeys.get(candidate);
+  }
+  return null;
 }
 
 function symbolKey(path, type, name, line) {

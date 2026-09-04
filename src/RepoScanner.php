@@ -29,7 +29,9 @@ final class RepoScanner
         }
         $jobId = $existingJobId ?? AnalysisJobStore::create($projectId, $profile, $currentCommit, $previousCommit, $changedPaths);
         if ($workerManaged) {
-            AnalysisJobStore::scanMetadata($jobId, $leaseToken, $currentCommit, $previousCommit, $changedPaths);
+            if (!AnalysisJobStore::scanMetadata($jobId, $leaseToken, $currentCommit, $previousCommit, $changedPaths)) {
+                throw new RuntimeException('The scan worker no longer owns this analysis.');
+            }
             if (!AnalysisJobStore::heartbeat($jobId, (string) $leaseToken, 'Analyzing source evidence', 2, 4)) {
                 throw new RuntimeException('The scan worker no longer owns this analysis.');
             }
@@ -37,9 +39,17 @@ final class RepoScanner
             AnalysisJobStore::running($jobId);
         }
         try {
-            $inspection = $this->inspect($root, $profile, $currentCommit, $previousCommit, $changedPaths);
+            $checkpoint = $workerManaged
+                ? static function (string $providerId, int $providerIndex, int $providerTotal) use ($jobId, $leaseToken): void {
+                    $stage = sprintf('Analyzing evidence: %s (%d/%d)', $providerId, $providerIndex, $providerTotal);
+                    if (!AnalysisJobStore::heartbeat($jobId, (string) $leaseToken, $stage, 2, 4)) {
+                        throw new ScanLeaseLostException('The scan worker lease expired during analysis.');
+                    }
+                }
+                : null;
+            $inspection = $this->inspect($root, $profile, $currentCommit, $previousCommit, $changedPaths, $checkpoint);
         } catch (Throwable $exception) {
-            if (!$workerManaged) AnalysisJobStore::finish($jobId, 'failed', $exception->getMessage());
+            if (!$workerManaged) AnalysisJobStore::finish($jobId, 'failed', 'The repository analysis did not finish.');
             throw $exception;
         }
         $files = $inspection['files'];
@@ -91,7 +101,7 @@ final class RepoScanner
             $pdo->commit();
         } catch (Throwable $exception) {
             if ($pdo->inTransaction()) $pdo->rollBack();
-            if (!$workerManaged) AnalysisJobStore::finish($jobId, 'failed', $exception->getMessage());
+            if (!$workerManaged) AnalysisJobStore::finish($jobId, 'failed', 'The repository analysis did not finish.');
             throw $exception;
         }
 
@@ -102,14 +112,24 @@ final class RepoScanner
      * Read-only inspection used by the scanner and lightweight unit checks.
      * Source contents only exist in this method's in-memory result.
      */
-    public function inspect(string $root, string $profile = AnalysisProfile::QUICK, ?string $currentRevision = null, ?string $previousRevision = null, array $changedPaths = []): array
+    public function inspect(
+        string $root,
+        string $profile = AnalysisProfile::QUICK,
+        ?string $currentRevision = null,
+        ?string $previousRevision = null,
+        array $changedPaths = [],
+        ?callable $analysisCheckpoint = null,
+    ): array
     {
         if (!is_dir($root)) throw new RuntimeException('The repository files are no longer available.');
         $collected = (new \WTFCode\Scanning\FileCollector())->collect($root);
         $this->discoveryLimits = $collected['limitations'];
         $files = $collected['files'];
         $analysis = $this->analyse($files);
-        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files, $profile, $currentRevision, $previousRevision, $changedPaths));
+        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(
+            new AnalysisRequest($root, $files, $profile, $currentRevision, $previousRevision, $changedPaths),
+            $analysisCheckpoint,
+        );
         $analysis['symbol_graph'] = (new ProductIntelligence())->enrich($analysis['symbol_graph'], $files);
         $analysis['findings'] = array_merge($analysis['findings'], $analysis['symbol_graph']['findings'] ?? []);
         return $analysis + ['files' => $files];

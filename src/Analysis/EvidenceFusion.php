@@ -26,6 +26,9 @@ final class EvidenceFusion
 
         foreach ($this->successful($results) as $result) {
             foreach ($result->graph['symbols'] ?? [] as $symbol) {
+                if (!is_array($symbol)) continue;
+                $symbol = $this->normalizeSymbol($symbol);
+                if ($symbol === null) continue;
                 $identity = $this->symbolIdentity($symbol);
                 $existingKey = $symbolIdentityToKey[$identity] ?? null;
                 if ($existingKey === null && count($symbols) >= self::MAX_SYMBOLS) continue;
@@ -96,6 +99,9 @@ final class EvidenceFusion
             }
 
             foreach ($result->graph['relationships'] ?? [] as $relationship) {
+                if (!is_array($relationship)) continue;
+                $relationship = $this->normalizeRelationship($relationship);
+                if ($relationship === null) continue;
                 $source = $relationship['source_key'] ?? null;
                 $target = $relationship['target_key'] ?? null;
                 if ($source !== null) $relationship['source_key'] = $providerKeyMap[$result->engine][(string) $source] ?? null;
@@ -112,6 +118,9 @@ final class EvidenceFusion
             }
 
             foreach ($result->graph['routes'] ?? [] as $route) {
+                if (!is_array($route)) continue;
+                $route = $this->normalizeRoute($route);
+                if ($route === null) continue;
                 $handler = $route['handler_key'] ?? null;
                 if ($handler !== null) $route['handler_key'] = $providerKeyMap[$result->engine][(string) $handler] ?? null;
                 $route['metadata'] = $this->withProvenance(
@@ -170,6 +179,117 @@ final class EvidenceFusion
     private function successful(array $results): array
     {
         return array_values(array_filter($results, static fn (AnalyzerResult $result): bool => in_array($result->status, [AnalyzerResult::SUCCESS, AnalyzerResult::PARTIAL], true)));
+    }
+
+    /** @param array<string, mixed> $symbol @return array<string, mixed>|null */
+    private function normalizeSymbol(array $symbol): ?array
+    {
+        $path = str_replace('\\', '/', trim((string) ($symbol['path'] ?? '')));
+        $name = trim((string) ($symbol['name'] ?? ''));
+        $qualifiedName = trim((string) ($symbol['qualified_name'] ?? $name));
+        if ($path === '' || $name === '' || $qualifiedName === '') return null;
+
+        $startLine = max(1, (int) ($symbol['start_line'] ?? 1));
+        $endLine = max($startLine, (int) ($symbol['end_line'] ?? $startLine));
+        $visibility = (string) ($symbol['visibility'] ?? 'unknown');
+        if (!in_array($visibility, ['public', 'protected', 'private', 'package', 'unknown'], true)) {
+            $visibility = 'unknown';
+        }
+        $confidence = in_array($symbol['confidence'] ?? '', ['high', 'medium', 'low'], true)
+            ? (string) $symbol['confidence']
+            : 'medium';
+
+        return array_replace([
+            'parent_key' => null,
+            'signature' => null,
+            'exported' => false,
+            'metadata' => [],
+        ], $symbol, [
+            'path' => $path,
+            'language' => trim((string) ($symbol['language'] ?? '')) ?: 'Unknown',
+            'type' => trim((string) ($symbol['type'] ?? '')) ?: 'unknown',
+            'name' => $name,
+            'qualified_name' => $qualifiedName,
+            'signature' => isset($symbol['signature']) ? trim((string) $symbol['signature']) : null,
+            'visibility' => $visibility,
+            'exported' => (bool) ($symbol['exported'] ?? false),
+            'start_line' => $startLine,
+            'end_line' => $endLine,
+            'confidence' => $confidence,
+            'metadata' => is_array($symbol['metadata'] ?? null) ? $symbol['metadata'] : [],
+        ]);
+    }
+
+    /** @param array<string, mixed> $relationship @return array<string, mixed>|null */
+    private function normalizeRelationship(array $relationship): ?array
+    {
+        $path = str_replace('\\', '/', trim((string) ($relationship['evidence_path'] ?? '')));
+        $type = trim((string) ($relationship['type'] ?? ''));
+        $targetKey = $relationship['target_key'] ?? null;
+        $external = trim((string) ($relationship['external_name'] ?? $relationship['target_name'] ?? ''));
+        if ($path === '' || $type === '' || ($targetKey === null && $external === '')) return null;
+
+        $lineStart = max(1, (int) ($relationship['line_start'] ?? 1));
+        $lineEnd = max($lineStart, (int) ($relationship['line_end'] ?? $lineStart));
+        $confidence = in_array($relationship['confidence'] ?? '', ['high', 'medium', 'low'], true)
+            ? (string) $relationship['confidence']
+            : 'medium';
+
+        return array_replace([
+            'source_key' => null,
+            'target_key' => null,
+            'excerpt' => null,
+            'metadata' => [],
+        ], $relationship, [
+            'source_key' => isset($relationship['source_key']) ? (string) $relationship['source_key'] : null,
+            'target_key' => $targetKey === null ? null : (string) $targetKey,
+            'external_name' => $external === '' ? null : $external,
+            'target_name' => trim((string) ($relationship['target_name'] ?? $external)),
+            'evidence_path' => $path,
+            'type' => $type,
+            'confidence' => $confidence,
+            'line_start' => $lineStart,
+            'line_end' => $lineEnd,
+            'excerpt' => isset($relationship['excerpt']) ? trim((string) $relationship['excerpt']) : null,
+            'metadata' => is_array($relationship['metadata'] ?? null) ? $relationship['metadata'] : [],
+        ]);
+    }
+
+    /** @param array<string, mixed> $route @return array<string, mixed>|null */
+    private function normalizeRoute(array $route): ?array
+    {
+        $path = str_replace('\\', '/', trim((string) ($route['path'] ?? '')));
+        $routePath = trim((string) ($route['route_path'] ?? ''));
+        if ($path === '' || $routePath === '') return null;
+
+        $confidence = in_array($route['confidence'] ?? '', ['high', 'medium', 'low'], true)
+            ? (string) $route['confidence']
+            : 'medium';
+
+        return array_replace([
+            'handler_key' => null,
+            'framework' => 'Unknown',
+            'method' => 'ANY',
+            'name' => null,
+            'middleware' => [],
+            'confidence' => 'medium',
+            'line' => 1,
+            'metadata' => [],
+        ], $route, [
+            'path' => $path,
+            'handler_key' => isset($route['handler_key']) ? (string) $route['handler_key'] : null,
+            'framework' => trim((string) ($route['framework'] ?? '')) ?: 'Unknown',
+            'method' => strtoupper(trim((string) ($route['method'] ?? ''))) ?: 'ANY',
+            'route_path' => $routePath,
+            'name' => isset($route['name']) ? trim((string) $route['name']) : null,
+            'middleware' => array_values(array_unique(array_filter(
+                is_array($route['middleware'] ?? null) ? $route['middleware'] : [],
+                'is_string',
+            ))),
+            'confidence' => $confidence,
+            'line' => max(1, (int) ($route['line'] ?? 1)),
+            'metadata' => is_array($route['metadata'] ?? null) ? $route['metadata'] : [],
+        ]);
     }
 
     /** @param array<string, mixed> $symbol */

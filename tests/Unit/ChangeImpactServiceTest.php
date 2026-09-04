@@ -7,6 +7,7 @@ namespace WTFCode\Tests\Unit;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use WTFCode\Application\ChangeImpactService;
+use WTFCode\Application\ChangeTargetResolver;
 
 final class ChangeImpactServiceTest extends TestCase
 {
@@ -62,7 +63,7 @@ final class ChangeImpactServiceTest extends TestCase
     public function testFiveAffectedRoutesEscalateToHighRisk(): void
     {
         $routes = array_map(
-            static fn (int $index): array => ['route_path' => '/route-' . $index],
+            static fn(int $index): array => ['route_path' => '/route-' . $index],
             range(1, 5),
         );
 
@@ -77,5 +78,38 @@ final class ChangeImpactServiceTest extends TestCase
         $risk = ChangeImpactService::classify(['src/Domain/Formatter.php'], [], [], [], ['medium']);
 
         self::assertSame('medium', $risk['level']);
+    }
+
+    public function testRouteTargetSeparatesMethodFromPath(): void
+    {
+        self::assertSame(['POST', '/accounts/{id}'], ChangeTargetResolver::splitRouteTarget('post /accounts/{id}'));
+        self::assertSame([null, '/accounts/{id}'], ChangeTargetResolver::splitRouteTarget('/accounts/{id}'));
+    }
+
+    public function testTypedTargetResolutionPrefersExactIdentityOverFuzzyMatches(): void
+    {
+        $rows = [
+            ['id' => 1, 'name' => 'AccountArchive', 'qualified_name' => 'App\\AccountArchive', 'path' => 'src/AccountArchive.php'],
+            ['id' => 2, 'name' => 'Account', 'qualified_name' => 'App\\Account', 'path' => 'src/Account.php'],
+        ];
+
+        self::assertSame([2], array_column(ChangeTargetResolver::preferExactRows($rows, 'Account'), 'id'));
+        self::assertSame([1], array_column(ChangeTargetResolver::preferExactRows($rows, 'Archive'), 'id'));
+        self::assertSame([], ChangeTargetResolver::preferExactRows($rows, 'Missing'));
+    }
+
+    public function testBlastRadiusExternalServicesAreMergedAndDeduplicated(): void
+    {
+        $services = ChangeImpactService::mergeBoundaryRows(
+            ['41' => ['id' => 41, 'name' => 'Stripe']],
+            [
+                ['id' => 41, 'name' => 'Stripe API'],
+                ['id' => 52, 'name' => 'Mailgun'],
+            ],
+        );
+
+        self::assertCount(2, $services);
+        self::assertSame('Stripe API', $services['41']['name']);
+        self::assertSame('Mailgun', $services['52']['name']);
     }
 }

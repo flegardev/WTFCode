@@ -6,7 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "check:workers": "node --check workers/typescript-semantic.mjs && node --check workers/tree-sitter.mjs && node --check workers/ast-grep.mjs && node --check public/assets/js/symbol-map.js && node --check public/assets/js/repository-picker.js"
+    "check:workers": "node --check workers/typescript-semantic.mjs && node --check workers/tree-sitter.mjs && node --check workers/ast-grep.mjs && node --check public/assets/js/symbol-map.js && node --check public/assets/js/overview-graph.js && node --check public/assets/js/project-shell.js && node --check public/assets/js/scan-progress.js && node --check public/assets/js/change-workbench.js && node --check public/assets/js/repository-picker.js"
   },
   "dependencies": {
     "@ast-grep/napi": "0.45.1",

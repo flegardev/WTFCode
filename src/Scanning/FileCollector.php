@@ -9,8 +9,7 @@ final class FileCollector
     public function __construct(
         private readonly SourceClassifier $classifier = new SourceClassifier(),
         private readonly RepositoryLimits $limits = new RepositoryLimits(),
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{files: list<array{path: string, language: string, size: int, lines: int, hash: string, content: string, role: string, summary: string, imports: list<string>, symbols: list<string>}>, limitations: list<string>}

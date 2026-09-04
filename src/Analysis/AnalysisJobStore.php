@@ -15,31 +15,56 @@ final class AnalysisJobStore
         int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
     ): int {
         $pdo = Database::connection();
-        if ($pdo->inTransaction()) {
-            throw new LogicException('Scan jobs must be enqueued outside an existing transaction.');
-        }
-
         $profile = AnalysisProfile::normalize($profile);
         $jobKind = in_array($jobKind, ['initial', 'rescan'], true) ? $jobKind : 'rescan';
         $maxAttempts = max(1, min(10, $maxAttempts));
-        self::recoverExpiredLeases($projectId);
+        $ownsTransaction = !$pdo->inTransaction();
 
-        $pdo->beginTransaction();
+        if ($ownsTransaction) $pdo->beginTransaction();
         try {
             // The projects row is the portable per-project mutex. PostgreSQL's
-            // partial unique index is a second line of defence.
+            // partial unique index and MySQL generated-column unique key are a
+            // second line of defence.
             $owner = $pdo->prepare('SELECT id FROM projects WHERE id = :project_id AND user_id = :user_id FOR UPDATE');
             $owner->execute(['project_id' => $projectId, 'user_id' => $requestedByUserId]);
             if (!$owner->fetchColumn()) {
                 throw new RuntimeException('Project not found.');
             }
+            self::recoverExpiredLeases($projectId);
 
-            $active = $pdo->prepare("SELECT id FROM analysis_jobs WHERE project_id = :project_id AND state IN ('queued', 'running') ORDER BY id DESC LIMIT 1");
+            $active = $pdo->prepare("SELECT id, state, analysis_profile, job_kind, max_attempts FROM analysis_jobs WHERE project_id = :project_id AND state IN ('queued', 'running') ORDER BY id DESC LIMIT 1 FOR UPDATE");
             $active->execute(['project_id' => $projectId]);
-            $activeId = $active->fetchColumn();
-            if ($activeId !== false) {
-                $pdo->commit();
-                return (int) $activeId;
+            $activeJob = $active->fetch();
+            if (is_array($activeJob)) {
+                $activeId = (int) $activeJob['id'];
+                if (($activeJob['state'] ?? '') === 'queued') {
+                    $update = $pdo->prepare(
+                        "UPDATE analysis_jobs
+                         SET analysis_profile = :profile,
+                             job_kind = CASE WHEN job_kind = 'initial' OR :job_kind = 'initial' THEN 'initial' ELSE 'rescan' END,
+                             max_attempts = CASE WHEN max_attempts < :max_attempts THEN :max_attempts_update ELSE max_attempts END,
+                             current_stage = :stage,
+                             updated_at = CURRENT_TIMESTAMP
+                         WHERE id = :id AND state = 'queued'",
+                    );
+                    $update->execute([
+                        'profile' => $profile,
+                        'job_kind' => $jobKind,
+                        'max_attempts' => $maxAttempts,
+                        'max_attempts_update' => $maxAttempts,
+                        'stage' => 'Waiting for a scan worker',
+                        'id' => $activeId,
+                    ]);
+                } elseif (($activeJob['analysis_profile'] ?? '') !== $profile || ($activeJob['job_kind'] ?? '') !== $jobKind) {
+                    Logger::warning('Scan request reused an already running job', [
+                        'project_id' => $projectId,
+                        'job_id' => $activeId,
+                        'running_profile' => $activeJob['analysis_profile'] ?? null,
+                        'requested_profile' => $profile,
+                    ]);
+                }
+                if ($ownsTransaction) $pdo->commit();
+                return $activeId;
             }
 
             $jobId = Database::insert(
@@ -54,10 +79,10 @@ final class AnalysisJobStore
                     'stage' => 'Waiting for a scan worker',
                 ],
             );
-            $pdo->commit();
+            if ($ownsTransaction) $pdo->commit();
             return $jobId;
         } catch (Throwable $exception) {
-            if ($pdo->inTransaction()) {
+            if ($ownsTransaction && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
             throw $exception;
@@ -103,7 +128,7 @@ final class AnalysisJobStore
         $workerId = substr((string) (preg_replace('/[^A-Za-z0-9_.:-]/', '-', trim($workerId)) ?: 'worker'), 0, 100);
         $leaseSeconds = max(60, min(7200, $leaseSeconds));
         $leaseToken = bin2hex(random_bytes(32));
-        $leasedUntil = gmdate('Y-m-d H:i:s', time() + $leaseSeconds);
+        $leaseExpression = self::leaseExpression($leaseSeconds);
 
         $pdo->beginTransaction();
         try {
@@ -114,10 +139,9 @@ final class AnalysisJobStore
                 return null;
             }
 
-            $update = $pdo->prepare("UPDATE analysis_jobs SET state = 'running', attempt_count = attempt_count + 1, lease_token = :lease_token, leased_until = :leased_until, heartbeat_at = CURRENT_TIMESTAMP, worker_id = :worker_id, current_stage = :stage, error_message = NULL, started_at = COALESCE(started_at, CURRENT_TIMESTAMP), finished_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND state = 'queued'");
+            $update = $pdo->prepare("UPDATE analysis_jobs SET state = 'running', attempt_count = attempt_count + 1, lease_token = :lease_token, leased_until = $leaseExpression, heartbeat_at = CURRENT_TIMESTAMP, worker_id = :worker_id, current_stage = :stage, error_message = NULL, started_at = COALESCE(started_at, CURRENT_TIMESTAMP), finished_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND state = 'queued'");
             $update->execute([
                 'lease_token' => $leaseToken,
-                'leased_until' => $leasedUntil,
                 'worker_id' => $workerId,
                 'stage' => 'Preparing repository',
                 'id' => (int) $job['id'],
@@ -156,10 +180,9 @@ final class AnalysisJobStore
         $progressCurrent = max(0, $progressCurrent);
         $progressTotal = max($progressCurrent, $progressTotal);
         $stage = substr(trim($stage) === '' ? 'Analyzing repository' : trim($stage), 0, 120);
-        $leasedUntil = gmdate('Y-m-d H:i:s', time() + max(60, min(7200, $leaseSeconds)));
-        $statement = Database::connection()->prepare("UPDATE analysis_jobs SET heartbeat_at = CURRENT_TIMESTAMP, leased_until = :leased_until, current_stage = :stage, progress_current = :progress_current, progress_total = :progress_total, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND state = 'running' AND lease_token = :lease_token AND (leased_until IS NULL OR leased_until >= CURRENT_TIMESTAMP)");
+        $leaseExpression = self::leaseExpression($leaseSeconds);
+        $statement = Database::connection()->prepare("UPDATE analysis_jobs SET heartbeat_at = CURRENT_TIMESTAMP, leased_until = $leaseExpression, current_stage = :stage, progress_current = :progress_current, progress_total = :progress_total, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND state = 'running' AND lease_token = :lease_token AND (leased_until IS NULL OR leased_until >= CURRENT_TIMESTAMP)");
         $statement->execute([
-            'leased_until' => $leasedUntil,
             'stage' => $stage,
             'progress_current' => $progressCurrent,
             'progress_total' => $progressTotal,
@@ -241,13 +264,12 @@ final class AnalysisJobStore
             $willRetry = (int) $job['attempt_count'] < (int) $job['max_attempts'];
             $state = $willRetry ? 'queued' : 'failed';
             $delay = $willRetry ? min(900, 30 * (2 ** max(0, (int) $job['attempt_count'] - 1))) : 0;
-            $availableAt = gmdate('Y-m-d H:i:s', time() + $delay);
-            $update = $pdo->prepare("UPDATE analysis_jobs SET state = :state, error_message = :error, current_stage = :stage, available_at = :available_at, lease_token = NULL, leased_until = NULL, heartbeat_at = CURRENT_TIMESTAMP, worker_id = NULL, finished_at = CASE WHEN :terminal = 1 THEN CURRENT_TIMESTAMP ELSE NULL END, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND state = 'running' AND lease_token = :lease_token");
+            $availableExpression = self::availabilityExpression($delay);
+            $update = $pdo->prepare("UPDATE analysis_jobs SET state = :state, error_message = :error, current_stage = :stage, available_at = $availableExpression, lease_token = NULL, leased_until = NULL, heartbeat_at = CURRENT_TIMESTAMP, worker_id = NULL, finished_at = CASE WHEN :terminal = 1 THEN CURRENT_TIMESTAMP ELSE NULL END, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND state = 'running' AND lease_token = :lease_token");
             $update->execute([
                 'state' => $state,
                 'error' => self::safeError($error),
                 'stage' => $willRetry ? 'Retry scheduled' : 'Analysis failed',
-                'available_at' => $availableAt,
                 'terminal' => $willRetry ? 0 : 1,
                 'id' => $jobId,
                 'lease_token' => $leaseToken,
@@ -292,7 +314,6 @@ final class AnalysisJobStore
     /** @return array<string, mixed>|null */
     public static function latest(int $projectId): ?array
     {
-        self::recoverExpiredLeases($projectId);
         $statement = Database::connection()->prepare('SELECT * FROM analysis_jobs WHERE project_id = :project_id ORDER BY id DESC LIMIT 1');
         $statement->execute(['project_id' => $projectId]);
         return self::withSteps($statement->fetch() ?: null);
@@ -301,12 +322,17 @@ final class AnalysisJobStore
     /** @return array<string, mixed>|null */
     public static function latestForUser(int $projectId, int $userId): ?array
     {
-        $owned = Database::connection()->prepare('SELECT id FROM projects WHERE id = :project_id AND user_id = :user_id LIMIT 1');
-        $owned->execute(['project_id' => $projectId, 'user_id' => $userId]);
-        if (!$owned->fetchColumn()) {
-            return null;
-        }
-        return self::latest($projectId);
+        $statement = Database::connection()->prepare(
+            'SELECT job.*
+             FROM analysis_jobs job
+             INNER JOIN projects project ON project.id = job.project_id AND project.user_id = :user_id
+             WHERE job.project_id = :project_id
+             ORDER BY job.id DESC
+             LIMIT 1',
+        );
+        $statement->execute(['project_id' => $projectId, 'user_id' => $userId]);
+
+        return self::withSteps($statement->fetch() ?: null);
     }
 
     /** @return array<string, mixed>|null */
@@ -319,20 +345,80 @@ final class AnalysisJobStore
 
     public static function recoverExpiredLeases(?int $projectId = null): void
     {
-        $filter = $projectId === null ? '' : ' AND project_id = :project_id';
-        $parameters = $projectId === null ? [] : ['project_id' => $projectId];
+        $pdo = Database::connection();
+        $ownsTransaction = !$pdo->inTransaction();
+        if ($ownsTransaction) $pdo->beginTransaction();
+
         $legacyCutoff = Database::isPostgres()
             ? "CURRENT_TIMESTAMP - INTERVAL '15 minutes'"
             : 'DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 15 MINUTE)';
+        $filter = $projectId === null ? '' : ' AND project_id = :project_id';
+        $parameters = $projectId === null ? [] : ['project_id' => $projectId];
 
-        $legacy = Database::connection()->prepare("UPDATE analysis_jobs SET state = 'failed', error_message = :error, current_stage = :stage, finished_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE state = 'running' AND lease_token IS NULL AND created_at < $legacyCutoff$filter");
-        $legacy->execute(['error' => 'Hosted execution ended before the analysis completed.', 'stage' => 'Analysis failed'] + $parameters);
+        try {
+            $candidates = $pdo->prepare(
+                "SELECT DISTINCT project_id
+                 FROM analysis_jobs
+                 WHERE (
+                     (state = 'running' AND ((lease_token IS NULL AND created_at < $legacyCutoff) OR (leased_until IS NOT NULL AND leased_until < CURRENT_TIMESTAMP)))
+                     OR (state = 'queued' AND attempt_count >= max_attempts)
+                 )$filter
+                 ORDER BY project_id
+                 LIMIT 100",
+            );
+            $candidates->execute($parameters);
+            $projectIds = array_values(array_filter(array_map('intval', $candidates->fetchAll(PDO::FETCH_COLUMN)), static fn(int $id): bool => $id > 0));
+            if ($projectIds === []) {
+                if ($ownsTransaction) $pdo->commit();
+                return;
+            }
 
-        $exhausted = Database::connection()->prepare("UPDATE analysis_jobs SET state = 'failed', error_message = :error, current_stage = :stage, lease_token = NULL, leased_until = NULL, worker_id = NULL, finished_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE state = 'running' AND leased_until < CURRENT_TIMESTAMP AND attempt_count >= max_attempts$filter");
-        $exhausted->execute(['error' => 'The scan worker lease expired after the final retry.', 'stage' => 'Analysis failed'] + $parameters);
+            $placeholders = [];
+            $projectParameters = [];
+            foreach ($projectIds as $index => $id) {
+                $key = 'recovery_project_' . $index;
+                $placeholders[] = ':' . $key;
+                $projectParameters[$key] = $id;
+            }
+            $projectList = implode(', ', $placeholders);
+            $lock = $pdo->prepare("SELECT id FROM projects WHERE id IN ($projectList) ORDER BY id FOR UPDATE");
+            $lock->execute($projectParameters);
+            $lock->fetchAll();
 
-        $retry = Database::connection()->prepare("UPDATE analysis_jobs SET state = 'queued', error_message = :error, current_stage = :stage, available_at = CURRENT_TIMESTAMP, lease_token = NULL, leased_until = NULL, worker_id = NULL, finished_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE state = 'running' AND leased_until < CURRENT_TIMESTAMP AND attempt_count < max_attempts$filter");
-        $retry->execute(['error' => 'The previous scan worker stopped responding; retry queued.', 'stage' => 'Retry scheduled'] + $parameters);
+            $legacy = $pdo->prepare("UPDATE analysis_jobs SET state = 'failed', error_message = :error, current_stage = :stage, lease_token = NULL, leased_until = NULL, worker_id = NULL, finished_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE project_id IN ($projectList) AND state = 'running' AND lease_token IS NULL AND created_at < $legacyCutoff");
+            $legacy->execute(['error' => 'The scan worker stopped before analysis could finish.', 'stage' => 'Analysis failed'] + $projectParameters);
+
+            $exhausted = $pdo->prepare("UPDATE analysis_jobs SET state = 'failed', error_message = :error, current_stage = :stage, lease_token = NULL, leased_until = NULL, worker_id = NULL, finished_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE project_id IN ($projectList) AND ((state = 'running' AND leased_until IS NOT NULL AND leased_until < CURRENT_TIMESTAMP AND attempt_count >= max_attempts) OR (state = 'queued' AND attempt_count >= max_attempts))");
+            $exhausted->execute(['error' => 'The scan worker stopped after the final attempt.', 'stage' => 'Analysis failed'] + $projectParameters);
+
+            $retry = $pdo->prepare("UPDATE analysis_jobs SET state = 'queued', error_message = :error, current_stage = :stage, available_at = CURRENT_TIMESTAMP, lease_token = NULL, leased_until = NULL, worker_id = NULL, finished_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE project_id IN ($projectList) AND state = 'running' AND leased_until IS NOT NULL AND leased_until < CURRENT_TIMESTAMP AND attempt_count < max_attempts");
+            $retry->execute(['error' => 'The previous scan worker stopped responding; retry queued.', 'stage' => 'Retry scheduled'] + $projectParameters);
+
+            $latest = $pdo->prepare(
+                "SELECT project.id, project.last_scan_at,
+                        (SELECT job.state FROM analysis_jobs job WHERE job.project_id = project.id ORDER BY job.id DESC LIMIT 1) AS job_state
+                 FROM projects project
+                 WHERE project.id IN ($projectList)",
+            );
+            $latest->execute($projectParameters);
+            $reconcile = $pdo->prepare('UPDATE projects SET status = :status, last_error = :error WHERE id = :id');
+            foreach ($latest->fetchAll() as $project) {
+                $hasEvidence = !empty($project['last_scan_at']);
+                $active = in_array($project['job_state'] ?? '', ['queued', 'running'], true);
+                $reconcile->execute([
+                    'status' => $hasEvidence ? 'ready' : ($active ? 'queued' : 'failed'),
+                    'error' => $active
+                        ? 'The previous scan worker stopped responding; retry queued.'
+                        : ($hasEvidence ? 'The latest rescan did not finish. Previous evidence is still available.' : 'The scan worker stopped before analysis could finish.'),
+                    'id' => (int) $project['id'],
+                ]);
+            }
+
+            if ($ownsTransaction) $pdo->commit();
+        } catch (Throwable $exception) {
+            if ($ownsTransaction && $pdo->inTransaction()) $pdo->rollBack();
+            throw $exception;
+        }
     }
 
     /** @param array<string, mixed>|null $job @return array<string, mixed>|null */
@@ -361,5 +447,23 @@ final class AnalysisJobStore
             return null;
         }
         return substr(SensitiveDataSanitizer::text($error), 0, 500);
+    }
+
+    private static function leaseExpression(int $leaseSeconds): string
+    {
+        $seconds = max(60, min(7200, $leaseSeconds));
+
+        return Database::isPostgres()
+            ? "CURRENT_TIMESTAMP + INTERVAL '{$seconds} seconds'"
+            : "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL {$seconds} SECOND)";
+    }
+
+    private static function availabilityExpression(int $delaySeconds): string
+    {
+        $seconds = max(0, min(3600, $delaySeconds));
+
+        return Database::isPostgres()
+            ? "CURRENT_TIMESTAMP + INTERVAL '{$seconds} seconds'"
+            : "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL {$seconds} SECOND)";
     }
 }

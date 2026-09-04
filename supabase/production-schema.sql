@@ -305,6 +305,7 @@ CREATE TABLE IF NOT EXISTS analysis_jobs (
     finished_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT analysis_jobs_attempts_check CHECK (attempt_count >= 0 AND max_attempts BETWEEN 1 AND 10),
+    CONSTRAINT analysis_jobs_queued_attempt_budget_check CHECK (state <> 'queued' OR attempt_count < max_attempts),
     CONSTRAINT analysis_jobs_progress_check CHECK (progress_current >= 0 AND progress_total >= 0 AND (progress_total = 0 OR progress_current <= progress_total))
 );
 CREATE INDEX IF NOT EXISTS analysis_jobs_project_created_index ON analysis_jobs(project_id, created_at DESC);

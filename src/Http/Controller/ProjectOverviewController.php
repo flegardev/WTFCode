@@ -8,9 +8,7 @@ use WTFCode\Application\ProjectOverviewService;
 
 final class ProjectOverviewController
 {
-    public function __construct(private readonly ProjectOverviewService $overview = new ProjectOverviewService())
-    {
-    }
+    public function __construct(private readonly ProjectOverviewService $overview = new ProjectOverviewService()) {}
 
     /** @return array<string, mixed>|null */
     public function show(int $userId, int $projectId): ?array

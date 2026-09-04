@@ -16,16 +16,16 @@ if (is_post()) {
         $installationId = filter_var($parts[0] ?? null, FILTER_VALIDATE_INT);
         $repositoryId = filter_var($parts[1] ?? null, FILTER_VALIDATE_INT);
         $result = $installationId && $repositoryId
-            ? Project::createFromGitHubInstallation($userId, (int) $installationId, (int) $repositoryId, $old['name'], $old['profile'])
+            ? Project::queueFromGitHubInstallation($userId, (int) $installationId, (int) $repositoryId, $old['name'], $old['profile'])
             : ['error' => 'Choose a repository from the GitHub picker.'];
     } else {
-        $result = Project::createFromGithub($userId, $old['name'], $old['repository_url'], $old['profile']);
+        $result = Project::queueFromGithub($userId, $old['name'], $old['repository_url'], $old['profile']);
     }
     resume_session();
     if (isset($result['error'])) {
         $error = $result['error'];
     } else {
-        flash('success', 'Repository imported and analysed.');
+        flash('success', 'Repository queued for analysis. You can keep browsing while the worker runs.');
         redirect('project.php?id=' . (int) $result['project']['id']);
     }
 }
@@ -66,7 +66,7 @@ require __DIR__ . '/../views/header.php';
                 <label>Find repository<input type="search" data-repository-search placeholder="Search owner or repository" autocomplete="off"></label>
                 <label>Accessible repository<select name="repository_choice" data-repository-select required><option value="">Choose a repository</option><?php foreach ($repositoryOptions as $option): ?><?php $repository = $option['repository']; $installation = $option['installation']; $value = (int) $installation['id'] . ':' . (int) $repository['id']; ?><option value="<?= e($value) ?>" <?= $old['repository_choice'] === $value ? 'selected' : '' ?>><?= e($repository['full_name']) ?> · <?= e($repository['visibility']) ?></option><?php endforeach; ?></select></label>
                 <label>Analysis profile<select name="profile"><?php foreach ([AnalysisProfile::QUICK => 'Quick', AnalysisProfile::DEEP => 'Deep', AnalysisProfile::SECURITY => 'Security', AnalysisProfile::MAXIMUM => 'Maximum'] as $value => $label): ?><option value="<?= e($value) ?>" <?= $old['profile'] === $value ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></label>
-                <button class="button button-primary" type="submit">Import and analyse</button>
+                <button class="button button-primary" type="submit">Queue analysis</button>
             </form>
         <?php elseif ($installations !== []): ?><p class="muted-copy">No repositories are currently granted. Update the GitHub App installation and select at least one repository.</p><?php endif; ?>
     </section>
@@ -78,9 +78,9 @@ require __DIR__ . '/../views/header.php';
             <label>Project name <span>Optional</span><input name="name" type="text" maxlength="140" value="<?= e($old['name']) ?>" placeholder="My app"></label>
             <label>GitHub repository URL<input name="repository_url" type="url" value="<?= e($old['repository_url']) ?>" placeholder="https://github.com/owner/repository" required></label>
             <label>Analysis profile<select name="profile"><?php foreach ([AnalysisProfile::QUICK => 'Quick', AnalysisProfile::DEEP => 'Deep', AnalysisProfile::SECURITY => 'Security', AnalysisProfile::MAXIMUM => 'Maximum'] as $value => $label): ?><option value="<?= e($value) ?>" <?= $old['profile'] === $value ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></label>
-            <button class="button button-primary" type="submit">Import and analyse</button>
+            <button class="button button-primary" type="submit">Queue analysis</button>
         </form>
-        <div class="import-safety"><strong>What happens next</strong><p>WTFCode validates the GitHub host, clones the repository into temporary private storage, scans file metadata and relationships, removes the clone, and keeps source contents out of its database. If this URL is private, connect GitHub above and select it from the picker.</p></div>
+        <div class="import-safety"><strong>What happens next</strong><p>WTFCode validates the GitHub host and queues the work. A separate worker clones the repository into private storage, scans bounded static evidence without executing repository code, removes hosted clones, and keeps complete source files out of its database. If this URL is private, connect GitHub above and select it from the picker.</p></div>
     </section>
 </section>
 <?php if ($repositoryOptions !== []): ?><script src="<?= e(url('assets/js/repository-picker.js')) ?>" defer></script><?php endif; ?>

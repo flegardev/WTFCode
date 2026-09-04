@@ -10,19 +10,31 @@ use WTFCode\Repository\TestEvidenceRepository;
 
 final class ChangeImpactService
 {
-    public function __construct(private readonly TestEvidenceRepository $tests = new TestEvidenceRepository())
-    {
-    }
+    private const TARGET_TYPES = ['feature', 'symbol', 'file', 'route', 'table'];
+
+    public function __construct(
+        private readonly TestEvidenceRepository $tests = new TestEvidenceRepository(),
+        private readonly ChangeTargetResolver $targets = new ChangeTargetResolver(),
+    ) {}
 
     /** @return array<string, mixed> */
-    public function forTarget(int $projectId, string $target): array
+    public function forTarget(int $projectId, string $target, string $targetType = 'feature'): array
     {
+        $targetType = in_array($targetType, self::TARGET_TYPES, true) ? $targetType : 'feature';
         $trace = FeatureTracer::trace($projectId, $target);
-        $paths = array_values(array_unique(array_filter(array_column($trace['files'], 'path'), 'is_string')));
-        $symbols = array_values(array_filter($trace['symbols'], static fn (array $symbol): bool => isset($symbol['id'])));
-        $impact = $this->expandBlastRadius($projectId, $symbols, $paths, $trace['entry_points'], $trace['tables']);
+        $evidence = $this->targets->resolve($projectId, $targetType, $target, $trace);
+        $impact = $this->expandBlastRadius(
+            $projectId,
+            $evidence['symbols'],
+            $evidence['paths'],
+            $evidence['routes'],
+            $evidence['tables'],
+            $evidence['services'],
+        );
         $impact['trace'] = $trace;
         $impact['target'] = $target;
+        $impact['target_type'] = $targetType;
+        $impact['resolved_target_count'] = count($evidence['symbols']) + count($evidence['routes']) + count($evidence['paths']);
         return $impact;
     }
 
@@ -32,16 +44,39 @@ final class ChangeImpactService
         $paths = [];
         foreach ($diff['groups'] ?? [] as $changes) {
             foreach ($changes as $change) {
-                if (is_string($change['path'] ?? null)) $paths[] = $change['path'];
-                if (is_string($change['old_path'] ?? null)) $paths[] = $change['old_path'];
+                if (is_string($change['path'] ?? null)) {
+                    $paths[] = $change['path'];
+                }
+                if (is_string($change['old_path'] ?? null)) {
+                    $paths[] = $change['old_path'];
+                }
             }
         }
         $symbols = is_array($diff['impact']['symbols'] ?? null) ? $diff['impact']['symbols'] : [];
         $routes = is_array($diff['impact']['routes'] ?? null) ? $diff['impact']['routes'] : [];
         $tables = is_array($diff['impact']['tables'] ?? null) ? $diff['impact']['tables'] : [];
-        $impact = $this->expandBlastRadius($projectId, $symbols, $paths, $routes, $tables);
+        $services = is_array($diff['impact']['services'] ?? null) ? $diff['impact']['services'] : [];
+        $impact = $this->expandBlastRadius($projectId, $symbols, $paths, $routes, $tables, $services);
         $impact['graph_context'] = $diff['graph_context'] ?? ['state' => 'unknown'];
         return $impact;
+    }
+
+    /**
+     * Merge graph boundaries by stable identity. Kept pure so service/table
+     * aggregation cannot regress without a fast unit test.
+     *
+     * @param array<string, array<string, mixed>> $indexed
+     * @param array<int, array<string, mixed>> $incoming
+     * @return array<string, array<string, mixed>>
+     */
+    public static function mergeBoundaryRows(array $indexed, array $incoming): array
+    {
+        foreach ($incoming as $row) {
+            $key = (string) ($row['id'] ?? $row['name'] ?? $row['path'] ?? count($indexed));
+            $indexed[$key] = $row;
+        }
+
+        return $indexed;
     }
 
     /**
@@ -66,11 +101,21 @@ final class ChangeImpactService
                 $normalized,
             ) === 1;
         }));
-        if ($sensitive !== []) $reasons[] = count($sensitive) . ' sensitive path' . (count($sensitive) === 1 ? '' : 's') . ' changed or affected';
-        if ($tables !== []) $reasons[] = count($tables) . ' data boundar' . (count($tables) === 1 ? 'y' : 'ies') . ' affected';
-        if ($services !== []) $reasons[] = count($services) . ' external service boundar' . (count($services) === 1 ? 'y' : 'ies') . ' affected';
-        if ($routes !== []) $reasons[] = count($routes) . ' route' . (count($routes) === 1 ? '' : 's') . ' affected';
-        if (in_array('high', $blastRisks, true)) $reasons[] = 'A matched symbol has a high static blast radius';
+        if ($sensitive !== []) {
+            $reasons[] = count($sensitive) . ' sensitive path' . (count($sensitive) === 1 ? '' : 's') . ' changed or affected';
+        }
+        if ($tables !== []) {
+            $reasons[] = count($tables) . ' data boundar' . (count($tables) === 1 ? 'y' : 'ies') . ' affected';
+        }
+        if ($services !== []) {
+            $reasons[] = count($services) . ' external service boundar' . (count($services) === 1 ? 'y' : 'ies') . ' affected';
+        }
+        if ($routes !== []) {
+            $reasons[] = count($routes) . ' route' . (count($routes) === 1 ? '' : 's') . ' affected';
+        }
+        if (in_array('high', $blastRisks, true)) {
+            $reasons[] = 'A matched symbol has a high static blast radius';
+        }
 
         $high = $sensitive !== [] || $tables !== [] || $services !== [] || in_array('high', $blastRisks, true) || count($routes) >= 5;
         $medium = !$high && (count($paths) >= 5 || $routes !== [] || in_array('medium', $blastRisks, true));
@@ -85,23 +130,26 @@ final class ChangeImpactService
      * @param array<int, string> $seedPaths
      * @param array<int, array<string, mixed>> $seedRoutes
      * @param array<int, array<string, mixed>> $seedTables
+     * @param array<int, array<string, mixed>> $seedServices
      * @return array<string, mixed>
      */
-    private function expandBlastRadius(int $projectId, array $symbols, array $seedPaths, array $seedRoutes, array $seedTables): array
+    private function expandBlastRadius(int $projectId, array $symbols, array $seedPaths, array $seedRoutes, array $seedTables, array $seedServices): array
     {
         $files = [];
-        foreach ($seedPaths as $path) if (is_string($path) && $path !== '') $files[$path] = ['path' => $path, 'depth' => 0];
+        foreach ($seedPaths as $path) {
+            if (is_string($path) && $path !== '') {
+                $files[$path] = ['path' => $path, 'depth' => 0];
+            }
+        }
         $routes = [];
         foreach ($seedRoutes as $route) {
             $label = (string) ($route['label'] ?? (($route['http_method'] ?? '') . ' ' . ($route['route_path'] ?? '')));
-            if (trim($label) !== '') $routes[$label] = $route + ['label' => trim($label)];
+            if (trim($label) !== '') {
+                $routes[$label] = $route + ['label' => trim($label)];
+            }
         }
-        $tables = [];
-        foreach ($seedTables as $table) {
-            $key = (string) ($table['id'] ?? $table['name'] ?? $table['path'] ?? count($tables));
-            $tables[$key] = $table;
-        }
-        $services = [];
+        $tables = self::mergeBoundaryRows([], $seedTables);
+        $services = self::mergeBoundaryRows([], $seedServices);
         $direct = [];
         $transitive = [];
         $chains = [];
@@ -110,29 +158,50 @@ final class ChangeImpactService
 
         foreach (array_slice($symbols, 0, 20) as $symbol) {
             $symbolId = filter_var($symbol['id'] ?? null, FILTER_VALIDATE_INT);
-            if ($symbolId === false || $symbolId === null) continue;
+            if ($symbolId === false || $symbolId === null) {
+                continue;
+            }
             $symbolNames[] = (string) ($symbol['name'] ?? 'symbol');
             $blast = BlastRadiusService::forSymbol($projectId, (int) $symbolId);
             $blastRisks[] = (string) ($blast['risk'] ?? 'unknown');
-            foreach ($blast['files'] ?? [] as $file) if (is_string($file['path'] ?? null)) $files[$file['path']] = $file;
+            foreach ($blast['files'] ?? [] as $file) {
+                if (is_string($file['path'] ?? null)) {
+                    $files[$file['path']] = $file;
+                }
+            }
             foreach ($blast['routes'] ?? [] as $route) {
                 $label = trim((string) ($route['http_method'] ?? '') . ' ' . (string) ($route['route_path'] ?? ''));
-                if ($label !== '') $routes[$label] = $route + ['label' => $label];
+                if ($label !== '') {
+                    $routes[$label] = $route + ['label' => $label];
+                }
             }
-            foreach ($blast['tables'] ?? [] as $table) $tables[(string) ($table['id'] ?? $table['name'] ?? count($tables))] = $table;
-            foreach ($blast['direct'] ?? [] as $item) $direct[(string) ($item['id'] ?? $item['name'])] = $item;
-            foreach ($blast['transitive'] ?? [] as $item) $transitive[(string) ($item['id'] ?? $item['name'])] = $item;
+            $tables = self::mergeBoundaryRows($tables, array_values(array_filter($blast['tables'] ?? [], 'is_array')));
+            $services = self::mergeBoundaryRows($services, array_values(array_filter($blast['services'] ?? [], 'is_array')));
+            foreach ($blast['direct'] ?? [] as $item) {
+                $direct[(string) ($item['id'] ?? $item['name'])] = $item;
+            }
+            foreach ($blast['transitive'] ?? [] as $item) {
+                $transitive[(string) ($item['id'] ?? $item['name'])] = $item;
+            }
 
             $first = array_values($blast['direct'] ?? [])[0] ?? null;
             $second = array_values($blast['transitive'] ?? [])[0] ?? null;
             $chain = [['name' => (string) ($symbol['name'] ?? 'Selected symbol'), 'type' => (string) ($symbol['symbol_type'] ?? $symbol['type'] ?? 'symbol')]];
-            if ($first !== null) $chain[] = ['name' => (string) $first['name'], 'type' => (string) ($first['relationship'] ?? 'dependent')];
-            if ($second !== null) $chain[] = ['name' => (string) $second['name'], 'type' => (string) ($second['relationship'] ?? 'transitive dependent')];
-            if (count($chain) > 1) $chains[] = $chain;
+            if ($first !== null) {
+                $chain[] = ['name' => (string) $first['name'], 'type' => (string) ($first['relationship'] ?? 'dependent')];
+            }
+            if ($second !== null) {
+                $chain[] = ['name' => (string) $second['name'], 'type' => (string) ($second['relationship'] ?? 'transitive dependent')];
+            }
+            if (count($chain) > 1) {
+                $chains[] = $chain;
+            }
         }
 
         foreach ($symbols as $symbol) {
-            if (($symbol['symbol_type'] ?? $symbol['type'] ?? '') === 'external_service') $services[(string) ($symbol['id'] ?? $symbol['name'])] = $symbol;
+            if (($symbol['symbol_type'] ?? $symbol['type'] ?? '') === 'external_service') {
+                $services = self::mergeBoundaryRows($services, [$symbol]);
+            }
         }
 
         $pathValues = array_keys($files);
@@ -164,13 +233,26 @@ final class ChangeImpactService
     private function recommendations(string $risk, array $paths, array $routes, array $tables, array $services, array $tests): array
     {
         $items = [];
-        if ($tests === []) $items[] = 'Add a regression test around the selected behavior before changing its contract.';
-        else $items[] = 'Run the matched tests first, then the repository-wide suite.';
-        if ($routes !== []) $items[] = 'Exercise affected request flows, including authentication and authorization failures.';
-        if ($tables !== []) $items[] = 'Apply schema changes to disposable data and verify backward compatibility and rollback.';
-        if ($services !== []) $items[] = 'Test external-service failure, timeout, and retry behavior without exposing credentials.';
-        if ($risk === 'high') $items[] = 'Review every direct consumer before merge and confirm the highest-risk path manually.';
-        if ($paths !== []) $items[] = 'Rescan after the edit and compare the resulting evidence before merge.';
+        if ($tests === []) {
+            $items[] = 'Add a regression test around the selected behavior before changing its contract.';
+        } else {
+            $items[] = 'Run the matched tests first, then the repository-wide suite.';
+        }
+        if ($routes !== []) {
+            $items[] = 'Exercise affected request flows, including authentication and authorization failures.';
+        }
+        if ($tables !== []) {
+            $items[] = 'Apply schema changes to disposable data and verify backward compatibility and rollback.';
+        }
+        if ($services !== []) {
+            $items[] = 'Test external-service failure, timeout, and retry behavior without exposing credentials.';
+        }
+        if ($risk === 'high') {
+            $items[] = 'Review every direct consumer before merge and confirm the highest-risk path manually.';
+        }
+        if ($paths !== []) {
+            $items[] = 'Rescan after the edit and compare the resulting evidence before merge.';
+        }
         return array_values(array_unique($items));
     }
 }

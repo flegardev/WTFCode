@@ -25,7 +25,7 @@ final class TestEvidenceRepository
              WHERE project_id = :project_id
                AND (LOWER(path) LIKE :test_path OR LOWER(path) LIKE :spec_path OR LOWER(role_name) LIKE :test_role)
              ORDER BY path
-             LIMIT 400"
+             LIMIT 400",
         );
         $statement->execute([
             'project_id' => $projectId,
@@ -36,10 +36,14 @@ final class TestEvidenceRepository
 
         $needles = [];
         foreach (array_merge($changedPaths, $symbolNames) as $value) {
-            if (!is_string($value) || trim($value) === '') continue;
+            if (!is_string($value) || trim($value) === '') {
+                continue;
+            }
             $base = pathinfo(str_replace('\\', '/', $value), PATHINFO_FILENAME);
             $normalized = self::normalize($base);
-            if (strlen($normalized) >= 3) $needles[$normalized] = true;
+            if (strlen($normalized) >= 3) {
+                $needles[$normalized] = true;
+            }
         }
 
         $ranked = [];
@@ -47,19 +51,23 @@ final class TestEvidenceRepository
             $normalizedPath = self::normalize((string) $file['path']);
             $matches = [];
             foreach (array_keys($needles) as $needle) {
-                if (str_contains($normalizedPath, $needle)) $matches[] = $needle;
+                if (str_contains($normalizedPath, $needle)) {
+                    $matches[] = $needle;
+                }
             }
             $file['matched_terms'] = array_slice($matches, 0, 5);
             $file['match_score'] = count($matches);
             $ranked[] = $file;
         }
 
-        usort($ranked, static fn (array $left, array $right): int =>
+        usort(
+            $ranked,
+            static fn(array $left, array $right): int =>
             ((int) $right['match_score'] <=> (int) $left['match_score'])
-            ?: strcmp((string) $left['path'], (string) $right['path'])
+            ?: strcmp((string) $left['path'], (string) $right['path']),
         );
 
-        $matched = array_values(array_filter($ranked, static fn (array $file): bool => (int) $file['match_score'] > 0));
+        $matched = array_values(array_filter($ranked, static fn(array $file): bool => (int) $file['match_score'] > 0));
         return array_slice($matched !== [] ? $matched : $ranked, 0, max(1, min($limit, 30)));
     }
 
