@@ -33,6 +33,8 @@ Add these to **Production** before the first deployment:
 
 `PORT` is supplied by Vercel. `APP_URL` is optional; set it to the final `https://` production origin after the domain is known. The deterministic explanation provider is the default. Only add external explanation-provider variables if that data transfer is intentionally enabled and disclosed.
 
+For the first administrator, set `WTF_ADMIN_EMAIL` to the exact account email before that account registers or logs in once. The successful login promotes that account and persists the flag; remove the variable after setup. Alternatively, run `php tools/promote-admin.php --email=owner@example.com` from a trusted PHP environment with the production `DATABASE_URL`.
+
 Never add Supabase anon, publishable, or service-role keys. Never expose `DATABASE_URL` through client-side code or a `NEXT_PUBLIC_`/`VITE_` variable.
 
 ## First-deployment checks

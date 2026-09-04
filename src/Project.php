@@ -5,132 +5,161 @@ declare(strict_types=1);
 final class Project
 {
     /** @return array{project: array<string, mixed>}|array{error: string} */
-    public static function createFromGithub(int $userId, string $name, string $repositoryUrl, string $profile = AnalysisProfile::QUICK): array
+    public static function queueFromGithub(int $userId, string $name, string $repositoryUrl, string $profile = AnalysisProfile::QUICK): array
     {
-        @set_time_limit(120);
         $repositoryUrl = RepositoryImporter::normalizeGithubUrl($repositoryUrl);
         $name = trim($name);
         if ($repositoryUrl === null) return ['error' => 'Use a public HTTPS GitHub repository URL, for example https://github.com/owner/repository.'];
         if ($name === '') $name = RepositoryImporter::defaultName($repositoryUrl);
         if (text_length($name) > 140) return ['error' => 'Project names must be 140 characters or fewer.'];
 
-        try { GitHubAppService::inspectPublicRepository($repositoryUrl); }
-        catch (GitHubAccessException $exception) { return ['error' => $exception->safeMessage()]; }
-
         try {
-            $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => $name, 'repository_url' => $repositoryUrl, 'local_path' => '', 'status' => 'queued']);
-        } catch (PDOException $exception) {
-            if (Database::isUniqueViolation($exception)) return ['error' => 'You have already imported this repository.'];
-            throw $exception;
+            GitHubAppService::inspectPublicRepository($repositoryUrl);
+        } catch (GitHubAccessException $exception) {
+            return ['error' => $exception->safeMessage()];
         }
 
-        $path = null;
-        try {
-            self::setStatus($projectId, 'cloning');
-            $path = RepositoryImporter::clone($projectId, $repositoryUrl);
-            Database::connection()->prepare('UPDATE projects SET local_path = :local_path, status = :status WHERE id = :id')->execute(['local_path' => $path, 'status' => 'scanning', 'id' => $projectId]);
-            (new RepoScanner())->scan($projectId, $path, AnalysisProfile::normalize($profile));
-        } catch (Throwable $exception) {
-            Logger::error('Repository import failed', ['project_id' => $projectId, 'type' => get_class($exception), 'message' => $exception->getMessage()]);
-            $safe = self::safeRepositoryError($exception, 'The repository could not be imported. Check the URL or connect GitHub for private access.');
-            Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id')->execute(['status' => 'failed', 'last_error' => substr($safe, 0, 500), 'id' => $projectId]);
-            return ['error' => $safe];
-        } finally {
-            if ($path !== null && RepositoryImporter::ephemeral()) {
-                RepositoryImporter::cleanup($path);
-                Database::connection()->prepare("UPDATE projects SET local_path = '' WHERE id = :id")->execute(['id' => $projectId]);
-            }
-        }
-        return ['project' => self::findForUser($projectId, $userId)];
-    }
-
-    /** @return array{project: array<string, mixed>}|array{error: string} */
-    public static function createFromGitHubInstallation(int $userId, int $installationRecordId, int $repositoryId, string $name, string $profile = AnalysisProfile::QUICK): array
-    {
-        @set_time_limit(120);
-        $name = trim($name);
-        if (text_length($name) > 140) return ['error' => 'Project names must be 140 characters or fewer.'];
+        $pdo = Database::connection();
         $projectId = null;
-        $path = null;
         try {
-            $prepared = GitHubAppService::withRepositoryAccess($userId, $installationRecordId, $repositoryId, static function (array $repository, string $token) use ($userId, $installationRecordId, $name, &$projectId, &$path): array {
-                $projectName = $name === '' ? (string) $repository['name'] : $name;
-                $existing = Database::connection()->prepare('SELECT id, name FROM projects WHERE user_id = :user_id AND repository_url = :repository_url LIMIT 1');
-                $existing->execute(['user_id' => $userId, 'repository_url' => (string) $repository['repository_url']]);
-                $ownedProject = $existing->fetch();
-                if ($ownedProject) {
-                    $id = (int) $ownedProject['id'];
-                    Database::connection()->prepare('UPDATE projects SET name = :name, local_path = :local_path, status = :status, last_error = NULL, github_installation_id = :installation_id, github_repository_id = :repository_id, github_repository_owner = :repository_owner, github_repository_name = :repository_name, github_repository_visibility = :repository_visibility WHERE id = :id AND user_id = :user_id')->execute([
-                        'name' => $name === '' ? (string) $ownedProject['name'] : $projectName,
-                        'local_path' => '',
-                        'status' => 'cloning',
-                        'installation_id' => $installationRecordId,
-                        'repository_id' => (int) $repository['id'],
-                        'repository_owner' => (string) $repository['owner'],
-                        'repository_name' => (string) $repository['name'],
-                        'repository_visibility' => (string) $repository['visibility'],
-                        'id' => $id,
-                        'user_id' => $userId,
-                    ]);
-                } else try {
-                    $id = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status, github_installation_id, github_repository_id, github_repository_owner, github_repository_name, github_repository_visibility) VALUES (:user_id, :name, :repository_url, :local_path, :status, :installation_id, :repository_id, :repository_owner, :repository_name, :repository_visibility)', [
-                        'user_id' => $userId,
-                        'name' => $projectName,
-                        'repository_url' => (string) $repository['repository_url'],
-                        'local_path' => '',
-                        'status' => 'cloning',
-                        'installation_id' => $installationRecordId,
-                        'repository_id' => (int) $repository['id'],
-                        'repository_owner' => (string) $repository['owner'],
-                        'repository_name' => (string) $repository['name'],
-                        'repository_visibility' => (string) $repository['visibility'],
-                    ]);
-                } catch (PDOException $exception) {
-                    if (Database::isUniqueViolation($exception)) throw new GitHubAccessException('This repository changed while it was being linked. Try again.', 'Concurrent private project import.', 'concurrent_project', $exception);
-                    throw $exception;
-                }
-                $projectId = $id;
-                $copy = RepositoryImporter::cloneAuthorized($id, (string) $repository['repository_url'], $token);
-                $path = $copy;
-                Database::connection()->prepare('UPDATE projects SET local_path = :local_path, status = :status WHERE id = :id')->execute(['local_path' => $copy, 'status' => 'scanning', 'id' => $id]);
-                return ['project_id' => $id, 'path' => $copy];
-            });
-            $projectId = (int) $prepared['project_id'];
-            $path = (string) $prepared['path'];
-            (new RepoScanner())->scan($projectId, $path, AnalysisProfile::normalize($profile));
+            $pdo->beginTransaction();
+            $projectId = Database::insert(
+                'INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)',
+                ['user_id' => $userId, 'name' => $name, 'repository_url' => $repositoryUrl, 'local_path' => '', 'status' => 'queued'],
+            );
+            AnalysisJobStore::enqueue($projectId, $userId, $profile, 'initial');
+            $pdo->commit();
         } catch (Throwable $exception) {
-            $safe = self::safeRepositoryError($exception, 'The private repository could not be imported. Update GitHub access and try again.');
-            Logger::error('Private repository import failed', ['project_id' => $projectId, 'type' => get_class($exception), 'message' => $exception->getMessage()]);
-            if ($projectId !== null) Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id AND user_id = :user_id')->execute(['status' => 'failed', 'last_error' => substr($safe, 0, 500), 'id' => $projectId, 'user_id' => $userId]);
-            return ['error' => $safe];
-        } finally {
-            if ($path !== null && RepositoryImporter::ephemeral()) {
-                RepositoryImporter::cleanup($path);
-                if ($projectId !== null) Database::connection()->prepare("UPDATE projects SET local_path = '' WHERE id = :id AND user_id = :user_id")->execute(['id' => $projectId, 'user_id' => $userId]);
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            if ($exception instanceof PDOException && Database::isUniqueViolation($exception)) {
+                return ['error' => 'You have already imported this repository. Open the existing project to rescan it.'];
             }
+            Logger::error('Public repository enqueue failed', ['project_id' => $projectId, 'type' => get_class($exception)]);
+            $safe = self::safeRepositoryError($exception, 'The repository could not be queued for analysis. Try again.');
+            return ['error' => $safe];
         }
+
         return ['project' => self::findForUser((int) $projectId, $userId)];
     }
 
+    /** @return array{project: array<string, mixed>}|array{error: string} */
+    public static function queueFromGitHubInstallation(int $userId, int $installationRecordId, int $repositoryId, string $name, string $profile = AnalysisProfile::QUICK): array
+    {
+        $name = trim($name);
+        if (text_length($name) > 140) return ['error' => 'Project names must be 140 characters or fewer.'];
+        $projectId = null;
+
+        try {
+            $prepared = GitHubAppService::withRepositoryAccess(
+                $userId,
+                $installationRecordId,
+                $repositoryId,
+                static function (array $repository, string $_token) use ($userId, $installationRecordId, $name, $profile): array {
+                    $pdo = Database::connection();
+                    $projectName = $name === '' ? (string) $repository['name'] : $name;
+                    $pdo->beginTransaction();
+                    try {
+                        $existing = $pdo->prepare('SELECT id, name, last_scan_at FROM projects WHERE user_id = :user_id AND repository_url = :repository_url LIMIT 1 FOR UPDATE');
+                        $existing->execute(['user_id' => $userId, 'repository_url' => (string) $repository['repository_url']]);
+                        $ownedProject = $existing->fetch();
+
+                        if ($ownedProject) {
+                            $id = (int) $ownedProject['id'];
+                            $hasEvidence = !empty($ownedProject['last_scan_at']);
+                            $pdo->prepare('UPDATE projects SET name = :name, local_path = :local_path, status = :status, last_error = NULL, github_installation_id = :installation_id, github_repository_id = :repository_id, github_repository_owner = :repository_owner, github_repository_name = :repository_name, github_repository_visibility = :repository_visibility WHERE id = :id AND user_id = :user_id')->execute([
+                                'name' => $name === '' ? (string) $ownedProject['name'] : $projectName,
+                                'local_path' => '',
+                                'status' => $hasEvidence ? 'ready' : 'queued',
+                                'installation_id' => $installationRecordId,
+                                'repository_id' => (int) $repository['id'],
+                                'repository_owner' => (string) $repository['owner'],
+                                'repository_name' => (string) $repository['name'],
+                                'repository_visibility' => (string) $repository['visibility'],
+                                'id' => $id,
+                                'user_id' => $userId,
+                            ]);
+                        } else {
+                            $id = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status, github_installation_id, github_repository_id, github_repository_owner, github_repository_name, github_repository_visibility) VALUES (:user_id, :name, :repository_url, :local_path, :status, :installation_id, :repository_id, :repository_owner, :repository_name, :repository_visibility)', [
+                                'user_id' => $userId,
+                                'name' => $projectName,
+                                'repository_url' => (string) $repository['repository_url'],
+                                'local_path' => '',
+                                'status' => 'queued',
+                                'installation_id' => $installationRecordId,
+                                'repository_id' => (int) $repository['id'],
+                                'repository_owner' => (string) $repository['owner'],
+                                'repository_name' => (string) $repository['name'],
+                                'repository_visibility' => (string) $repository['visibility'],
+                            ]);
+                            $hasEvidence = false;
+                        }
+
+                        AnalysisJobStore::enqueue($id, $userId, $profile, $hasEvidence ? 'rescan' : 'initial');
+                        $pdo->commit();
+
+                        return ['project_id' => $id];
+                    } catch (Throwable $exception) {
+                        if ($pdo->inTransaction()) $pdo->rollBack();
+                        if ($exception instanceof PDOException && Database::isUniqueViolation($exception)) {
+                            throw new GitHubAccessException('This repository changed while it was being linked. Try again.', 'Concurrent private project import.', 'concurrent_project', $exception);
+                        }
+                        throw $exception;
+                    }
+                },
+            );
+            $projectId = (int) $prepared['project_id'];
+        } catch (Throwable $exception) {
+            $safe = self::safeRepositoryError($exception, 'The private repository could not be queued. Update GitHub access and try again.');
+            Logger::error('Private repository enqueue failed', ['project_id' => $projectId, 'type' => get_class($exception)]);
+            return ['error' => $safe];
+        }
+
+        return ['project' => self::findForUser((int) $projectId, $userId)];
+    }
+
+    public static function queueRescan(array $project, int $userId, string $profile = AnalysisProfile::QUICK): ?string
+    {
+        if ((int) ($project['user_id'] ?? 0) !== $userId) return 'Project not found.';
+
+        $pdo = Database::connection();
+        try {
+            $pdo->beginTransaction();
+            AnalysisJobStore::enqueue((int) $project['id'], $userId, $profile, 'rescan');
+            if (empty($project['last_scan_at'])) {
+                $pdo->prepare("UPDATE projects SET status = 'queued', last_error = NULL WHERE id = :id AND user_id = :user_id")->execute(['id' => (int) $project['id'], 'user_id' => $userId]);
+            }
+            $pdo->commit();
+        } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            Logger::error('Repository rescan enqueue failed', ['project_id' => $project['id'] ?? null, 'type' => get_class($exception)]);
+            return self::safeRepositoryError($exception, 'The repository could not be queued for analysis. Try again.');
+        }
+
+        return null;
+    }
+
+    /**
+     * @deprecated HTTP imports are asynchronous; retained as a compatibility alias.
+     * @return array{project: array<string, mixed>}|array{error: string}
+     */
+    public static function createFromGithub(int $userId, string $name, string $repositoryUrl, string $profile = AnalysisProfile::QUICK): array
+    {
+        return self::queueFromGithub($userId, $name, $repositoryUrl, $profile);
+    }
+
+    /**
+     * @deprecated HTTP imports are asynchronous; retained as a compatibility alias.
+     * @return array{project: array<string, mixed>}|array{error: string}
+     */
+    public static function createFromGitHubInstallation(int $userId, int $installationRecordId, int $repositoryId, string $name, string $profile = AnalysisProfile::QUICK): array
+    {
+        return self::queueFromGitHubInstallation($userId, $installationRecordId, $repositoryId, $name, $profile);
+    }
+
+    /** @deprecated HTTP rescans are asynchronous; retained as a compatibility alias. */
     public static function rescan(array $project, int $userId, string $profile = AnalysisProfile::QUICK): ?string
     {
-        if ((int) $project['user_id'] !== $userId) return 'Project not found.';
-        $path = null;
-        try {
-            @set_time_limit(120);
-            self::setStatus((int) $project['id'], 'scanning');
-            $path = RepositoryImporter::workingCopy($project);
-            Database::connection()->prepare('UPDATE projects SET local_path = :path WHERE id = :id')->execute(['path' => RepositoryImporter::ephemeral() ? '' : $path, 'id' => $project['id']]);
-            (new RepoScanner())->scan((int) $project['id'], $path, AnalysisProfile::normalize($profile));
-        } catch (Throwable $exception) {
-            Logger::error('Repository rescan failed', ['project_id' => $project['id'], 'type' => get_class($exception), 'message' => $exception->getMessage()]);
-            $safe = self::safeRepositoryError($exception, 'The repository could not be rescanned. Try Quick analysis again.');
-            Database::connection()->prepare('UPDATE projects SET status = :status, last_error = :last_error WHERE id = :id AND user_id = :user_id')->execute(['status' => 'failed', 'last_error' => substr($safe, 0, 500), 'id' => $project['id'], 'user_id' => $userId]);
-            return $safe;
-        } finally {
-            if ($path !== null && RepositoryImporter::ephemeral()) RepositoryImporter::cleanup($path);
-        }
-        return null;
+        return self::queueRescan($project, $userId, $profile);
     }
 
     public static function findForUser(int $projectId, int $userId): ?array
@@ -318,11 +347,6 @@ final class Project
         $statement = Database::connection()->prepare('SELECT * FROM project_files WHERE project_id = :project_id AND role_name = :role ORDER BY path LIMIT 30');
         $statement->execute(['project_id' => $projectId, 'role' => $role]);
         return $statement->fetchAll();
-    }
-
-    private static function setStatus(int $projectId, string $status): void
-    {
-        Database::connection()->prepare('UPDATE projects SET status = :status, last_error = NULL WHERE id = :id')->execute(['status' => $status, 'id' => $projectId]);
     }
 
     private static function safeRepositoryError(Throwable $exception, string $fallback): string

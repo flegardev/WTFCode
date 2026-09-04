@@ -18,6 +18,13 @@ vendor/
 node_modules/
 tools/composer.phar
 tools/bin/
+
+# Local credentials and signing material
+*.pem
+*.key
+*.p12
+*.pfx
+
 *.log
 *.tmp
 *security*.json

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 final class GitDiffService
 {
+    /** @var array<string, string|null> */
+    private static array $contentCache = [];
+
     public static function commits(array $project): array
     {
         try { $path = RepositoryImporter::workingCopy($project); }
@@ -22,6 +25,8 @@ final class GitDiffService
         if (!self::isSafeRef($from) || !self::isSafeRef($to) || $from === $to) return ['error' => 'Choose two different commit references from this repository.'];
         try { $path = RepositoryImporter::workingCopy($project); }
         catch (Throwable) { return ['error' => 'The temporary repository copy could not be prepared. Try again.']; }
+        if (!self::commitExists($path, $from) || !self::commitExists($path, $to)) return ['error' => 'One of the selected references is no longer available as a commit in this repository.'];
+        self::$contentCache = [];
         $stat = self::run($path, ['diff', '--stat', $from, $to, '--']);
         $changes = self::run($path, ['diff', '--name-status', $from, $to, '--']);
         if ($changes === []) return ['error' => 'No file changes were found between those commits.'];
@@ -31,20 +36,38 @@ final class GitDiffService
             $parts = explode("\t", $line);
             $status = $parts[0] ?? '?';
             $file = $parts[count($parts) - 1] ?? $line;
+            $oldPath = (preg_match('/^[RC]\d*$/', $status) === 1 && count($parts) >= 3) ? ($parts[1] ?? null) : null;
             $category = self::categoryFor($file);
             $risk = self::riskFor($file, $status);
-            $entry = ['status' => $status, 'path' => $file, 'risk' => $risk];
+            $entry = ['status' => $status, 'path' => $file, 'old_path' => $oldPath, 'risk' => $risk];
             $groups[$category][] = $entry;
             if ($risk !== null) $risky[] = $entry;
         }
         $paths = [];
-        foreach ($groups as $entries) foreach ($entries as $entry) $paths[] = $entry['path'];
+        foreach ($groups as $entries) foreach ($entries as $entry) {
+            $paths[] = $entry['path'];
+            if (is_string($entry['old_path'] ?? null)) $paths[] = $entry['old_path'];
+        }
+        $paths = array_values(array_unique($paths));
         $symbolDelta = self::symbolDelta($path, $from, $to, $paths);
         $semanticDelta = self::semanticDelta($path, $from, $to, $paths);
         $impact = SymbolRepository::impactForPaths((int) $project['id'], $paths);
         $scopeDrift = self::scopeDrift($intendedChange, array_keys($groups), $semanticDelta);
+        $latestScan = SymbolRepository::latestScan((int) $project['id']);
+        $scanCommit = is_string($latestScan['commit_sha'] ?? null) ? strtolower((string) $latestScan['commit_sha']) : null;
+        $resolvedTo = trim((string) self::runRaw($path, ['rev-parse', $to]));
+        $graphContext = [
+            'state' => $scanCommit === null || $scanCommit === '' ? 'unversioned' : ($scanCommit === strtolower($resolvedTo) ? 'exact' : 'stale'),
+            'scan_commit' => $scanCommit,
+            'target_commit' => $resolvedTo !== '' ? $resolvedTo : $to,
+            'message' => $scanCommit === null || $scanCommit === ''
+                ? 'Stored graph evidence has no commit identity, so impact is a best-effort current snapshot.'
+                : ($scanCommit === strtolower($resolvedTo)
+                    ? 'Stored graph evidence matches the selected later commit.'
+                    : 'Stored graph evidence comes from a different commit. Diff facts are exact, while blast radius is current-scan context.'),
+        ];
         $summary = 'Git reports ' . count($changes) . ' changed file' . (count($changes) === 1 ? '' : 's') . ' across ' . count($groups) . ' area' . (count($groups) === 1 ? '' : 's') . '. ' . ($risky === [] ? 'No high-risk path patterns were identified by the conservative review rules.' : count($risky) . ' file' . (count($risky) === 1 ? '' : 's') . ' deserve extra review because they touch authentication, data, configuration, or removals.');
-        return ['summary' => $summary, 'stat' => $stat, 'changes' => $changes, 'groups' => $groups, 'risky' => $risky, 'symbol_delta' => $symbolDelta, 'semantic_delta' => $semanticDelta, 'architecture_diff' => $semanticDelta['architecture'], 'scope_drift' => $scopeDrift, 'impact' => $impact];
+        return ['summary' => $summary, 'stat' => $stat, 'changes' => $changes, 'groups' => $groups, 'risky' => $risky, 'symbol_delta' => $symbolDelta, 'semantic_delta' => $semanticDelta, 'architecture_diff' => $semanticDelta['architecture'], 'scope_drift' => $scopeDrift, 'impact' => $impact, 'graph_context' => $graphContext];
     }
 
     /** @return array<string, array<string, array<int, array<string, mixed>>>> */
@@ -227,9 +250,11 @@ final class GitDiffService
 
     private static function contentAtRef(string $path, string $ref, string $file): ?string
     {
+        $cacheKey = hash('sha256', $path . "\0" . $ref . "\0" . $file);
+        if (array_key_exists($cacheKey, self::$contentCache)) return self::$contentCache[$cacheKey];
         $output = self::runRaw($path, ['show', $ref . ':' . str_replace('\\', '/', $file)]);
-        if ($output === null || strlen($output) > 262144 || str_contains($output, "\0")) return null;
-        return $output;
+        if ($output === null || strlen($output) > 262144 || str_contains($output, "\0")) return self::$contentCache[$cacheKey] = null;
+        return self::$contentCache[$cacheKey] = $output;
     }
 
     private static function categoryFor(string $path): string
@@ -258,6 +283,12 @@ final class GitDiffService
     private static function isSafeRef(string $ref): bool
     {
         return !str_starts_with($ref, '-') && preg_match('/^[A-Za-z0-9._\/-]{1,100}$/', $ref) === 1;
+    }
+
+    private static function commitExists(string $path, string $ref): bool
+    {
+        $resolved = self::runRaw($path, ['rev-parse', '--verify', $ref . '^{commit}']);
+        return is_string($resolved) && preg_match('/^[a-f0-9]{40}\s*$/i', $resolved) === 1;
     }
 
     /** @return array<int, string> */

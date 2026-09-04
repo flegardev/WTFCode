@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 final class RepoScanner
 {
-    private const MAX_FILES = 3000;
-    private const MAX_FILE_SIZE = 262144;
-    private const MAX_TOTAL_SCANNED_BYTES = 20971520;
-    private const IGNORED_DIRECTORIES = ['.git', '.idea', '.vscode', '.playwright-cli', 'node_modules', 'vendor', '.next', 'dist', 'build', 'coverage', '.turbo', '.cache', 'storage', 'tmp', 'temp'];
-    private const TEXT_EXTENSIONS = ['php', 'js', 'jsx', 'ts', 'tsx', 'py', 'rb', 'go', 'java', 'cs', 'rs', 'vue', 'svelte', 'json', 'yml', 'yaml', 'toml', 'sql', 'md', 'html', 'css', 'scss', 'sh', 'env'];
     private array $discoveryLimits = [];
 
-    public function scan(int $projectId, string $root, string $profile = AnalysisProfile::QUICK): array
+    public function scan(
+        int $projectId,
+        string $root,
+        string $profile = AnalysisProfile::QUICK,
+        ?int $existingJobId = null,
+        ?string $leaseToken = null,
+    ): array
     {
         if (!is_dir($root)) {
             throw new RuntimeException('The repository files are no longer available.');
@@ -22,17 +23,41 @@ final class RepoScanner
         $previousScan = SymbolRepository::latestScan($projectId);
         $previousCommit = is_string($previousScan['commit_sha'] ?? null) ? trim($previousScan['commit_sha']) : null;
         $changedPaths = $this->changedPaths($root, $previousCommit, $currentCommit);
-        $jobId = AnalysisJobStore::create($projectId, $profile, $currentCommit, $previousCommit, $changedPaths);
-        AnalysisJobStore::running($jobId);
+        $workerManaged = $existingJobId !== null;
+        if ($workerManaged && ($leaseToken === null || !preg_match('/^[a-f0-9]{64}$/', $leaseToken))) {
+            throw new RuntimeException('The scan worker lease is invalid.');
+        }
+        $jobId = $existingJobId ?? AnalysisJobStore::create($projectId, $profile, $currentCommit, $previousCommit, $changedPaths);
+        if ($workerManaged) {
+            if (!AnalysisJobStore::scanMetadata($jobId, $leaseToken, $currentCommit, $previousCommit, $changedPaths)) {
+                throw new RuntimeException('The scan worker no longer owns this analysis.');
+            }
+            if (!AnalysisJobStore::heartbeat($jobId, (string) $leaseToken, 'Analyzing source evidence', 2, 4)) {
+                throw new RuntimeException('The scan worker no longer owns this analysis.');
+            }
+        } else {
+            AnalysisJobStore::running($jobId);
+        }
         try {
-            $inspection = $this->inspect($root, $profile, $currentCommit, $previousCommit, $changedPaths);
+            $checkpoint = $workerManaged
+                ? static function (string $providerId, int $providerIndex, int $providerTotal) use ($jobId, $leaseToken): void {
+                    $stage = sprintf('Analyzing evidence: %s (%d/%d)', $providerId, $providerIndex, $providerTotal);
+                    if (!AnalysisJobStore::heartbeat($jobId, (string) $leaseToken, $stage, 2, 4)) {
+                        throw new ScanLeaseLostException('The scan worker lease expired during analysis.');
+                    }
+                }
+                : null;
+            $inspection = $this->inspect($root, $profile, $currentCommit, $previousCommit, $changedPaths, $checkpoint);
         } catch (Throwable $exception) {
-            AnalysisJobStore::finish($jobId, 'failed', $exception->getMessage());
+            if (!$workerManaged) AnalysisJobStore::finish($jobId, 'failed', 'The repository analysis did not finish.');
             throw $exception;
         }
         $files = $inspection['files'];
         unset($inspection['files']);
         $analysis = $inspection;
+        if ($workerManaged && !AnalysisJobStore::heartbeat($jobId, (string) $leaseToken, 'Persisting analysis evidence', 3, 4)) {
+            throw new RuntimeException('The scan worker lease expired before evidence could be saved.');
+        }
         $pdo = Database::connection();
         $pdo->beginTransaction();
 
@@ -59,6 +84,9 @@ final class RepoScanner
             PackageInventoryStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['packages'] ?? []);
             DisagreementStore::persist($projectId, $scanRunId, $analysis['symbol_graph']['disagreements'] ?? []);
             AnalysisJobStore::steps($jobId, $analysis['symbol_graph']['engine_runs'] ?? []);
+            if (!AnalysisJobStore::associateScanRun($jobId, $leaseToken, $scanRunId)) {
+                throw new RuntimeException('The analysis job could not be linked to its evidence.');
+            }
             $statement = $pdo->prepare('UPDATE projects SET status = :status, stack_json = :stack_json, overview = :overview, last_scan_at = NOW(), last_error = NULL WHERE id = :id');
             $statement->execute([
                 'status' => 'ready',
@@ -66,12 +94,14 @@ final class RepoScanner
                 'overview' => $analysis['overview'],
                 'id' => $projectId,
             ]);
-            $pdo->commit();
             $partial = count(array_filter($analysis['symbol_graph']['engine_runs'] ?? [], static fn (array $run): bool => in_array($run['status'] ?? '', ['partial', 'failed', 'unavailable'], true))) > 0;
-            AnalysisJobStore::finish($jobId, $partial ? 'partial' : 'completed');
+            if (!AnalysisJobStore::finish($jobId, $partial ? 'partial' : 'completed', null, $leaseToken)) {
+                throw new RuntimeException('The analysis job could not be completed by this worker.');
+            }
+            $pdo->commit();
         } catch (Throwable $exception) {
             if ($pdo->inTransaction()) $pdo->rollBack();
-            AnalysisJobStore::finish($jobId, 'failed', $exception->getMessage());
+            if (!$workerManaged) AnalysisJobStore::finish($jobId, 'failed', 'The repository analysis did not finish.');
             throw $exception;
         }
 
@@ -82,13 +112,24 @@ final class RepoScanner
      * Read-only inspection used by the scanner and lightweight unit checks.
      * Source contents only exist in this method's in-memory result.
      */
-    public function inspect(string $root, string $profile = AnalysisProfile::QUICK, ?string $currentRevision = null, ?string $previousRevision = null, array $changedPaths = []): array
+    public function inspect(
+        string $root,
+        string $profile = AnalysisProfile::QUICK,
+        ?string $currentRevision = null,
+        ?string $previousRevision = null,
+        array $changedPaths = [],
+        ?callable $analysisCheckpoint = null,
+    ): array
     {
         if (!is_dir($root)) throw new RuntimeException('The repository files are no longer available.');
-        $this->discoveryLimits = [];
-        $files = $this->discoverFiles($root);
+        $collected = (new \WTFCode\Scanning\FileCollector())->collect($root);
+        $this->discoveryLimits = $collected['limitations'];
+        $files = $collected['files'];
         $analysis = $this->analyse($files);
-        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(new AnalysisRequest($root, $files, $profile, $currentRevision, $previousRevision, $changedPaths));
+        $analysis['symbol_graph'] = (new AnalysisCoordinator())->analyze(
+            new AnalysisRequest($root, $files, $profile, $currentRevision, $previousRevision, $changedPaths),
+            $analysisCheckpoint,
+        );
         $analysis['symbol_graph'] = (new ProductIntelligence())->enrich($analysis['symbol_graph'], $files);
         $analysis['findings'] = array_merge($analysis['findings'], $analysis['symbol_graph']['findings'] ?? []);
         return $analysis + ['files' => $files];
@@ -105,134 +146,6 @@ final class RepoScanner
         } catch (Throwable) {
             return [];
         }
-    }
-
-    private function discoverFiles(string $root): array
-    {
-        $files = [];
-        $totalBytes = 0;
-        $directory = new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS);
-        $filtered = new RecursiveCallbackFilterIterator($directory, static function (SplFileInfo $entry): bool {
-            if ($entry->isLink()) return false;
-            return !$entry->isDir() || !in_array($entry->getFilename(), self::IGNORED_DIRECTORIES, true);
-        });
-        $iterator = new RecursiveIteratorIterator($filtered);
-        foreach ($iterator as $file) {
-            if (count($files) >= self::MAX_FILES) {
-                $this->discoveryLimits[] = 'The scanner stopped after the 3,000-file MVP limit.';
-                break;
-            }
-            if ($file->isLink() || !$file->isFile() || $file->getSize() > self::MAX_FILE_SIZE || $this->isIgnored($file->getPathname(), $root)) {
-                continue;
-            }
-            if ($totalBytes + $file->getSize() > self::MAX_TOTAL_SCANNED_BYTES) {
-                $this->discoveryLimits[] = 'The scanner reached its 20 MB readable-file limit.';
-                break;
-            }
-            $relative = str_replace('\\', '/', substr($file->getPathname(), strlen(rtrim($root, DIRECTORY_SEPARATOR)) + 1));
-            $extension = strtolower(pathinfo($relative, PATHINFO_EXTENSION));
-            $specialTextFile = in_array(basename($relative), ['Dockerfile', 'Procfile', 'Makefile', '.env.example'], true);
-            if (!in_array($extension, self::TEXT_EXTENSIONS, true) && !$specialTextFile) {
-                continue;
-            }
-            $content = file_get_contents($file->getPathname());
-            if ($content === false || str_contains($content, "\0")) {
-                continue;
-            }
-            $files[] = [
-                'path' => $relative,
-                'language' => $this->languageFor($extension, basename($relative)),
-                'size' => (int) $file->getSize(),
-                'lines' => substr_count($content, "\n") + 1,
-                'hash' => hash('sha256', $content),
-                'content' => $content,
-                'role' => $this->roleFor($relative, $content),
-                'summary' => $this->summaryFor($relative, $content),
-                'imports' => $this->extractImports($content, $extension),
-                'symbols' => $this->extractSymbols($content, $extension),
-            ];
-            $totalBytes += $file->getSize();
-        }
-        return $files;
-    }
-
-    private function isIgnored(string $path, string $root): bool
-    {
-        $relativeParts = explode(DIRECTORY_SEPARATOR, substr($path, strlen(rtrim($root, DIRECTORY_SEPARATOR)) + 1));
-        return count(array_intersect($relativeParts, self::IGNORED_DIRECTORIES)) > 0;
-    }
-
-    private function languageFor(string $extension, string $basename): string
-    {
-        if ($basename === 'Dockerfile') return 'Docker';
-        return match ($extension) {
-            'ts', 'tsx' => 'TypeScript', 'js', 'jsx' => 'JavaScript', 'php' => 'PHP', 'py' => 'Python',
-            'vue' => 'Vue', 'svelte' => 'Svelte', 'sql' => 'SQL', 'json' => 'JSON', 'yml', 'yaml' => 'YAML',
-            'css', 'scss' => 'CSS', 'html' => 'HTML', 'md' => 'Markdown', 'go' => 'Go', 'rb' => 'Ruby',
-            default => $extension === '' ? 'Configuration' : strtoupper($extension),
-        };
-    }
-
-    private function roleFor(string $path, string $content): string
-    {
-        $lower = strtolower($path);
-        $extension = pathinfo($lower, PATHINFO_EXTENSION);
-        $isDocumentation = $extension === 'md';
-        $isRuntimeCode = in_array($extension, ['php', 'js', 'jsx', 'ts', 'tsx', 'py', 'rb', 'go', 'java', 'cs'], true);
-        if (preg_match('#(^|/)(app|pages)/.+(page|route)\.(tsx?|jsx?)$#', $lower) || str_contains($lower, 'routes/')) return 'route';
-        if ((!$isDocumentation && preg_match('/@(app|router)\.(get|post|put|patch|delete)/i', $content)) || str_contains($lower, 'api/')) return 'api endpoint';
-        if (str_contains($lower, 'middleware')) return 'middleware';
-        if (str_contains($lower, 'auth') || ($isRuntimeCode && preg_match('/(?:password_(?:hash|verify)|session_start\s*\(|\bBearer\s+|supabase\.auth\.(?:signIn|signUp|getUser|onAuthStateChange)|nextauth\/|firebase\.auth\(\))/i', $content))) return 'authentication';
-        if (str_contains($lower, 'model') || str_contains($lower, 'schema') || (!$isDocumentation && preg_match('/(CREATE TABLE|prisma|sequelize|mongoose)/i', $content))) return 'data model';
-        if (in_array(basename($path), ['package.json', 'composer.json', 'requirements.txt', 'Dockerfile', 'vercel.json', 'docker-compose.yml'], true)) return 'configuration';
-        if (preg_match('#(^|/)(components?|ui)/#', $lower)) return 'ui component';
-        return 'source';
-    }
-
-    private function summaryFor(string $path, string $content): string
-    {
-        $role = $this->roleFor($path, $content);
-        return match ($role) {
-            'route' => 'This file defines a page or route that users can reach in the application.',
-            'api endpoint' => 'This file exposes server-side work that another part of the application can call.',
-            'middleware' => 'This file runs before selected requests and can protect, redirect, or reshape them.',
-            'authentication' => 'This file participates in identifying users or keeping them signed in.',
-            'data model' => 'This file describes, queries, or changes data that the application depends on.',
-            'configuration' => 'This file tells tooling or hosting platforms how the project should run.',
-            'ui component' => 'This is a reusable piece of the user interface that other screens can include.',
-            default => 'This is a source file that contributes application behavior or presentation.',
-        };
-    }
-
-    private function extractImports(string $content, string $extension): array
-    {
-        $matches = [];
-        if (in_array($extension, ['js', 'jsx', 'ts', 'tsx', 'vue', 'svelte'], true)) {
-            preg_match_all('/(?:from\s*[\'\"]|import\s*[\'\"]|require\(\s*[\'\"])([^\'\"]+)/', $content, $matches);
-        } elseif ($extension === 'php') {
-            preg_match_all('/(?:require|require_once|include|include_once)\s*[\(\s]*[\'\"]([^\'\"]+)/', $content, $matches);
-        } elseif ($extension === 'py') {
-            preg_match_all('/(?:from|import)\s+([A-Za-z0-9_\.\/]+)/', $content, $matches);
-        }
-        return array_values(array_unique($matches[1] ?? []));
-    }
-
-    private function extractSymbols(string $content, string $extension): array
-    {
-        if (!in_array($extension, ['php', 'js', 'jsx', 'ts', 'tsx', 'py', 'vue', 'svelte'], true)) return [];
-        $pattern = match ($extension) {
-            'php' => '/\b(?:final\s+|abstract\s+)?(?:class|interface|trait|function)\s+([A-Za-z_][A-Za-z0-9_]*)/i',
-            'py' => '/\b(?:class|def)\s+([A-Za-z_][A-Za-z0-9_]*)/',
-            default => '/\b(?:class|interface|function)\s+([A-Za-z_$][A-Za-z0-9_$]*)|\b(?:const|let|var)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=\s*(?:async\s*)?\(?[^\n]*?\)?\s*=>/',
-        };
-        preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
-        $symbols = [];
-        foreach ($matches as $match) {
-            $name = $match[1] !== '' ? $match[1] : ($match[2] ?? '');
-            if ($name !== '') $symbols[] = $name;
-            if (count($symbols) >= 16) break;
-        }
-        return array_values(array_unique($symbols));
     }
 
     private function analyse(array $files): array

@@ -1,61 +1,45 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * 🎓 BEGINNER NOTE: Application Bootstrap & Environment Initialization
+ * WTFCode Core Application Bootstrapper.
  * 
- * This file is the global entry point for all HTTP and CLI requests in WTFCode.
- * 
- * Core Architectural Responsibilities:
- * 1. PSR-4 / Fallback Class Autoloading:
- *    Registers `spl_autoload_register` so PHP classes in `/src` and `/src/Analysis`
- *    are automatically imported into memory on first reference without manual `require` statements.
- * 2. Centralized Exception & Crash Handler (`set_exception_handler`):
- *    Intercepts uncaught runtime errors, logs stack traces via `Logger::error`,
- *    and sanitizes sensitive database passwords or credentials using `SensitiveDataSanitizer`.
- * 3. HTTP Security Headers:
- *    Injects Content-Security-Policy (CSP), Strict-Transport-Security (HSTS), and X-Frame-Options.
- * 4. Hardened PHP Sessions:
- *    Configures `HttpOnly`, `SameSite=Lax`, and strict cookie flags to prevent session hijacking.
+ * BEGINNER NOTE:
+ * This file is included first by every web route and CLI command in WTFCode.
+ * It sets up Composer autoloader, environment configuration, global exception handlers,
+ * HTTP security headers, and secure session management.
  */
 
-if (PHP_SAPI === 'cli' || (int) ini_get('memory_limit') < 512) {
-    @ini_set('memory_limit', '512M');
-}
+declare(strict_types=1);
 
+// 1. Verify and load Composer vendor packages (third-party dependencies & class autoloader)
 $composerAutoload = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-if (is_file($composerAutoload)) {
-    require_once $composerAutoload;
-}
-
-spl_autoload_register(static function (string $class): void {
-    $relative = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
-    foreach ([__DIR__ . DIRECTORY_SEPARATOR . 'src', __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Analysis'] as $root) {
-        $candidate = $root . DIRECTORY_SEPARATOR . $relative;
-        if (is_file($candidate)) {
-            require_once $candidate;
-            return;
+if (!is_file($composerAutoload)) {
+    $message = 'WTFCode dependencies are missing. Run "composer install" in the project root.';
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $message . PHP_EOL);
+    } else {
+        http_response_code(503);
+        if (!headers_sent()) {
+            header('Content-Type: text/plain; charset=utf-8');
+            header('Cache-Control: no-store, max-age=0');
+            header('X-Content-Type-Options: nosniff');
         }
-        $candidate = $root . DIRECTORY_SEPARATOR . basename($relative);
-        if (is_file($candidate)) {
-            require_once $candidate;
-            return;
-        }
+        echo $message;
     }
-});
-
-foreach (['src/Logger.php', 'src/helpers.php', 'src/Database.php'] as $file) {
-    require_once __DIR__ . DIRECTORY_SEPARATOR . $file;
+    exit(1);
 }
+require_once $composerAutoload;
 
+// 2. Load application configuration settings
 $config = app_config();
 if ($config['environment'] === 'production') {
+    // In production, suppress raw PHP errors from displaying directly in the browser
     ini_set('display_errors', '0');
     ini_set('display_startup_errors', '0');
     error_reporting(E_ALL);
 }
 
+// 3. Global Exception Handler: logs unhandled errors and renders sanitized responses
 set_exception_handler(static function (Throwable $exception): void {
     Logger::error('Unhandled application exception', ['type' => get_class($exception), 'message' => $exception->getMessage()]);
     if (PHP_SAPI === 'cli') {
@@ -69,10 +53,12 @@ set_exception_handler(static function (Throwable $exception): void {
     exit($config['debug'] ? 'Application error: ' . SensitiveDataSanitizer::text($exception->getMessage()) : 'Something went wrong. Please try again.');
 });
 
+// 4. Send modern HTTP security headers (CSP, HSTS, X-Content-Type-Options, etc.)
 if (PHP_SAPI !== 'cli' && !headers_sent()) {
     send_security_headers();
 }
 
+// 5. Initialize secure cookie-based session management
 if (PHP_SAPI !== 'cli' && !defined('WTF_CODE_NO_SESSION') && session_status() !== PHP_SESSION_ACTIVE) {
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
@@ -90,17 +76,4 @@ if (PHP_SAPI !== 'cli' && !defined('WTF_CODE_NO_SESSION') && session_status() !=
         'samesite' => 'Lax',
     ]);
     session_start();
-}
-
-foreach ([
-    'src/Auth.php',
-    'src/RepositoryImporter.php',
-    'src/RepoScanner.php',
-    'src/Project.php',
-    'src/ExplorationService.php',
-    'src/PromptSafetyService.php',
-    'src/ExplanationService.php',
-    'src/GitDiffService.php',
-] as $file) {
-    require_once __DIR__ . DIRECTORY_SEPARATOR . $file;
 }

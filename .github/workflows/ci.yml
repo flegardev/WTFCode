@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable:
+    name: Portable quality gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, json, mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-check-publish
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install analysis worker dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Lint PHP
+        run: composer lint
+
+      - name: Run PHPUnit unit tests
+        run: composer test:unit
+
+      - name: Run portable regression scripts
+        run: composer test:portable
+
+      - name: Run analyzer contract tests
+        run: composer test:analyzers
+
+      - name: Check JavaScript syntax
+        run: npm run check:workers
+
+      - name: Run static analysis
+        run: composer analyse
+
+      - name: Check formatting
+        run: composer format:check
+
+  full-suite:
+    name: Database, security, and E2E suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: wtfcode
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wtfcode"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      APP_DEBUG: 'true'
+      APP_ENV: testing
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/wtfcode?sslmode=disable
+      SESSION_DRIVER: database
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, json, mbstring, pdo_pgsql
+          coverage: none
+          tools: composer:v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install analysis worker dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install pinned security analyzers
+        run: bash tools/install-security-tools.sh
+
+      - name: Apply canonical PostgreSQL schema
+        env:
+          PGPASSWORD: postgres
+        run: psql --host=127.0.0.1 --username=postgres --dbname=wtfcode --set=ON_ERROR_STOP=1 --file=supabase/production-schema.sql
+
+      - name: Run the complete reproducible test matrix
+        run: composer test:all

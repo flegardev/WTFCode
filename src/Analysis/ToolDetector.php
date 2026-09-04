@@ -12,7 +12,10 @@ final class ToolDetector
             return $resolved !== false && is_file($resolved) ? $resolved : null;
         }
         $localBin = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'tools' . DIRECTORY_SEPARATOR . 'bin';
-        foreach (PHP_OS_FAMILY === 'Windows' ? [$name, $name . '.exe', $name . '.cmd'] : [$name] as $localName) {
+        // A shared checkout can contain Linux and Windows tool payloads at the
+        // same time (for WSL/CI parity). Prefer PE launchers on Windows so a
+        // sibling extensionless ELF binary cannot shadow the native tool.
+        foreach (PHP_OS_FAMILY === 'Windows' ? [$name . '.exe', $name . '.cmd', $name] : [$name] as $localName) {
             $candidate = $localBin . DIRECTORY_SEPARATOR . $localName;
             if (is_file($candidate)) return realpath($candidate) ?: $candidate;
         }

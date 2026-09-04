@@ -91,28 +91,18 @@ try {
     }
     security_assert(hash_file('sha256', __DIR__ . '/../config/security/gitleaks.toml') === ($manifest['trusted_configs'][0]['sha256'] ?? ''), 'Pinned Gitleaks configuration hash must match the manifest');
 
-    // Database persistence sanitization check (if database is connected)
+    $pdo = Database::connection();
+    $pdo->beginTransaction();
     try {
-        $pdo = Database::connection();
-        $pdo->beginTransaction();
-        try {
-            $token = bin2hex(random_bytes(8));
-            $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Security test', 'email' => 'security-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
-            $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Security fixture', 'repository_url' => 'https://github.com/wtfcode-security/' . $token . '.git', 'local_path' => $root, 'status' => 'ready']);
-            $scanRunId = Database::insert('INSERT INTO scan_runs (project_id, analysis_version, analysis_profile) VALUES (:project_id, :analysis_version, :analysis_profile)', ['project_id' => $projectId, 'analysis_version' => AnalysisEngine::VERSION, 'analysis_profile' => AnalysisProfile::SECURITY]);
-            FindingStore::persist($projectId, $scanRunId, [$unsafeFinding]);
-            $stmt = $pdo->prepare('SELECT title, plain_explanation, evidence_json FROM scan_findings WHERE scan_run_id = :scan_run_id');
-            $stmt->execute([':scan_run_id' => $scanRunId]);
-            $row = $stmt->fetch();
-            $stored = $row ? implode(' ', $row) : '';
-            security_assert(!str_contains($stored, $rawSecret), 'Database persistence must apply the final secret-sanitization boundary');
-        } finally {
-            $pdo->rollBack();
-        }
-    } catch (RuntimeException $dbException) {
-        // If external DB is not running during local unit test, verify in-memory persistence logic
-        $sanitized = SensitiveDataSanitizer::finding($unsafeFinding);
-        security_assert(!str_contains(json_encode($sanitized, JSON_THROW_ON_ERROR), $rawSecret), 'Finding sanitization must redact raw secrets');
+        $token = bin2hex(random_bytes(8));
+        $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => 'Security test', 'email' => 'security-' . $token . '@wtfcode.local', 'password_hash' => password_hash($token, PASSWORD_DEFAULT)]);
+        $projectId = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)', ['user_id' => $userId, 'name' => 'Security fixture', 'repository_url' => 'https://github.com/wtfcode-security/' . $token . '.git', 'local_path' => $root, 'status' => 'ready']);
+        $scanRunId = Database::insert('INSERT INTO scan_runs (project_id, analysis_version, analysis_profile) VALUES (:project_id, :analysis_version, :analysis_profile)', ['project_id' => $projectId, 'analysis_version' => AnalysisEngine::VERSION, 'analysis_profile' => AnalysisProfile::SECURITY]);
+        FindingStore::persist($projectId, $scanRunId, [$unsafeFinding]);
+        $stored = (string) $pdo->query('SELECT CONCAT(title, plain_explanation, evidence_json) FROM scan_findings WHERE scan_run_id = ' . $scanRunId)->fetchColumn();
+        security_assert(!str_contains($stored, $rawSecret), 'Database persistence must apply the final secret-sanitization boundary');
+    } finally {
+        $pdo->rollBack();
     }
 } finally {
     @unlink($root . DIRECTORY_SEPARATOR . 'credentials.env');

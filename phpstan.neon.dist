@@ -1,0 +1,10 @@
+parameters:
+    level: 3
+    paths:
+        - bootstrap.php
+        - public
+        - src
+        - tools
+    tmpDir: storage/cache/phpstan
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: true

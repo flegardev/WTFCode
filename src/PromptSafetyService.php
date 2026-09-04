@@ -4,6 +4,64 @@ declare(strict_types=1);
 
 final class PromptSafetyService
 {
+    /**
+     * Build an implementation prompt from a concrete Git comparison. Unlike
+     * the free-form planner, every file, symbol, route, and boundary below was
+     * observed in the selected diff or its stored static blast radius.
+     *
+     * @param array<string, mixed> $diff
+     * @param array<string, mixed> $impact
+     * @return array{prompt:string, evidence:array<int, array<string, mixed>>, notes:array<int, string>}
+     */
+    public static function buildForReview(int $projectId, string $intendedChange, array $diff, array $impact): array
+    {
+        $intendedChange = trim(substr($intendedChange, 0, 500));
+        $paths = [];
+        foreach ($diff['groups'] ?? [] as $changes) {
+            foreach ($changes as $change) {
+                if (is_string($change['path'] ?? null)) $paths[] = $change['path'];
+                if (is_string($change['old_path'] ?? null)) $paths[] = $change['old_path'];
+            }
+        }
+        foreach ($impact['files'] ?? [] as $file) if (is_string($file['path'] ?? null)) $paths[] = $file['path'];
+        $paths = array_slice(array_values(array_unique($paths)), 0, 30);
+
+        $symbols = [];
+        foreach ($impact['symbols'] ?? [] as $symbol) {
+            $name = trim((string) ($symbol['qualified_name'] ?? $symbol['name'] ?? ''));
+            if ($name !== '') $symbols[] = $name;
+        }
+        $symbols = array_slice(array_values(array_unique($symbols)), 0, 20);
+
+        $routes = [];
+        foreach ($impact['routes'] ?? [] as $route) {
+            $label = trim((string) ($route['label'] ?? (($route['http_method'] ?? '') . ' ' . ($route['route_path'] ?? ''))));
+            if ($label !== '') $routes[] = $label;
+        }
+        $routes = array_slice(array_values(array_unique($routes)), 0, 20);
+
+        $notes = [
+            'Modify the existing project. Do not rewrite the stack or invent files, APIs, tables, or runtime behavior.',
+            'Treat this evidence as a static lower bound. Verify dynamic dispatch, generated code, and runtime configuration before editing.',
+            'Preserve authentication, authorization, CSRF, ownership checks, and secret handling.',
+        ];
+        if (($impact['tables'] ?? []) !== []) $notes[] = 'Keep data compatibility and include an explicit migration and rollback plan for structural changes.';
+        if (($impact['services'] ?? []) !== []) $notes[] = 'Keep credentials environment-backed and test timeout, failure, and retry behavior.';
+        if (($impact['routes'] ?? []) !== []) $notes[] = 'Preserve request methods, middleware order, response contracts, and authorization failures unless the requested change says otherwise.';
+        if (($impact['likely_tests'] ?? []) === []) $notes[] = 'No nearby test path was found in stored evidence. Add a focused regression test before relying on the change.';
+        foreach ($impact['recommendations'] ?? [] as $recommendation) if (is_string($recommendation)) $notes[] = $recommendation;
+
+        $goal = $intendedChange !== '' ? $intendedChange : 'Implement the reviewed change safely and preserve current behavior outside the selected scope.';
+        $prompt = "You are changing an existing repository.\n\nRequested outcome:\n{$goal}"
+            . "\n\nChanged and affected files supported by evidence:\n" . ($paths === [] ? 'No file path was resolved. Stop and gather evidence before editing.' : implode("\n", array_map(static fn (string $path): string => '- ' . $path, $paths)))
+            . "\n\nAffected symbols:\n" . ($symbols === [] ? 'No stored symbol was resolved.' : implode("\n", array_map(static fn (string $symbol): string => '- ' . $symbol, $symbols)))
+            . "\n\nAffected routes:\n" . ($routes === [] ? 'No affected route was resolved.' : implode("\n", array_map(static fn (string $route): string => '- ' . $route, $routes)))
+            . "\n\nConstraints and checks:\n- " . implode("\n- ", array_values(array_unique($notes)))
+            . "\n\nBefore editing, state the exact files and symbols you will change. After editing, report behavior changed, tests run, and any migration or configuration impact.";
+
+        return ['prompt' => $prompt, 'evidence' => Project::filesForPaths($projectId, $paths), 'notes' => array_values(array_unique($notes))];
+    }
+
     /** @return array{prompt: string, evidence: array<int, array<string, mixed>>, notes: array<int, string>} */
     public static function build(int $projectId, string $request): array
     {

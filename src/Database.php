@@ -12,62 +12,62 @@ final class Database
             return self::$connection;
         }
 
-        $config = app_config(true);
-        $driver = (string) ($config['driver'] ?? 'mysql');
-
-        $dsn = match ($driver) {
-            'pgsql' => sprintf('pgsql:host=%s;port=%s;dbname=%s;sslmode=%s;connect_timeout=10', $config['host'], $config['port'], $config['database'], $config['sslmode']),
-            'sqlite' => sprintf('sqlite:%s', $config['database']),
-            default => sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $config['host'], $config['port'], $config['database'], $config['charset']),
-        };
+        $config = app_config();
+        $dsn = $config['driver'] === 'pgsql'
+            ? sprintf('pgsql:host=%s;port=%s;dbname=%s;sslmode=%s;connect_timeout=10', $config['host'], $config['port'], $config['database'], $config['sslmode'])
+            : sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $config['host'], $config['port'], $config['database'], $config['charset']);
 
         try {
-            $user = $driver === 'sqlite' ? null : ($config['username'] ?? null);
-            $pass = $driver === 'sqlite' ? null : ($config['password'] ?? null);
-
-            self::$connection = new PDO($dsn, $user, $pass, [
+            self::$connection = new PDO($dsn, $config['username'], $config['password'], [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
-
-            if ($driver === 'pgsql') {
+            if ($config['driver'] === 'pgsql') {
                 self::$connection->exec("SET TIME ZONE 'UTC'");
                 self::$connection->exec("SET statement_timeout = '120s'");
-            } elseif ($driver === 'sqlite') {
-                self::$connection->exec('PRAGMA foreign_keys = ON;');
-                if ($config['database'] !== ':memory:') {
-                    self::$connection->exec('PRAGMA journal_mode = WAL;');
-                }
             }
         } catch (PDOException $exception) {
-            Logger::error('Database connection failed', ['code' => $exception->getCode(), 'driver' => $driver]);
-            self::$connection = null;
-            throw new RuntimeException('WTFCode could not connect to its database: ' . $exception->getMessage(), 0, $exception);
+            Logger::error('Database connection failed', ['code' => $exception->getCode()]);
+            self::disconnect();
+            throw new RuntimeException('WTFCode could not connect to its database.', 0, $exception);
         }
 
         return self::$connection;
     }
 
-    public static function setConnection(?PDO $pdo): void
+    /**
+     * Release the cached connection so a supervised worker or a later request
+     * cannot keep reusing a broken PDO handle. Any open transaction is rolled
+     * back when the connection is still healthy enough to do so.
+     */
+    public static function disconnect(): void
     {
-        self::$connection = $pdo;
-        app_config(true);
+        $connection = self::$connection;
+        self::$connection = null;
+
+        if (!$connection instanceof PDO) {
+            return;
+        }
+
+        try {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+        } catch (Throwable) {
+            // A broken connection may not be able to report or roll back its
+            // transaction. Dropping the final handle still prevents reuse.
+        }
     }
 
     public static function driver(): string
     {
-        return (string) app_config(true)['driver'];
+        return (string) app_config()['driver'];
     }
 
     public static function isPostgres(): bool
     {
         return self::driver() === 'pgsql';
-    }
-
-    public static function isSqlite(): bool
-    {
-        return self::driver() === 'sqlite';
     }
 
     /** @param array<string|int, mixed> $parameters */
@@ -80,6 +80,6 @@ final class Database
 
     public static function isUniqueViolation(PDOException $exception): bool
     {
-        return in_array((string) $exception->getCode(), ['23000', '23505', '19'], true);
+        return in_array((string) $exception->getCode(), ['23000', '23505'], true);
     }
 }

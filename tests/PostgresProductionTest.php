@@ -107,6 +107,7 @@ try {
     production_assert(Project::findForUser($project, $owner) !== null, 'The owner must be able to load the project.');
     production_assert(Project::findForUser($project, $other) === null, 'Another account must not load the project.');
     Database::insert("INSERT INTO analysis_jobs (project_id, analysis_profile, state, changed_paths_json, created_at) VALUES (:project_id, :profile, :state, :paths, CURRENT_TIMESTAMP - INTERVAL '20 minutes')", ['project_id' => $project, 'profile' => 'quick', 'state' => 'running', 'paths' => '[]']);
+    AnalysisJobStore::recoverExpiredLeases($project);
     $staleJob = AnalysisJobStore::latest($project);
     production_assert(($staleJob['state'] ?? null) === 'failed', 'Stale hosted jobs must not remain permanently running.');
 } finally {

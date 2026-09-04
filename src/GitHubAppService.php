@@ -177,7 +177,12 @@ final class GitHubAppService
         ];
     }
 
-    /** @template T @param array<int,int>|null $repositoryIds @param callable(string):T $callback @return T */
+    /**
+     * @template T
+     * @param array<int, int>|null $repositoryIds
+     * @param callable(string): T $callback
+     * @return T
+     */
     private static function withInstallationToken(int $installationId, ?array $repositoryIds, callable $callback): mixed
     {
         $payload = $repositoryIds === null ? [] : ['repository_ids' => array_values($repositoryIds)];
