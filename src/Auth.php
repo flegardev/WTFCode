@@ -19,9 +19,25 @@ final class Auth
         return self::id() !== null;
     }
 
+    public static function isAdmin(): bool
+    {
+        if (!self::refreshUser()) return false;
+        $user = self::user();
+        return $user !== null && self::flag($user['is_admin'] ?? false) && !self::flag($user['is_suspended'] ?? false);
+    }
+
+    public static function requireAdmin(): void
+    {
+        self::requireLogin();
+        if (!self::isAdmin()) {
+            flash('error', 'Administrator access is required for that area.');
+            redirect('dashboard.php');
+        }
+    }
+
     public static function requireLogin(): void
     {
-        if (!self::check()) {
+        if (!self::check() || !self::refreshUser()) {
             flash('error', 'Log in to view your repository workspace.');
             redirect('login.php');
         }
@@ -72,7 +88,7 @@ final class Auth
             Logger::warning('Login rate limit reached', ['attempt_hash' => $rateKey]);
             return false;
         }
-        $statement = Database::connection()->prepare('SELECT id, name, email, password_hash FROM users WHERE email = :email LIMIT 1');
+        $statement = Database::connection()->prepare('SELECT id, name, email, password_hash, is_admin, is_suspended FROM users WHERE email = :email LIMIT 1');
         $statement->execute(['email' => strtolower(trim($email))]);
         $user = $statement->fetch();
         if (!$user || !password_verify($password, $user['password_hash'])) {
@@ -80,6 +96,11 @@ final class Auth
             Logger::warning('Login failed', ['email_hash' => hash('sha256', strtolower(trim($email)))]);
             return false;
         }
+        if (self::flag($user['is_suspended'] ?? false)) {
+            Logger::warning('Suspended login blocked', ['user_id' => (int) $user['id']]);
+            return false;
+        }
+        self::promoteConfiguredAdmin($user);
         LoginRateLimiter::clear($rateKey);
         if (password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
             Database::connection()->prepare('UPDATE users SET password_hash = :hash WHERE id = :id')->execute(['hash' => password_hash($password, PASSWORD_DEFAULT), 'id' => $user['id']]);
@@ -107,18 +128,63 @@ final class Auth
 
     private static function loginById(int $id): void
     {
-        $statement = Database::connection()->prepare('SELECT id, name, email FROM users WHERE id = :id LIMIT 1');
+        $statement = Database::connection()->prepare('SELECT id, name, email, is_admin, is_suspended FROM users WHERE id = :id LIMIT 1');
         $statement->execute(['id' => $id]);
         $user = $statement->fetch();
         if (!$user) {
             throw new RuntimeException('New account could not be loaded.');
         }
+        if (self::flag($user['is_suspended'] ?? false)) {
+            throw new RuntimeException('The new account is suspended.');
+        }
+        self::promoteConfiguredAdmin($user);
         self::storeUser($user);
     }
 
     private static function storeUser(array $user): void
     {
         session_regenerate_id(true);
-        $_SESSION['user'] = ['id' => (int) $user['id'], 'name' => $user['name'], 'email' => $user['email']];
+        $_SESSION['user'] = [
+            'id' => (int) $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'is_admin' => self::flag($user['is_admin'] ?? false),
+            'is_suspended' => self::flag($user['is_suspended'] ?? false),
+        ];
+    }
+
+    private static function refreshUser(): bool
+    {
+        $user = self::user();
+        if ($user === null) return false;
+        $statement = Database::connection()->prepare('SELECT id, name, email, is_admin, is_suspended FROM users WHERE id = :id LIMIT 1');
+        $statement->execute(['id' => (int) $user['id']]);
+        $record = $statement->fetch();
+        if (!is_array($record)) return false;
+        $_SESSION['user'] = [
+            'id' => (int) $record['id'],
+            'name' => $record['name'],
+            'email' => $record['email'],
+            'is_admin' => self::flag($record['is_admin'] ?? false),
+            'is_suspended' => self::flag($record['is_suspended'] ?? false),
+        ];
+        return !self::flag($record['is_suspended'] ?? false);
+    }
+
+    /** @param array<string, mixed> $user */
+    private static function promoteConfiguredAdmin(array &$user): void
+    {
+        $configuredEmail = strtolower(trim((string) (app_config()['admin_email'] ?? '')));
+        $email = strtolower(trim((string) ($user['email'] ?? '')));
+        if ($configuredEmail === '' || $email === '' || !hash_equals($configuredEmail, $email)) {
+            return;
+        }
+        Database::connection()->prepare('UPDATE users SET is_admin = :is_admin WHERE id = :id')->execute(['is_admin' => true, 'id' => (int) $user['id']]);
+        $user['is_admin'] = true;
+    }
+
+    private static function flag(mixed $value): bool
+    {
+        return $value === true || $value === 1 || $value === '1' || strtolower((string) $value) === 't' || strtolower((string) $value) === 'true';
     }
 }

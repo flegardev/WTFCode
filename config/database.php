@@ -72,4 +72,7 @@ return [
     'github_app_client_secret' => $environmentValue('GITHUB_APP_CLIENT_SECRET') ?? '',
     'github_app_private_key' => $environmentValue('GITHUB_APP_PRIVATE_KEY') ?? '',
     'github_app_callback_url' => $environmentValue('GITHUB_APP_CALLBACK_URL') ?? '',
+    // Optional first-admin bootstrap. On a successful login/register, this
+    // exact email is promoted once; leave it blank after setup if preferred.
+    'admin_email' => strtolower(trim($environmentValue('WTF_ADMIN_EMAIL') ?? '')),
 ];

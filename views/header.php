@@ -6,6 +6,7 @@ $pageTitle = $pageTitle ?? 'WTFCode';
 $activePage = $activePage ?? '';
 $currentUser = Auth::user();
 $projectContext = $currentUser !== null && isset($project) && is_array($project) && isset($project['id']);
+$isAdmin = $currentUser !== null && Auth::isAdmin();
 ?>
 <!doctype html>
 <html lang="en">
@@ -31,6 +32,7 @@ $projectContext = $currentUser !== null && isset($project) && is_array($project)
             <?php else: ?>
                 <a class="<?= $activePage === 'dashboard' ? 'is-active' : '' ?>" href="<?= e(url('dashboard.php')) ?>"<?= $activePage === 'dashboard' && !$projectContext ? ' aria-current="page"' : '' ?>>Projects</a>
                 <a class="<?= $activePage === 'import' ? 'is-active' : '' ?>" href="<?= e(url('project-create.php')) ?>"<?= $activePage === 'import' ? ' aria-current="page"' : '' ?>>Import repository</a>
+                <?php if ($isAdmin): ?><a class="<?= $activePage === 'admin' ? 'is-active' : '' ?>" href="<?= e(url('admin.php')) ?>"<?= $activePage === 'admin' ? ' aria-current="page"' : '' ?>>Admin</a><?php endif; ?>
                 <span class="user-name"><?= e($currentUser['name']) ?></span>
                 <form action="<?= e(url('logout.php')) ?>" method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><button class="text-button" type="submit">Log out</button></form>
             <?php endif; ?>

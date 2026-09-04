@@ -374,3 +374,28 @@ body.ask-is-open { overflow:hidden; }
     .graph-path-tools > span { grid-column:auto; }
     .graph-viewport { min-height:520px; }
 }
+
+.admin-shell { padding-bottom:80px; }
+.admin-metrics { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.admin-filter { display:grid; gap:10px; margin:26px 0; padding:18px 20px; }
+.admin-filter label { color:var(--muted); font-family:var(--mono); font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.admin-filter > div { display:flex; gap:10px; align-items:center; }
+.admin-filter input { min-width:0; flex:1; }
+.admin-panel { margin-top:20px; overflow:hidden; }
+.admin-table-wrap { overflow-x:auto; }
+.admin-table { width:100%; border-collapse:collapse; min-width:760px; }
+.admin-table th { color:var(--muted); font-family:var(--mono); font-size:.65rem; letter-spacing:.08em; text-align:left; text-transform:uppercase; }
+.admin-table th,.admin-table td { border-bottom:1px solid var(--line); padding:14px 16px; vertical-align:top; }
+.admin-table tr:last-child td { border-bottom:0; }
+.admin-table td > strong,.admin-table td > a { display:block; color:var(--text); }
+.admin-table td small { display:block; color:var(--muted); font-size:.72rem; line-height:1.45; margin-top:3px; max-width:270px; overflow-wrap:anywhere; }
+.admin-actions { display:flex; flex-wrap:wrap; gap:7px; }
+.admin-actions form { margin:0; }
+.admin-badge { display:inline-block; border:1px solid var(--line-strong); border-radius:999px; color:var(--muted); font-family:var(--mono); font-size:.62rem; font-weight:800; letter-spacing:.04em; padding:5px 8px; text-transform:uppercase; white-space:nowrap; }
+.admin-badge.is-good { border-color:rgba(119,240,194,.38); color:var(--accent); }
+.admin-badge.is-danger { border-color:rgba(255,117,117,.4); color:#ff9292; }
+.admin-badge.is-accent { background:rgba(119,240,194,.1); border-color:rgba(119,240,194,.38); color:var(--accent); }
+.button-danger { background:transparent; border:1px solid rgba(255,117,117,.4); color:#ff9292; }
+.button-danger:hover,.button-danger:focus-visible { background:rgba(255,117,117,.1); border-color:#ff9292; }
+@media (max-width:1000px) { .admin-metrics { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:600px) { .admin-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .admin-filter > div { align-items:stretch; flex-wrap:wrap; } .admin-filter input { flex-basis:100%; } .admin-filter .button { flex:1; text-align:center; } }
