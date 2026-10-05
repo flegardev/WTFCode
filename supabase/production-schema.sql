@@ -398,6 +398,15 @@ CREATE TRIGGER projects_touch_updated_at BEFORE UPDATE ON projects FOR EACH ROW 
 DROP TRIGGER IF EXISTS github_installations_touch_updated_at ON github_installations;
 CREATE TRIGGER github_installations_touch_updated_at BEFORE UPDATE ON github_installations FOR EACH ROW EXECUTE FUNCTION wtfcode_touch_updated_at();
 
+-- Foreign-key covering indexes (keep in sync with linked Supabase migrations)
+CREATE INDEX IF NOT EXISTS architecture_edges_from_node_id_index ON architecture_edges(from_node_id);
+CREATE INDEX IF NOT EXISTS architecture_edges_to_node_id_index ON architecture_edges(to_node_id);
+CREATE INDEX IF NOT EXISTS change_guard_snapshots_scan_run_id_index ON change_guard_snapshots(scan_run_id);
+CREATE INDEX IF NOT EXISTS change_guard_snapshots_user_id_index ON change_guard_snapshots(user_id);
+CREATE INDEX IF NOT EXISTS code_routes_file_id_index ON code_routes(file_id);
+CREATE INDEX IF NOT EXISTS code_symbols_parent_symbol_id_index ON code_symbols(parent_symbol_id);
+CREATE INDEX IF NOT EXISTS symbol_relationships_scan_run_id_index ON symbol_relationships(scan_run_id);
+
 -- Backend-only model: browser-facing Supabase Data API roles receive no privileges.
 DO $$
 DECLARE role_name TEXT;
