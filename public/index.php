@@ -12,7 +12,13 @@
 
 declare(strict_types=1);
 
-// Boot application services and sessions
+// Anonymous marketing requests need no database-backed session. Existing
+// session cookies retain the normal authenticated redirect and fail closed.
+if (!isset($_COOKIE['wtfcode_session'])) {
+    define('WTF_CODE_NO_SESSION', true);
+}
+
+// Boot application services and, when required, sessions
 require_once __DIR__ . '/../bootstrap.php';
 
 // Redirect logged-in users directly to their dashboard
