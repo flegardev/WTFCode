@@ -23,6 +23,7 @@ final class Project
         $projectId = null;
         try {
             $pdo->beginTransaction();
+            Entitlements::requireProjectSlot($userId);
             $projectId = Database::insert(
                 'INSERT INTO projects (user_id, name, repository_url, local_path, status) VALUES (:user_id, :name, :repository_url, :local_path, :status)',
                 ['user_id' => $userId, 'name' => $name, 'repository_url' => $repositoryUrl, 'local_path' => '', 'status' => 'queued'],
@@ -59,6 +60,7 @@ final class Project
                     $projectName = $name === '' ? (string) $repository['name'] : $name;
                     $pdo->beginTransaction();
                     try {
+                        Entitlements::lockUser($userId);
                         $existing = $pdo->prepare('SELECT id, name, last_scan_at FROM projects WHERE user_id = :user_id AND repository_url = :repository_url LIMIT 1 FOR UPDATE');
                         $existing->execute(['user_id' => $userId, 'repository_url' => (string) $repository['repository_url']]);
                         $ownedProject = $existing->fetch();
@@ -79,6 +81,7 @@ final class Project
                                 'user_id' => $userId,
                             ]);
                         } else {
+                            Entitlements::requireProjectSlot($userId);
                             $id = Database::insert('INSERT INTO projects (user_id, name, repository_url, local_path, status, github_installation_id, github_repository_id, github_repository_owner, github_repository_name, github_repository_visibility) VALUES (:user_id, :name, :repository_url, :local_path, :status, :installation_id, :repository_id, :repository_owner, :repository_name, :repository_visibility)', [
                                 'user_id' => $userId,
                                 'name' => $projectName,
@@ -351,6 +354,7 @@ final class Project
 
     private static function safeRepositoryError(Throwable $exception, string $fallback): string
     {
+        if ($exception instanceof DomainException) return $exception->getMessage();
         return $exception instanceof GitHubAccessException ? $exception->safeMessage() : $fallback;
     }
 }

@@ -29,6 +29,7 @@ final class GitHubAppService
     public static function configured(): bool
     {
         $config = self::configuration();
+        if (!(bool) ($config['private_repositories_enabled'] ?? false)) return false;
         foreach (['github_app_id', 'github_app_slug', 'github_app_client_id', 'github_app_client_secret', 'github_app_private_key', 'github_app_callback_url'] as $key) {
             if (trim((string) ($config[$key] ?? '')) === '') return false;
         }
@@ -259,7 +260,7 @@ final class GitHubAppService
         $raw = curl_exec($handle);
         $status = (int) curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
         $transportError = curl_error($handle);
-        curl_close($handle);
+        unset($handle);
         if (!is_string($raw)) throw new GitHubAccessException('GitHub could not be reached. Try again shortly.', 'GitHub transport error: ' . $transportError, 'unavailable');
         $decoded = $raw === '' ? [] : json_decode($raw, true);
         if (!is_array($decoded)) $decoded = [];

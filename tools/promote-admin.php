@@ -6,7 +6,7 @@ define('WTF_CODE_NO_SESSION', true);
 require_once __DIR__ . '/../bootstrap.php';
 
 $email = '';
-foreach (array_slice($argv, 1) as $argument) {
+foreach (array_slice($_SERVER['argv'] ?? [], 1) as $argument) {
     if (str_starts_with($argument, '--email=')) {
         $email = strtolower(trim(substr($argument, 8)));
     }

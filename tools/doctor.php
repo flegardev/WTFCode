@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../bootstrap.php';
 
 $checks = (new ToolDoctor())->inspect(dirname(__DIR__));
-if (in_array('--json', $argv, true)) {
+if (in_array('--json', $_SERVER['argv'] ?? [], true)) {
     echo json_encode([
         'analysis_version' => AnalysisEngine::VERSION,
         'platform' => PHP_OS_FAMILY,

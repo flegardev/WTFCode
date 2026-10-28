@@ -51,6 +51,10 @@ final class Auth
         $name = trim($name);
         $email = strtolower(trim($email));
         $errors = [];
+        $registrationKey = LoginRateLimiter::key('registration:' . client_ip());
+        if (LoginRateLimiter::blocked($registrationKey)) {
+            return ['email' => 'Too many workspace requests. Please try again in 15 minutes.'];
+        }
 
         if ($name === '' || text_length($name) > 100) {
             $errors['name'] = 'Enter a name up to 100 characters.';
@@ -58,8 +62,8 @@ final class Auth
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || text_length($email) > 190) {
             $errors['email'] = 'Enter a valid email address.';
         }
-        if (strlen($password) < 10) {
-            $errors['password'] = 'Use at least 10 characters for your password.';
+        if (strlen($password) < 10 || strlen($password) > 72) {
+            $errors['password'] = 'Use a password between 10 and 72 bytes.';
         }
         if ($password !== $confirmation) {
             $errors['confirmation'] = 'Passwords do not match.';
@@ -68,6 +72,7 @@ final class Auth
             return $errors;
         }
 
+        LoginRateLimiter::failed($registrationKey);
         try {
             $userId = Database::insert('INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)', ['name' => $name, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT)]);
         } catch (PDOException $exception) {
@@ -144,6 +149,7 @@ final class Auth
     private static function storeUser(array $user): void
     {
         session_regenerate_id(true);
+        unset($_SESSION['csrf_token']);
         $_SESSION['user'] = [
             'id' => (int) $user['id'],
             'name' => $user['name'],
@@ -160,7 +166,10 @@ final class Auth
         $statement = Database::connection()->prepare('SELECT id, name, email, is_admin, is_suspended FROM users WHERE id = :id LIMIT 1');
         $statement->execute(['id' => (int) $user['id']]);
         $record = $statement->fetch();
-        if (!is_array($record)) return false;
+        if (!is_array($record) || self::flag($record['is_suspended'] ?? false)) {
+            unset($_SESSION['user'], $_SESSION['csrf_token']);
+            return false;
+        }
         $_SESSION['user'] = [
             'id' => (int) $record['id'],
             'name' => $record['name'],

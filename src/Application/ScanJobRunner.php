@@ -41,7 +41,9 @@ final class ScanJobRunner
             }
 
             $this->markPreparing($projectId, $jobKind);
-            $path = RepositoryImporter::workingCopy($project);
+            // A long-running worker must not reuse its previous checkout when
+            // a user requests a rescan; that would analyze the old commit again.
+            $path = RepositoryImporter::workingCopy($project, true);
             $this->markScanning($projectId, $path, $jobKind);
 
             (new RepoScanner())->scan(

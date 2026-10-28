@@ -9,8 +9,11 @@ final class ExplanationManager
     {
         $packet = EvidencePacket::build($projectId, $question);
         $selected = strtolower((string) (getenv('WTF_CODE_EXPLANATION_PROVIDER') ?: 'deterministic'));
-        $provider = match ($selected) { 'openai', 'openai-compatible' => new OpenAiCompatibleExplanationProvider(), 'ollama' => new OllamaExplanationProvider(), default => new DeterministicExplanationProvider() };
-        $fallback = false;
+        // Customer Q&A stays local until a durable per-customer AI budget and
+        // explicit evidence-sharing consent are implemented. Preserve provider
+        // adapters for operator tests; environment selection cannot incur spend.
+        $provider = new DeterministicExplanationProvider();
+        $fallback = $selected !== 'deterministic';
         try {
             if (!$provider->isAvailable()) throw new RuntimeException('Selected explanation provider is unavailable.');
             $explanation = $provider->explain($packet);

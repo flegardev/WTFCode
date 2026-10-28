@@ -13,7 +13,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 @set_time_limit(0);
-$arguments = array_slice($argv, 1);
+$arguments = array_slice($_SERVER['argv'] ?? [], 1);
 $once = in_array('--once', $arguments, true);
 $loop = in_array('--loop', $arguments, true);
 if ($once === $loop) {

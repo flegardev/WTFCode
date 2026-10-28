@@ -18,6 +18,9 @@ try {
     import_assert(is_dir($path . DIRECTORY_SEPARATOR . '.git'), 'Known public repository must clone without a GitHub connection.');
     $samePath = RepositoryImporter::workingCopy(['id' => $projectId, 'user_id' => 1, 'repository_url' => $url, 'local_path' => $path]);
     import_assert($samePath === $path, 'Public working-copy reuse must remain available for rescan.');
+    file_put_contents($path . DIRECTORY_SEPARATOR . 'stale-checkout-marker.txt', 'must not survive a new scan');
+    $path = RepositoryImporter::workingCopy(['id' => $projectId, 'user_id' => 1, 'repository_url' => $url, 'local_path' => $path], true);
+    import_assert(!is_file($path . DIRECTORY_SEPARATOR . 'stale-checkout-marker.txt'), 'A fresh scan must discard both stored and in-process cached checkouts.');
     RepositoryImporter::cleanup($path);
     $path = RepositoryImporter::workingCopy(['id' => $projectId, 'user_id' => 1, 'repository_url' => $url, 'local_path' => '']);
     import_assert(is_dir($path . DIRECTORY_SEPARATOR . '.git'), 'Public rescan must rehydrate a missing working copy.');

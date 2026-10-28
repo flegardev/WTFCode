@@ -67,6 +67,7 @@ return [
     'version' => substr($environmentValue('APP_VERSION', 'VERCEL_GIT_COMMIT_SHA') ?? 'dev', 0, 64),
     'vercel' => $booleanValue($environmentValue('VERCEL')),
     'github_app_id' => $environmentValue('GITHUB_APP_ID') ?? '',
+    'private_repositories_enabled' => $booleanValue($environmentValue('WTF_PRIVATE_REPOSITORIES_ENABLED')),
     'github_app_slug' => $environmentValue('GITHUB_APP_SLUG') ?? '',
     'github_app_client_id' => $environmentValue('GITHUB_APP_CLIENT_ID') ?? '',
     'github_app_client_secret' => $environmentValue('GITHUB_APP_CLIENT_SECRET') ?? '',

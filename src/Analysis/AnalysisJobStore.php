@@ -22,6 +22,7 @@ final class AnalysisJobStore
 
         if ($ownsTransaction) $pdo->beginTransaction();
         try {
+            Entitlements::lockUser($requestedByUserId);
             // The projects row is the portable per-project mutex. PostgreSQL's
             // partial unique index and MySQL generated-column unique key are a
             // second line of defence.
@@ -67,6 +68,7 @@ final class AnalysisJobStore
                 return $activeId;
             }
 
+            Entitlements::requireScanSlot($requestedByUserId);
             $jobId = Database::insert(
                 'INSERT INTO analysis_jobs (project_id, requested_by_user_id, analysis_profile, job_kind, state, max_attempts, available_at, current_stage, progress_current, progress_total) VALUES (:project_id, :user_id, :profile, :job_kind, :state, :max_attempts, CURRENT_TIMESTAMP, :stage, 0, 4)',
                 [

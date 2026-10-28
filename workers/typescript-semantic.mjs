@@ -71,7 +71,9 @@ for (const source of project.getSourceFiles()) {
     nodeKeys.set(declaration, key);
 
     if (Node.isClassDeclaration(declaration) || Node.isInterfaceDeclaration(declaration)) {
-      for (const heritage of [...(declaration.getExtends?.() ?? []), ...(declaration.getImplements?.() ?? [])]) {
+      const extended = declaration.getExtends?.();
+      const heritageNodes = [...(Array.isArray(extended) ? extended : extended ? [extended] : []), ...(declaration.getImplements?.() ?? [])];
+      for (const heritage of heritageNodes) {
         addRelationship(key, null, safeName(heritage.getExpression?.().getText?.() ?? heritage.getText()), 'inherits', path, heritage.getStartLineNumber(), { semantic: true });
       }
     }
@@ -85,6 +87,13 @@ for (const source of project.getSourceFiles()) {
     if (target) addRelationship(moduleKey, null, target, 're_exports', path, exportDeclaration.getStartLineNumber(), { semantic: true });
   }
 
+}
+
+// Resolve calls only after every source file has registered its declarations.
+// Otherwise import resolution depends on alphabetical source-file order.
+for (const source of project.getSourceFiles()) {
+  const path = normalize(source.getFilePath().replace(/^\/repo\//, ''));
+  const moduleKey = moduleKeys.get(source);
   for (const call of source.getDescendantsOfKind(SyntaxKind.CallExpression)) {
     const expression = call.getExpression();
     const sourceDeclaration = call.getFirstAncestor((ancestor) => nodeKeys.has(ancestor));
@@ -129,13 +138,6 @@ function addRelationship(sourceKey, targetKey, externalName, type, path, line, m
 }
 
 function resolveRelationships() {
-  const byName = new Map();
-  for (const symbol of symbols) {
-    if (symbol.type === 'module') continue;
-    const list = byName.get(symbol.name) ?? [];
-    list.push(symbol.key);
-    byName.set(symbol.name, list);
-  }
   for (const edge of relationships) {
     if (edge.target_key || !edge.external_name) continue;
     if (edge.type === 'imports' || edge.type === 're_exports') {
@@ -148,17 +150,8 @@ function resolveRelationships() {
       }
       continue;
     }
-    if (edge.type !== 'calls' && edge.type !== 'renders') continue;
-    const shortName = edge.external_name.split(/[.:#]/).pop();
-    const candidates = byName.get(shortName) ?? [];
-    if (candidates.length === 1) {
-      edge.target_key = candidates[0];
-      edge.external_name = null;
-      edge.target_name = shortName;
-      edge.confidence = 'high';
-      edge.metadata.semantic = true;
-      edge.metadata.resolution = 'unique-project-symbol';
-    }
+    // A unique matching name is not proof that a call refers to that symbol.
+    // Unresolved calls/renders retain their external name and medium confidence.
   }
 }
 
