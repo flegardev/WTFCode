@@ -64,6 +64,11 @@
         showError(typeof job.error === 'string' ? job.error : '');
         if (reload instanceof HTMLElement) reload.hidden = !job.terminal || !payload.evidence_ready;
 
+        if (terminal && payload.evidence_ready && root.dataset.evidenceLoaded === 'false') {
+            stop();
+            window.location.reload();
+            return;
+        }
         if (terminal) stop();
         else schedule();
     };

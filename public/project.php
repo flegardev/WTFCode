@@ -97,7 +97,7 @@ require __DIR__ . '/../views/header.php';
         </form>
     </header>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
-    <section class="scan-summary-line" aria-label="Latest scan status" data-scan-progress data-scan-project="<?= (int) $project['id'] ?>" data-scan-endpoint="<?= e(url('scan-status.php?id=' . (int) $project['id'])) ?>">
+    <section class="scan-summary-line" aria-label="Latest scan status" data-scan-progress data-evidence-loaded="<?= $latestScan === null ? 'false' : 'true' ?>" data-scan-project="<?= (int) $project['id'] ?>" data-scan-endpoint="<?= e(url('scan-status.php?id=' . (int) $project['id'])) ?>">
         <span class="scan-state <?= e((string) ($latestJob['state'] ?? $project['status'])) ?>" data-scan-state><?= e(ucfirst((string) ($latestJob['state'] ?? $project['status']))) ?></span>
         <strong data-scan-stage><?= e($jobSummary) ?></strong>
         <?php $latestJobTerminal = $latestJob !== null && in_array((string) ($latestJob['state'] ?? ''), ['completed', 'partial', 'failed'], true); ?>
@@ -107,6 +107,10 @@ require __DIR__ . '/../views/header.php';
         <a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>" data-scan-reload hidden>Refresh evidence</a>
         <a href="<?= e(url('analyzers.php?id=' . (int) $project['id'])) ?>">Scan details</a>
     </section>
+    <?php if ($latestScan === null): ?>
+        <section class="empty-panel" aria-live="polite"><span class="empty-mark" aria-hidden="true">{ }</span><h2><?= ($project['status'] ?? '') === 'failed' ? 'This scan needs another try.' : 'Getting to know your codebase.' ?></h2><p><?= ($project['status'] ?? '') === 'failed' ? 'The scan did not finish. Check the URL and try Rescan above. Your account and project remain available.' : 'Your repository is queued for a background worker. Analysis will appear here when it finishes. There are no findings to assess yet.' ?></p><p>You can return to your projects while the scan runs.</p><a class="button button-secondary" href="<?= e(url('dashboard.php')) ?>">Back to projects</a></section>
+    <?php else: ?>
+    <section class="overview-section project-plain-summary"><h2>What this project does</h2><p><?= e($project['overview'] ?: 'Explore the detected systems and their source references below.') ?></p><small>Summary inferred from static source structure. <a href="<?= e(url('understand.php?id=' . (int) $project['id'])) ?>">Inspect the architecture evidence →</a></small></section>
     <a class="project-ask-bar" href="<?= e(url('ask.php?id=' . (int) $project['id'])) ?>" data-ask-open aria-haspopup="dialog" aria-controls="ask-codebase-panel">
         <span class="project-ask-mark">Ask</span>
         <span><strong>Ask anything about this codebase</strong><small>Trace a feature, challenge a dependency, or check a risky change.</small></span>
@@ -142,6 +146,7 @@ require __DIR__ . '/../views/header.php';
     </section>
     <section class="overview-section impact-files" id="files"><header><div><h2>High-impact files</h2><p>Files ordered by confirmed direct dependents.</p></div><a href="<?= e(url('files.php?id=' . (int) $project['id'])) ?>">Browse all files</a></header><?php if ($files === []): ?><div class="empty-inline">No readable source files were stored from this scan.</div><?php else: ?><div class="file-list"><?php foreach ($files as $file): ?><a href="<?= e(url('file.php?project=' . (int) $project['id'] . '&id=' . (int) $file['id'])) ?>"><div><span><?= e($file['role_name']) ?></span><strong><?= e($file['path']) ?></strong></div><div class="file-impact"><b><?= (int) $file['dependent_count'] ?></b><span>direct dependent<?= (int) $file['dependent_count'] === 1 ? '' : 's' ?></span></div></a><?php endforeach; ?></div><?php endif; ?></section>
     <a class="exploration-progress-link" href="<?= e(url('learn.php?id=' . (int) $project['id'])) ?>"><span>Exploration progress</span><strong><?= (int) ($progress['percentage'] ?? 0) ?>%</strong><small>Based on project evidence you have opened, not analyzer understanding.</small></a>
+    <?php endif; ?>
 </section>
 <?php if ($architecture['nodes'] !== []): ?><script src="<?= e(url('assets/lib/cytoscape-3.34.1.min.js')) ?>" defer></script><script src="<?= e(url('assets/js/overview-graph.js')) ?>" defer></script><?php endif; ?>
 <script src="<?= e(url('assets/js/scan-progress.js')) ?>" defer></script>

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+if (!isset($_COOKIE['wtfcode_session'])) define('WTF_CODE_NO_SESSION', true);
 require_once __DIR__ . '/../bootstrap.php';
 $pageTitle = 'Terms';
 require __DIR__ . '/../views/header.php';

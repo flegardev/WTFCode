@@ -69,7 +69,7 @@ require __DIR__ . '/../views/header.php';
 ?>
 <section class="app-shell narrow ask-page">
     <div class="breadcrumb"><a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>"><?= e($project['name']) ?></a><span>/</span><span>Ask</span></div>
-    <div class="project-heading compact"><div><p class="landing-kicker">Ask WTFCode</p><h1>Start with the evidence.</h1><p>Questions use bounded, redacted evidence. Every supported claim from an optional provider must cite its evidence number.</p></div></div>
+    <div class="project-heading compact"><div><p class="landing-kicker">Ask WTFCode</p><h1>Start with the evidence.</h1><p>Local answers use bounded, redacted evidence with numbered source references. Static evidence cannot prove runtime behavior.</p></div></div>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
     <section class="ask-card">
         <form method="post">

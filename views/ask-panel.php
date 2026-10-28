@@ -24,7 +24,7 @@ $askProjectId = (int) $project['id'];
                 <?php endforeach; ?>
             </div>
             <div class="ask-form-actions">
-                <p>Uses bounded, redacted evidence. Configured external providers receive only that evidence packet.</p>
+                <p>Uses bounded, redacted source evidence. Answers are generated locally; no external AI calls.</p>
                 <button class="button button-primary" type="submit" data-ask-submit>Ask codebase</button>
             </div>
             <p class="ask-status" role="status" aria-live="polite" data-ask-status></p>

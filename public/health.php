@@ -9,7 +9,12 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, max-age=0');
 $database = 'unavailable';
 try {
-    $ready = Database::connection()->query("SELECT to_regclass('public.users') IS NOT NULL")->fetchColumn();
+    // Verify the request/session and worker queue contracts, not just one table.
+    Database::connection()->query('SELECT id, is_suspended FROM users LIMIT 0');
+    Database::connection()->query('SELECT id, state, lease_token, attempt_count, max_attempts, available_at FROM analysis_jobs LIMIT 0');
+    Database::connection()->query('SELECT id, user_id, status FROM projects LIMIT 0');
+    Database::connection()->query('SELECT session_id, payload, expires_at FROM sessions LIMIT 0');
+    $ready = true;
     $database = $ready ? 'ready' : 'unavailable';
 } catch (Throwable) {
     $database = 'unavailable';
