@@ -12,8 +12,8 @@ $areaForSection = [
 $currentArea = $areaForSection[$activeProjectSection] ?? '';
 $primaryLinks = [
     'overview' => ['project.php?id=' . (int) $project['id'], 'Overview'],
-    'explore' => ['map.php?id=' . (int) $project['id'], 'Explore'],
-    'change' => ['change.php?id=' . (int) $project['id'], 'Change'],
+    'explore' => ['map.php?id=' . (int) $project['id'], 'Architecture'],
+    'change' => ['change.php?id=' . (int) $project['id'], 'Change impact'],
     'security' => ['secure.php?id=' . (int) $project['id'], 'Security'],
 ];
 $contextLinks = [
@@ -53,10 +53,10 @@ $contextLinks = [
         </a>
     </div>
     <?php if ($currentArea !== '' && isset($contextLinks[$currentArea])): ?>
-        <nav class="project-context-nav" aria-label="<?= e(ucfirst($currentArea)) ?> tools">
+        <details class="project-tools"><summary>More tools</summary><nav class="project-context-nav" aria-label="<?= e(ucfirst($currentArea)) ?> tools">
             <?php foreach ($contextLinks[$currentArea] as $section => [$href, $label]): ?>
                 <a class="<?= $activeProjectSection === $section ? 'is-active' : '' ?>" href="<?= e(url($href)) ?>"<?= $activeProjectSection === $section ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
             <?php endforeach; ?>
-        </nav>
+        </nav></details>
     <?php endif; ?>
 </div>

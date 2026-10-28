@@ -35,6 +35,17 @@ if (is_post()) {
         }
     }
 }
+$linkedEvidence = [];
+if ($result !== null) {
+    $references = $result['evidence_packet']['evidence'] ?? [];
+    $sourceFiles = Project::filesForPaths((int) $project['id'], array_column($references, 'path'));
+    $byPath = array_column($sourceFiles, 'id', 'path');
+    foreach ($references as $reference) {
+        $fileId = $byPath[$reference['path'] ?? ''] ?? null;
+        $reference['href'] = $fileId === null ? null : url('file.php?project=' . (int) $project['id'] . '&id=' . (int) $fileId . '&line=' . max(1, (int) ($reference['line'] ?? 1)) . '#source-evidence');
+        $linkedEvidence[] = $reference;
+    }
+}
 if ($wantsJson && is_post()) {
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store, max-age=0');
@@ -44,7 +55,7 @@ if ($wantsJson && is_post()) {
         exit;
     }
     $trace = is_array($result['trace'] ?? null) ? $result['trace'] : [];
-    $evidence = array_values(array_filter(is_array($result['evidence_packet']['evidence'] ?? null) ? $result['evidence_packet']['evidence'] : [], 'is_array'));
+    $evidence = array_values(array_filter(is_array($result['evidence_packet']['evidence'] ?? null) ? $linkedEvidence : [], 'is_array'));
     $symbols = array_map(static fn (array $symbol): array => [
         'id' => (int) ($symbol['id'] ?? 0),
         'name' => (string) ($symbol['name'] ?? ''),
@@ -69,7 +80,7 @@ require __DIR__ . '/../views/header.php';
 ?>
 <section class="app-shell narrow ask-page">
     <div class="breadcrumb"><a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>"><?= e($project['name']) ?></a><span>/</span><span>Ask</span></div>
-    <div class="project-heading compact"><div><p class="landing-kicker">Ask WTFCode</p><h1>Start with the evidence.</h1><p>Local answers use bounded, redacted evidence with numbered source references. Static evidence cannot prove runtime behavior.</p></div></div>
+    <div class="project-heading compact"><div><p class="landing-kicker">Ask WTFCode</p><h1>Make sense of your code.</h1><p>Ask a question in your own words. Your answer comes from the last scan, with source references you can inspect.</p></div></div>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
     <section class="ask-card">
         <form method="post">
@@ -85,8 +96,8 @@ require __DIR__ . '/../views/header.php';
                 <h2>Answer</h2>
                 <p class="ask-answer-text"><?= e($result['answer']) ?></p>
                 <?php if (($result['inferences'] ?? []) !== []): ?><p class="uncertainty-note">Sentences without a valid graph citation are explicitly labeled as inference.</p><?php endif; ?>
-                <?php if (($result['evidence_packet']['evidence'] ?? []) !== []): ?><h3>Numbered evidence</h3><ol class="ask-evidence-list"><?php foreach ($result['evidence_packet']['evidence'] as $evidence): ?><li id="evidence-<?= (int) $evidence['id'] ?>"><strong>[<?= (int) $evidence['id'] ?>] <?= e($evidence['label']) ?></strong><span><?= e($evidence['path']) ?>:<?= (int) $evidence['line'] ?> | <?= e($evidence['confidence']) ?> confidence</span></li><?php endforeach; ?></ol><?php endif; ?>
-                <?php if (($result['trace']['symbols'] ?? []) !== []): ?><h3>Matched symbols</h3><div class="answer-evidence"><?php foreach (array_slice($result['trace']['symbols'], 0, 12) as $symbol): ?><a href="<?= e(url('symbol.php?project=' . (int) $project['id'] . '&id=' . (int) $symbol['id'])) ?>"><strong><?= e($symbol['name']) ?></strong><span><?= e(str_replace('_', ' ', $symbol['type'])) ?> in <?= e($symbol['path']) ?></span></a><?php endforeach; ?></div><?php endif; ?>
+                <?php if (($result['evidence_packet']['evidence'] ?? []) !== []): ?><p class="uncertainty-note">Source matches can be incomplete. Static analysis cannot verify runtime behavior.</p><details><summary>Source references</summary><ol class="ask-evidence-list"><?php foreach ($linkedEvidence as $evidence): ?><li id="evidence-<?= (int) $evidence['id'] ?>"><?php if ($evidence['href'] !== null): ?><a href="<?= e($evidence['href']) ?>"><?php endif; ?><strong>[<?= (int) $evidence['id'] ?>] <?= e($evidence['label']) ?></strong><span><?= e($evidence['path']) ?>:<?= (int) $evidence['line'] ?> | <?= e($evidence['confidence']) ?> confidence</span><?php if ($evidence['href'] !== null): ?></a><?php endif; ?></li><?php endforeach; ?></ol></details><?php endif; ?>
+                <?php if (($result['trace']['symbols'] ?? []) !== []): ?><details><summary>Technical details · matched symbols</summary><div class="answer-evidence"><?php foreach (array_slice($result['trace']['symbols'], 0, 12) as $symbol): ?><a href="<?= e(url('symbol.php?project=' . (int) $project['id'] . '&id=' . (int) $symbol['id'])) ?>"><strong><?= e($symbol['name']) ?></strong><span><?= e(str_replace('_', ' ', $symbol['type'])) ?> in <?= e($symbol['path']) ?></span></a><?php endforeach; ?></div></details><?php endif; ?>
             </article>
         <?php endif; ?>
     </section>

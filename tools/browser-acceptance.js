@@ -7,6 +7,7 @@ async (page) => {
   const checks = [];
   const check = (ok, name) => { if (!ok) throw new Error(name); checks.push(name); };
   await page.keyboard.press('Escape');
+  if (await page.locator('html').getAttribute('data-theme') !== 'dark') await page.getByRole('button', { name: 'Switch to dark theme' }).click();
   const health = await page.request.get(`${base}/health.php`);
   check(health.status() === 200, 'Core database, sessions and queue readiness');
   const rejected = await page.request.post(`${base}/ask.php?id=${id}`, { headers: { Accept: 'application/json' }, form: { question: 'authentication', csrf_token: 'invalid' } });

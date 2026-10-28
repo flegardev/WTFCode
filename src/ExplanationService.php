@@ -41,7 +41,7 @@ final class ExplanationService
     {
         $labels = [
             'authentication' => 'Authentication', 'middleware' => 'Request protection', 'api endpoint' => 'API behavior',
-            'data model' => 'Application data', 'route' => 'User-facing routes', 'ui component' => 'Interface components',
+            'data model' => 'Application data', 'route' => 'Routing-related files', 'ui component' => 'Interface components',
             'configuration' => 'Runtime configuration',
         ];
         $systems = [];
@@ -79,24 +79,14 @@ final class ExplanationService
             $trace = FeatureTracer::trace($projectId, $featurePhrase);
             if ($trace['symbols'] !== [] || $trace['entry_points'] !== []) {
                 $evidence = Project::filesForPaths($projectId, array_column($trace['files'], 'path'));
-                $details = [];
-                if ($trace['entry_points'] !== []) $details[] = count($trace['entry_points']) . ' matching route' . (count($trace['entry_points']) === 1 ? '' : 's');
-                if ($trace['symbols'] !== []) $details[] = count($trace['symbols']) . ' connected symbol' . (count($trace['symbols']) === 1 ? '' : 's');
-                if ($trace['tables'] !== []) $details[] = count($trace['tables']) . ' data structure' . (count($trace['tables']) === 1 ? '' : 's');
-                if ($trace['services'] !== []) $details[] = count($trace['services']) . ' external service' . (count($trace['services']) === 1 ? '' : 's');
-                return ['answer' => 'The strongest normalized evidence for "' . $featurePhrase . '" includes ' . implode(', ', $details) . '. Confidence is ' . $trace['confidence'] . '; open the symbol and file evidence before treating dynamic behavior as proven.', 'evidence' => $evidence, 'trace' => $trace];
+                return ['answer' => self::describeTrace($trace, $featurePhrase), 'evidence' => $evidence, 'trace' => $trace];
             }
         }
         foreach (array_slice($terms, 0, 8) as $term) {
             $trace = FeatureTracer::trace($projectId, $term);
             if ($trace['symbols'] === [] && $trace['entry_points'] === []) continue;
             $evidence = Project::filesForPaths($projectId, array_column($trace['files'], 'path'));
-            $details = [];
-            if ($trace['entry_points'] !== []) $details[] = count($trace['entry_points']) . ' matching route' . (count($trace['entry_points']) === 1 ? '' : 's');
-            if ($trace['symbols'] !== []) $details[] = count($trace['symbols']) . ' connected symbol' . (count($trace['symbols']) === 1 ? '' : 's');
-            if ($trace['tables'] !== []) $details[] = count($trace['tables']) . ' data structure' . (count($trace['tables']) === 1 ? '' : 's');
-            if ($trace['services'] !== []) $details[] = count($trace['services']) . ' external service' . (count($trace['services']) === 1 ? '' : 's');
-            return ['answer' => 'The strongest normalized evidence for "' . $term . '" includes ' . implode(', ', $details) . '. Confidence is ' . $trace['confidence'] . '; open the evidence files and trace hops before treating dynamic behavior as proven.', 'evidence' => $evidence, 'trace' => $trace];
+            return ['answer' => self::describeTrace($trace, $term), 'evidence' => $evidence, 'trace' => $trace];
         }
         $role = null;
         if (preg_match('/(login|sign.?in|auth|session|register)/', $lower)) $role = 'authentication';
@@ -112,6 +102,21 @@ final class ExplanationService
             if ($files !== []) return ['answer' => 'I found repository evidence related to "' . $word . '". This answer is based on scanned file metadata and static relationships, not an external AI guess.', 'evidence' => $files];
         }
         return ['answer' => 'The scanner does not have enough direct evidence to answer that confidently. Try a file name, feature name, or a question about authentication, APIs, Docker, routes, or data.', 'evidence' => []];
+    }
+
+    /** Describe only the kinds of evidence found, without inventing a runtime story. */
+    private static function describeTrace(array $trace, string $topic): string
+    {
+        $routes = array_slice(array_column($trace['entry_points'] ?? [], 'label'), 0, 3);
+        if ($routes !== []) {
+            $answer = 'The scan found request handlers related to "' . $topic . '": ' . implode(', ', $routes) . '. These are places where the application accepts a request.';
+        } else {
+            $names = array_slice(array_unique(array_column($trace['symbols'] ?? [], 'name')), 0, 3);
+            $answer = 'The closest source matches for "' . $topic . '" are ' . implode(', ', $names) . '. Their names and stored relationships connect them to your question; they do not establish a complete feature flow.';
+        }
+        if (($trace['tables'] ?? []) !== []) $answer .= ' Related data definitions were also found; check their source before changing how information is stored.';
+        $answer .= ' Open the references to check the implementation. This scan cannot confirm that the feature works, or establish the order in which every part runs.';
+        return $answer;
     }
 
     /** @return array{answer:string,evidence:array<int,array<string,mixed>>}|null */

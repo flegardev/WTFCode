@@ -185,16 +185,15 @@ final class ChangeImpactService
             }
 
             $first = array_values($blast['direct'] ?? [])[0] ?? null;
-            $second = array_values($blast['transitive'] ?? [])[0] ?? null;
-            $chain = [['name' => (string) ($symbol['name'] ?? 'Selected symbol'), 'type' => (string) ($symbol['symbol_type'] ?? $symbol['type'] ?? 'symbol')]];
+            $chain = [['id' => (int) $symbolId, 'name' => (string) ($symbol['name'] ?? 'Selected symbol'), 'type' => (string) ($symbol['symbol_type'] ?? $symbol['type'] ?? 'symbol')]];
             if ($first !== null) {
-                $chain[] = ['name' => (string) $first['name'], 'type' => (string) ($first['relationship'] ?? 'dependent')];
+                $chain[0]['type'] = 'selected target';
+                array_unshift($chain, ['id' => (int) $first['id'], 'name' => (string) $first['name'], 'type' => (string) ($first['relationship'] ?? 'dependent') . ' · ' . (string) ($first['confidence'] ?? 'unknown') . ' confidence']);
             }
-            if ($second !== null) {
-                $chain[] = ['name' => (string) $second['name'], 'type' => (string) ($second['relationship'] ?? 'transitive dependent')];
-            }
+            // A reachable symbol is not necessarily connected to the first direct
+            // dependent. Only show the known pair; keep transitive evidence separate.
             if (count($chain) > 1) {
-                $chains[] = $chain;
+                $chains[hash('sha256', json_encode($chain))] = $chain;
             }
         }
 
@@ -221,7 +220,7 @@ final class ChangeImpactService
             'services' => array_slice($serviceValues, 0, 100),
             'direct' => array_slice(array_values($direct), 0, 100),
             'transitive' => array_slice(array_values($transitive), 0, 100),
-            'chains' => array_slice($chains, 0, 6),
+            'chains' => array_slice(array_values($chains), 0, 6),
             'likely_tests' => $likelyTests,
             'test_coverage_unknown' => $likelyTests === [],
             'recommendations' => $recommendations,
