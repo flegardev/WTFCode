@@ -95,6 +95,16 @@ try {
     change_assert($symbolImpact['risk']['level'] === 'high', 'External-service boundaries must escalate change risk');
     change_assert((bool) array_filter($symbolImpact['recommendations'], static fn(string $item): bool => str_contains($item, 'timeout')), 'External-service impact must recommend timeout and retry verification');
 
+    // A branching neighborhood must not be flattened into an invented call sequence.
+    $relationships = SymbolRepository::projectRelationships($projectId);
+    change_assert($symbolImpact['chains'] !== [], 'Fixture must exercise displayed dependency pairs');
+    foreach ($symbolImpact['chains'] as $chain) {
+        change_assert(count($chain) === 2, 'Transitive reachability must not imply a direct continuation');
+        $stored = array_filter($relationships, static fn(array $edge): bool => (int) $edge['source_symbol_id'] === $chain[0]['id'] && (int) $edge['target_symbol_id'] === $chain[1]['id']);
+        change_assert($stored !== [], 'Every displayed pair must preserve a stored edge and its direction');
+    }
+    change_assert(count($symbolImpact['chains']) === count(array_unique(array_map('json_encode', $symbolImpact['chains']))), 'Displayed dependency pairs must not repeat');
+
     $fileImpact = $changeImpact->forTarget($projectId, 'routes/billing.ts', 'file');
     change_assert($fileImpact['target_type'] === 'file' && $fileImpact['files'] !== [], 'File targets must resolve as files instead of generic feature searches');
     change_assert($fileImpact['routes'] !== [], 'A route file target must retain its affected HTTP route');

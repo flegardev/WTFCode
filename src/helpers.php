@@ -20,6 +20,15 @@ function e(mixed $value): string
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Local, pinned Lucide assets. Names never become arbitrary filesystem paths. */
+function ui_icon(string $name): string
+{
+    static $icons = [];
+    if (!in_array($name, ['folder-git-2', 'plus', 'settings', 'network', 'message-circle', 'git-branch', 'file-code-2'], true)) return '';
+    $icons[$name] ??= (string) file_get_contents(__DIR__ . '/../public/assets/icons/' . $name . '.svg');
+    return '<span class="ui-icon" aria-hidden="true">' . $icons[$name] . '</span>';
+}
+
 function url(string $path = ''): string
 {
     return app_config()['app_url'] . '/' . ltrim($path, '/');

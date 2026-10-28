@@ -7,6 +7,7 @@ declare(strict_types=1);
     <div><a class="brand" href="<?= e(url('index.php')) ?>"><span class="brand-mark">W</span>WTFCode</a><p>Know what your AI actually built.</p></div>
     <div class="footer-links"><a href="<?= e(url('security.php')) ?>">Security</a><a href="<?= e(url('privacy.php')) ?>">Privacy</a><a href="<?= e(url('terms.php')) ?>">Terms</a></div>
 </footer>
+<?php if (($currentUser ?? null) !== null): ?></div></div><?php endif; ?>
 <?php if (($projectContext ?? false) === true): ?>
     <?php require __DIR__ . '/ask-panel.php'; ?>
     <script src="<?= e(url('assets/js/project-shell.js')) ?>" defer></script>

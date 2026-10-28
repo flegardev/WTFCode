@@ -12,7 +12,7 @@ function modes_assert(bool $condition, string $message): void
 }
 
 $nav = (string) file_get_contents(__DIR__ . '/../views/project-nav.php');
-foreach (['Overview', 'Explore', 'Change', 'Security'] as $section) {
+foreach (['Overview', 'Architecture', 'Change impact', 'Security'] as $section) {
     modes_assert(str_contains($nav, "'$section'"), 'Project navigation must expose the ' . $section . ' section');
 }
 foreach (['project.php', 'map.php', 'change.php', 'secure.php'] as $page) {
@@ -40,7 +40,7 @@ $change = (string) file_get_contents(__DIR__ . '/../public/change.php');
 foreach (['feature', 'symbol', 'file', 'route', 'table'] as $target) {
     modes_assert(str_contains($change, "'$target'"), 'Change mode must support ' . $target . ' targets');
 }
-foreach (['What could this change affect?', 'Critical impact', 'Likely tests', 'Recommended before merge', 'Implementation prompt'] as $section) {
+foreach (['What could this change affect?', 'Detected connections', 'Likely tests', 'Your review checklist', 'Implementation prompt'] as $section) {
     modes_assert(str_contains($change, $section), 'Change workbench must include ' . $section);
 }
 modes_assert(str_contains($change, "PromptSafetyService::build"), 'Change workbench must build a bounded implementation prompt');

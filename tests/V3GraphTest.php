@@ -32,7 +32,11 @@ try {
 
     $script = (string) file_get_contents(__DIR__ . '/../public/assets/js/symbol-map.js');
     graph_assert(str_contains($script, '.dijkstra('), 'Graph UI should implement confidence-weighted shortest paths');
-    foreach (['architecture', 'subsystem', 'feature', 'file', 'symbol'] as $level) graph_assert(str_contains($script, "'" . $level . "'"), 'Graph UI should implement ' . $level . ' level of detail');
+    $markup = (string) file_get_contents(__DIR__ . '/../public/map.php');
+    foreach (['architecture', 'subsystem', 'feature', 'file', 'symbol'] as $level) {
+        graph_assert(str_contains($script, "'" . $level . "'") || str_contains($script, '"' . $level . '"'), 'Graph UI should implement ' . $level . ' level of detail regardless of quote style');
+        graph_assert(str_contains($markup, 'value="' . $level . '"'), 'Graph controls must offer the ' . $level . ' level');
+    }
     foreach (['relationship', 'framework', 'risk', 'confidence'] as $filter) graph_assert(str_contains($script, $filter), 'Graph UI should retain the ' . $filter . ' filter');
 } finally {
     if ($userId !== null) $pdo->prepare('DELETE FROM users WHERE id = :id')->execute(['id' => $userId]);

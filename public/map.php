@@ -7,6 +7,7 @@ Auth::requireLogin();
 $projectId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 $project = $projectId === false || $projectId === null ? null : Project::findForUser((int) $projectId, Auth::id());
 if ($project === null) { http_response_code(404); exit('Project not found.'); }
+$architecture = Project::architecture((int) $project['id']);
 $graph = SymbolRepository::graph((int) $project['id'], 100);
 $types = array_values(array_unique(array_column($graph['nodes'], 'symbol_type')));
 sort($types);
@@ -22,8 +23,10 @@ require __DIR__ . '/../views/header.php';
 ?>
 <section class="app-shell v2-shell graph-page">
     <div class="breadcrumb"><a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>"><?= e($project['name']) ?></a><span>/</span><span>Symbol graph</span></div>
-    <div class="project-heading compact"><div><p class="landing-kicker">Interactive architecture</p><h1>Follow the evidence.</h1><p>Choose a direction and depth, inspect a neighborhood, or trace the strongest static path between two symbols.</p></div><a class="button button-secondary" href="<?= e(url('symbols.php?id=' . (int) $project['id'])) ?>">Browse symbols</a></div>
+    <div class="project-heading compact"><div><p class="landing-kicker">Interactive architecture</p><h1>See how your app fits together.</h1><p>Start with the detected systems. Open the dependency workbench when you need individual code connections.</p></div><a class="button button-secondary" href="<?= e(url('symbols.php?id=' . (int) $project['id'])) ?>">Browse symbols</a></div>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
+    <?php require __DIR__ . '/../views/architecture-diagram.php'; ?>
+    <details class="advanced-section dependency-workbench" data-advanced-graph><summary>Advanced dependency graph · explore individual code connections</summary><p>Solid lines have high extraction confidence. Dashed lines need closer review. Grouping combines stored relationships; it does not prove runtime behavior.</p>
     <?php if ($graph['nodes'] === []): ?><section class="panel empty-state-v2"><strong>No symbol graph is available.</strong><p>Complete a new analysis. File and architecture views remain available.</p></section><?php else: ?>
     <section class="graph-workbench" data-project="<?= (int) $project['id'] ?>">
         <aside class="graph-controls">
@@ -31,7 +34,7 @@ require __DIR__ . '/../views/header.php';
                 <label><span>Search nodes</span><input id="graph-search" placeholder="Controller, login, User"></label>
                 <label><span>Level of detail</span><select id="graph-level"><option value="architecture" selected>Architecture</option><option value="subsystem">Subsystem</option><option value="feature">Feature</option><option value="file">File</option><option value="symbol">Symbol</option></select></label>
                 <div class="graph-traversal-controls">
-                    <label><span>Neighbor direction</span><select id="graph-direction"><option value="both">Dependencies and dependents</option><option value="outgoing">Dependencies</option><option value="incoming">Dependents</option></select></label>
+                    <label><span>Neighbor direction</span><select id="graph-direction"><option value="both">Both directions</option><option value="outgoing">Dependencies</option><option value="incoming">Dependents</option></select></label>
                     <label><span>Traversal depth</span><select id="graph-depth"><option value="1" selected>1 hop</option><option value="2">2 hops</option><option value="3">3 hops</option><option value="all">All connected</option></select></label>
                 </div>
             </div>
@@ -57,7 +60,7 @@ require __DIR__ . '/../views/header.php';
             </div>
             <div class="graph-path-tools"><label><span>From</span><select id="graph-path-from"><option value="">Choose a symbol</option><?php foreach ($graph['nodes'] as $node): ?><option value="<?= (int) $node['id'] ?>"><?= e($node['name'] . ' · ' . $node['path']) ?></option><?php endforeach; ?></select></label><label><span>To</span><select id="graph-path-to"><option value="">Choose a symbol</option><?php foreach ($graph['nodes'] as $node): ?><option value="<?= (int) $node['id'] ?>"><?= e($node['name'] . ' · ' . $node['path']) ?></option><?php endforeach; ?></select></label><button class="button button-primary" id="graph-trace" type="button">Trace strongest path</button><span id="graph-path-result" aria-live="polite"></span></div>
             <p class="graph-instructions" id="graph-instructions">Select a node to focus its neighborhood. Double-click a group to drill into the next level.</p>
-            <div class="graph-viewport" id="graph-viewport" tabindex="0" aria-label="Interactive code relationship graph" aria-describedby="graph-instructions"></div>
+            <div class="graph-viewport" id="graph-viewport" tabindex="0" role="img" aria-label="Interactive code relationship graph" aria-describedby="graph-instructions"></div>
         </div>
     </section>
     <details class="graph-text-fallback"><summary>Browse graph nodes as text</summary><p>This index stays available to keyboard and screen-reader users. The full symbol directory contains every stored symbol.</p><ul><?php foreach (array_slice($graph['nodes'], 0, 80) as $node): ?><li><a href="<?= e(url('symbol.php?project=' . (int) $project['id'] . '&id=' . (int) $node['id'])) ?>"><strong><?= e($node['name']) ?></strong><span><?= e(str_replace('_', ' ', $node['symbol_type'])) ?> in <?= e($node['path']) ?>:<?= (int) $node['start_line'] ?></span></a></li><?php endforeach; ?></ul><a href="<?= e(url('symbols.php?id=' . (int) $project['id'])) ?>">Open the full symbol directory</a></details>
@@ -66,5 +69,7 @@ require __DIR__ . '/../views/header.php';
     <script src="<?= e(url('assets/lib/cytoscape-3.34.1.min.js')) ?>" defer></script>
     <script src="<?= e(url('assets/js/symbol-map.js')) ?>" defer></script>
     <?php endif; ?>
+    </details>
 </section>
+<script src="<?= e(url('assets/js/overview-graph.js')) ?>" defer></script>
 <?php require __DIR__ . '/../views/footer.php'; ?>

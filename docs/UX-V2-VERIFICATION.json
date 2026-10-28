@@ -1,0 +1,2047 @@
+{
+  "date": "2026-10-28",
+  "base_branch": "codex/saas-mvp",
+  "base_commit": "d399e8ec91e6b03485154079c6b51f3961d31322",
+  "review_branch": "codex/premium-ux-v2",
+  "environment": "Disposable localhost PostgreSQL; PHP 8.5.12; Node 24; Playwright CLI 0.1.22; no cloud deployment",
+  "sample": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b",
+  "phpunit": {
+    "tests": 36,
+    "assertions": 96
+  },
+  "tiers": {
+    "portable": 10,
+    "analyzers": 3,
+    "integration": 8,
+    "security": 2,
+    "e2e": 1,
+    "hosted_checkout_cleanup": 1
+  },
+  "browser": {
+    "matrix": {
+      "checks": 331,
+      "failures": [],
+      "results": [
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "dashboard.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1458,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "project-create.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1594,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "project.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 2995,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "map.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 1644,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "change.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 1718,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 320,
+          "content": 305,
+          "height": 2803,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "file.php?project=1&id=25",
+          "viewport": 320,
+          "content": 305,
+          "height": 1667,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "ask.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 1019,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "pricing.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 2478,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "settings.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1199,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "path": "example.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1308,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "dashboard.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1358,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "project-create.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1440,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "project.php?id=1",
+          "viewport": 375,
+          "content": 360,
+          "height": 2747,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "map.php?id=1",
+          "viewport": 375,
+          "content": 360,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "change.php?id=1",
+          "viewport": 375,
+          "content": 360,
+          "height": 1617,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 375,
+          "content": 360,
+          "height": 2607,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "file.php?project=1&id=25",
+          "viewport": 375,
+          "content": 360,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "ask.php?id=1",
+          "viewport": 375,
+          "content": 375,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "pricing.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 2363,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "settings.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1154,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "path": "example.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1227,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "dashboard.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1338,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "project-create.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1418,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "project.php?id=1",
+          "viewport": 390,
+          "content": 375,
+          "height": 2706,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "map.php?id=1",
+          "viewport": 390,
+          "content": 375,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "change.php?id=1",
+          "viewport": 390,
+          "content": 375,
+          "height": 1617,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 390,
+          "content": 375,
+          "height": 2569,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "file.php?project=1&id=25",
+          "viewport": 390,
+          "content": 375,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "ask.php?id=1",
+          "viewport": 390,
+          "content": 390,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "pricing.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 2341,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "settings.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1130,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "path": "example.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1210,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "dashboard.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1282,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "project-create.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1362,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "project.php?id=1",
+          "viewport": 430,
+          "content": 415,
+          "height": 2674,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "map.php?id=1",
+          "viewport": 430,
+          "content": 415,
+          "height": 1511,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "change.php?id=1",
+          "viewport": 430,
+          "content": 415,
+          "height": 1578,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 430,
+          "content": 415,
+          "height": 2437,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "file.php?project=1&id=25",
+          "viewport": 430,
+          "content": 415,
+          "height": 1484,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "ask.php?id=1",
+          "viewport": 430,
+          "content": 430,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "pricing.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 2270,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "settings.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1084,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "path": "example.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1210,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "dashboard.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1045,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "project-create.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1282,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "project.php?id=1",
+          "viewport": 768,
+          "content": 753,
+          "height": 2631,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "map.php?id=1",
+          "viewport": 768,
+          "content": 753,
+          "height": 1502,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "change.php?id=1",
+          "viewport": 768,
+          "content": 753,
+          "height": 1305,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 768,
+          "content": 753,
+          "height": 1951,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "file.php?project=1&id=25",
+          "viewport": 768,
+          "content": 753,
+          "height": 1132,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "ask.php?id=1",
+          "viewport": 768,
+          "content": 768,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "pricing.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1469,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "settings.php",
+          "viewport": 768,
+          "content": 768,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "path": "example.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1002,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "dashboard.php",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "project-create.php",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1215,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "project.php?id=1",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 2484,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "map.php?id=1",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1447,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "change.php?id=1",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1129,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1794,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "file.php?project=1&id=25",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1092,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "ask.php?id=1",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "pricing.php",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1192,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "settings.php",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "path": "example.php",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "dashboard.php",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "project-create.php",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1226,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "project.php?id=1",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 2003,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "map.php?id=1",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1458,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "change.php?id=1",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1062,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1806,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "file.php?project=1&id=25",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1059,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "ask.php?id=1",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "pricing.php",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1163,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "settings.php",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "path": "example.php",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "dashboard.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1458,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "project-create.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1594,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "project.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 2995,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "map.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 1644,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "change.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 1718,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 320,
+          "content": 305,
+          "height": 2803,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "file.php?project=1&id=25",
+          "viewport": 320,
+          "content": 305,
+          "height": 1667,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "ask.php?id=1",
+          "viewport": 320,
+          "content": 305,
+          "height": 1019,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "pricing.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 2478,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "settings.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1199,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "path": "example.php",
+          "viewport": 320,
+          "content": 305,
+          "height": 1308,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "dashboard.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1358,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "project-create.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1440,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "project.php?id=1",
+          "viewport": 375,
+          "content": 360,
+          "height": 2747,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "map.php?id=1",
+          "viewport": 375,
+          "content": 360,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "change.php?id=1",
+          "viewport": 375,
+          "content": 360,
+          "height": 1617,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 375,
+          "content": 360,
+          "height": 2607,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "file.php?project=1&id=25",
+          "viewport": 375,
+          "content": 360,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "ask.php?id=1",
+          "viewport": 375,
+          "content": 375,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "pricing.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 2363,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "settings.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1154,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "path": "example.php",
+          "viewport": 375,
+          "content": 360,
+          "height": 1227,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "dashboard.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1338,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "project-create.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1418,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "project.php?id=1",
+          "viewport": 390,
+          "content": 375,
+          "height": 2706,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "map.php?id=1",
+          "viewport": 390,
+          "content": 375,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "change.php?id=1",
+          "viewport": 390,
+          "content": 375,
+          "height": 1617,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 390,
+          "content": 375,
+          "height": 2569,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "file.php?project=1&id=25",
+          "viewport": 390,
+          "content": 375,
+          "height": 1543,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "ask.php?id=1",
+          "viewport": 390,
+          "content": 390,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "pricing.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 2341,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "settings.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1130,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "path": "example.php",
+          "viewport": 390,
+          "content": 375,
+          "height": 1210,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "dashboard.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1282,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "project-create.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1362,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "project.php?id=1",
+          "viewport": 430,
+          "content": 415,
+          "height": 2674,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "map.php?id=1",
+          "viewport": 430,
+          "content": 415,
+          "height": 1511,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "change.php?id=1",
+          "viewport": 430,
+          "content": 415,
+          "height": 1578,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 430,
+          "content": 415,
+          "height": 2437,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "file.php?project=1&id=25",
+          "viewport": 430,
+          "content": 415,
+          "height": 1484,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "ask.php?id=1",
+          "viewport": 430,
+          "content": 430,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "pricing.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 2270,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "settings.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1084,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "path": "example.php",
+          "viewport": 430,
+          "content": 415,
+          "height": 1210,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "dashboard.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1045,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "project-create.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1282,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "project.php?id=1",
+          "viewport": 768,
+          "content": 753,
+          "height": 2631,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "map.php?id=1",
+          "viewport": 768,
+          "content": 753,
+          "height": 1502,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "change.php?id=1",
+          "viewport": 768,
+          "content": 753,
+          "height": 1305,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 768,
+          "content": 753,
+          "height": 1951,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "file.php?project=1&id=25",
+          "viewport": 768,
+          "content": 753,
+          "height": 1132,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "ask.php?id=1",
+          "viewport": 768,
+          "content": 768,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "pricing.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1469,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "settings.php",
+          "viewport": 768,
+          "content": 768,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "path": "example.php",
+          "viewport": 768,
+          "content": 753,
+          "height": 1002,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "dashboard.php",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "project-create.php",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1215,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "project.php?id=1",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 2484,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "map.php?id=1",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1447,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "change.php?id=1",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1129,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1794,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "file.php?project=1&id=25",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1092,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "ask.php?id=1",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "pricing.php",
+          "viewport": 1024,
+          "content": 1009,
+          "height": 1192,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "settings.php",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "path": "example.php",
+          "viewport": 1024,
+          "content": 1024,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "dashboard.php",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "project-create.php",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1226,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "project.php?id=1",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 2003,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "map.php?id=1",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1458,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "change.php?id=1",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1062,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1806,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "file.php?project=1&id=25",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1059,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "ask.php?id=1",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "pricing.php",
+          "viewport": 1440,
+          "content": 1425,
+          "height": 1163,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "settings.php",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "path": "example.php",
+          "viewport": 1440,
+          "content": 1440,
+          "height": 1000,
+          "outliers": []
+        }
+      ],
+      "errors": []
+    },
+    "interactions": {
+      "checks": 215,
+      "failures": [],
+      "metrics": [
+        {
+          "theme": "dark",
+          "width": 320,
+          "navigationMs": 24.300000000745058,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "dark",
+          "width": 375,
+          "navigationMs": 80,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "navigationMs": 75.10000000149012,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "dark",
+          "width": 430,
+          "navigationMs": 80,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "dark",
+          "width": 768,
+          "navigationMs": 75.40000000223517,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "dark",
+          "width": 1024,
+          "navigationMs": 78.09999999776483,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "navigationMs": 74.19999999925494,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 320,
+          "navigationMs": 171.19999999925494,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 375,
+          "navigationMs": 83.5,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "navigationMs": 77.40000000223517,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 430,
+          "navigationMs": 81.09999999776483,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 768,
+          "navigationMs": 181,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 1024,
+          "navigationMs": 73.69999999925494,
+          "decodedResourceBytes": 149841
+        },
+        {
+          "theme": "light",
+          "width": 1440,
+          "navigationMs": 77.29999999701977,
+          "decodedResourceBytes": 149841
+        }
+      ]
+    },
+    "baseline_acceptance": {
+      "status": "passed",
+      "checks": [
+        "Core database, sessions and queue readiness",
+        "Invalid CSRF rejected before Q&A",
+        "Real source-backed deterministic Q&A",
+        "Answer contains numbered source references",
+        "Second account registration and session",
+        "Cross-owner project.php blocked",
+        "Cross-owner map.php blocked",
+        "Cross-owner files.php blocked",
+        "Cross-owner change.php blocked",
+        "Cross-owner ask.php blocked",
+        "Cross-owner scan-status.php blocked",
+        "1440px dashboard.php loads",
+        "1440px dashboard.php has no horizontal page overflow",
+        "1440px project.php?id=1 loads",
+        "1440px project.php?id=1 has no horizontal page overflow",
+        "1440px map.php?id=1 loads",
+        "1440px map.php?id=1 has no horizontal page overflow",
+        "1440px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts loads",
+        "1440px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts has no horizontal page overflow",
+        "1440px files.php?id=1 loads",
+        "1440px files.php?id=1 has no horizontal page overflow",
+        "1440px project-create.php loads",
+        "1440px project-create.php has no horizontal page overflow",
+        "1440px pricing.php loads",
+        "1440px pricing.php has no horizontal page overflow",
+        "390px dashboard.php loads",
+        "390px dashboard.php has no horizontal page overflow",
+        "390px project.php?id=1 loads",
+        "390px project.php?id=1 has no horizontal page overflow",
+        "390px map.php?id=1 loads",
+        "390px map.php?id=1 has no horizontal page overflow",
+        "390px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts loads",
+        "390px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts has no horizontal page overflow",
+        "390px files.php?id=1 loads",
+        "390px files.php?id=1 has no horizontal page overflow",
+        "390px project-create.php loads",
+        "390px project-create.php has no horizontal page overflow",
+        "390px pricing.php loads",
+        "390px pricing.php has no horizontal page overflow",
+        "Light theme preference survives navigation",
+        "Browser runtime errors: "
+      ],
+      "questionProvider": "deterministic",
+      "sourceReferences": 40
+    },
+    "capture_cross_owner_source_checks": 2
+  },
+  "accessibility": {
+    "pages": 42,
+    "violations": 0,
+    "results": [
+      {
+        "name": "dashboard.php",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "project-create.php",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "project.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "map.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "change.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "file.php?project=1&id=25",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "pricing.php",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 0
+      },
+      {
+        "name": "settings.php",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 0
+      },
+      {
+        "name": "example.php",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 0
+      },
+      {
+        "name": "Expanded 320px project.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 320px map.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 320px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 320px file.php?project=1&id=25",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "Expanded 1440px project.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 1440px map.php?id=1",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 1440px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 1440px file.php?project=1&id=25",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "Ask drawer 1440px",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "Ask drawer 375px",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "Landing",
+        "theme": "dark",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "dashboard.php",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "project-create.php",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "project.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "map.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "change.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "file.php?project=1&id=25",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "pricing.php",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 0
+      },
+      {
+        "name": "settings.php",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 0
+      },
+      {
+        "name": "example.php",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 0
+      },
+      {
+        "name": "Expanded 320px project.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 320px map.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 320px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 320px file.php?project=1&id=25",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "Expanded 1440px project.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 1440px map.php?id=1",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 1440px change.php?id=1&type=file&target=src/app/routes/auth/auth.ts",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 3
+      },
+      {
+        "name": "Expanded 1440px file.php?project=1&id=25",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "Ask drawer 1440px",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 2
+      },
+      {
+        "name": "Ask drawer 375px",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 1
+      },
+      {
+        "name": "Landing",
+        "theme": "light",
+        "violations": [],
+        "incomplete": 1
+      }
+    ]
+  },
+  "performance": {
+    "scope": "14 warm/local anonymous landing navigations, both themes and seven widths, no device/network throttling; not production performance",
+    "navigation_ms_median": 77.8,
+    "navigation_ms_p95": 181,
+    "decoded_resource_bytes": [
+      149841
+    ]
+  },
+  "screenshots": [
+    {
+      "file": "01-landing.png",
+      "width": 1425,
+      "height": 2658,
+      "bytes": 204068,
+      "sha256": "bd31f1185195b706e10c1050362ee44122c3fca8b3c0df88444f851d983e248f"
+    },
+    {
+      "file": "02-empty-dashboard.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 61315,
+      "sha256": "01a2c09a5c74c61a32018bc6009adb2c76703ce6609f5906240a593a64d2c635"
+    },
+    {
+      "file": "03-dashboard.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 70227,
+      "sha256": "e4e3f9fdcc370d182a244618f515fcd8b352a408ddb8aff323cc60edb9e9f10c"
+    },
+    {
+      "file": "04-repository-import.png",
+      "width": 1425,
+      "height": 1227,
+      "bytes": 81972,
+      "sha256": "93fa34d9cb53a2a45f0b7c1c9b2f055a4cb4913b2d1879cbcfca8e346e7cc49b"
+    },
+    {
+      "file": "05-project-overview.png",
+      "width": 1425,
+      "height": 2003,
+      "bytes": 149939,
+      "sha256": "2bd346f88215210314a95cdd79ca3fd9b540e3e33dad96467290b71d6f04ee27"
+    },
+    {
+      "file": "06-architecture.png",
+      "width": 1425,
+      "height": 1537,
+      "bytes": 108067,
+      "sha256": "dc6d483ed4fd070ea227ea47807730b349940ca705c139a93602c2d92367233d"
+    },
+    {
+      "file": "07-dependency-graph.png",
+      "width": 1425,
+      "height": 2500,
+      "bytes": 202619,
+      "sha256": "f9fe9629e8d10d1a8c6d8c49f5d584316def07ecb841cd22cee15964f00dd0cb"
+    },
+    {
+      "file": "08-ask-codebase.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 118327,
+      "sha256": "c516836878a3aeaf2a6cf52c891c256d494214b568b795e1d8400bfdae205d94"
+    },
+    {
+      "file": "09-change-form.png",
+      "width": 1425,
+      "height": 1062,
+      "bytes": 81021,
+      "sha256": "ff192c4697925f7871615075ea0ade4dd6be135987b9adc18c8ef774fa765599"
+    },
+    {
+      "file": "10-change-result.png",
+      "width": 1425,
+      "height": 1806,
+      "bytes": 128251,
+      "sha256": "bd1514d0cd0367eed4a2fcdb22033e52f3551bc47f37c2407dff55a2b7a77209"
+    },
+    {
+      "file": "11-source-explanation.png",
+      "width": 1425,
+      "height": 1059,
+      "bytes": 76729,
+      "sha256": "7ecde74a2f38ed0a2660188e0a1eb2c196f1317b10dbdb60c45890f68e8ea8b3"
+    },
+    {
+      "file": "12-pricing.png",
+      "width": 1425,
+      "height": 1194,
+      "bytes": 88699,
+      "sha256": "803afa819154f4110fb03a0a1692ecb59b902533d206627cd79009bade0c1306"
+    },
+    {
+      "file": "13-light-theme.png",
+      "width": 1425,
+      "height": 2003,
+      "bytes": 149273,
+      "sha256": "2f10d0b515d901d7e01f69eed826a8375bd3ca4255f9211139f7795ac0f56cd4"
+    },
+    {
+      "file": "14-mobile-dashboard.png",
+      "width": 375,
+      "height": 1338,
+      "bytes": 54314,
+      "sha256": "515a7f9af7b179f994e84f04831e81226e9fd37adc1e89351f48a0abcd785fc1"
+    },
+    {
+      "file": "15-mobile-project.png",
+      "width": 375,
+      "height": 2706,
+      "bytes": 112011,
+      "sha256": "b56afafca6e4a977e08ce260d07b5469fc5718ddbfc15294577b04ff3ef1d1f3"
+    },
+    {
+      "file": "16-mobile-change.png",
+      "width": 375,
+      "height": 2569,
+      "bytes": 111953,
+      "sha256": "8ac026e5727c143690b860ca44c4500c8ff077e1fc86598374998619eb41ab2a"
+    },
+    {
+      "file": "17-source-evidence.png",
+      "width": 1425,
+      "height": 2210,
+      "bytes": 172530,
+      "sha256": "4e5b2fdbedb484f55812e63e2cdd540e48cd555e8ca481ddf390ecd4f8805d7e"
+    },
+    {
+      "file": "18-import-error.png",
+      "width": 1425,
+      "height": 1290,
+      "bytes": 86375,
+      "sha256": "59a1da83da1c598b12dce2dcb50b6bec73f986f27d4d1c6ec63e600cf21c1227"
+    },
+    {
+      "file": "19-public-example.png",
+      "width": 556,
+      "height": 715,
+      "bytes": 39196,
+      "sha256": "526c50fb9aa0e54789996e106d605a0154da86244cb29b820521fab0266048d3"
+    },
+    {
+      "file": "20-mobile-architecture.png",
+      "width": 375,
+      "height": 2152,
+      "bytes": 87088,
+      "sha256": "aa3ec2eafbc491d6fc866bd0cb5a50be1ded0ef5ea8f78b10f17a54b8537cbc8"
+    },
+    {
+      "file": "21-mobile-ask.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 41343,
+      "sha256": "9c9e0bf30ad2e6a6987760a2a4c06b1f691dd2a3cf8a178431d9c726aee3770f"
+    },
+    {
+      "file": "22-light-dashboard.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 70514,
+      "sha256": "34d63239598315ddf72c70bd14af77e2ed4e71a2c738b2b6c7c1af04a770c9f4"
+    },
+    {
+      "file": "23-dashboard-hover.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 70353,
+      "sha256": "66873d8286229a4e8964737dfe5c6caad3b24c75b75bdc31785a730e5205ece9"
+    }
+  ],
+  "baseline_screenshots": [
+    {
+      "file": "change-impact.png",
+      "sha256": "161e1a7e93cbb578b4375610a59e42e1397146c38a270a19c3290737bb557f9a"
+    },
+    {
+      "file": "codebase-questions.png",
+      "sha256": "8787e454b4128bdcd02a1e6fdad87914fbd66bd5a6a9595037d2b0c954df1bb8"
+    },
+    {
+      "file": "dashboard-empty.png",
+      "sha256": "d143f9594d318ccbc9dffd112e88a84f48517cdd8eaf6b6ed84a089c54b6dedd"
+    },
+    {
+      "file": "dashboard-light.png",
+      "sha256": "e2a038a30874c94f9047620ae4097df437122c97a6578df378d9472bcc0fce43"
+    },
+    {
+      "file": "dashboard.png",
+      "sha256": "e90d3f212984caebd3a9acacc53a068659a7de4098b7c3df6f90cee35d6499cb"
+    },
+    {
+      "file": "dependency-visualization.png",
+      "sha256": "70f4e2228a7c89a875483d44be0e2d4ddb8265cf3ec0153e8f9981ccba1ffcb3"
+    },
+    {
+      "file": "import-error.png",
+      "sha256": "9b16fcd665d6113f9afaa7d1b602fcb8424de7645a7d749b2364af4725e03bc4"
+    },
+    {
+      "file": "landing.png",
+      "sha256": "56477a305f258bd4ded005f2eb3d833f22c63f6f5eadbc07c63a2c329aaeb9e8"
+    },
+    {
+      "file": "mobile-change.png",
+      "sha256": "ffcf1f476b1803bec66efa91a3eee6bddeaf80595e68ce3d51ba8088707c2e89"
+    },
+    {
+      "file": "mobile-project.png",
+      "sha256": "a6efe4eb94a795b595eadb4975ef4ecd5d61e16c5624af8538715284337c8c1c"
+    },
+    {
+      "file": "pricing.png",
+      "sha256": "32aa53c2bf54e2268cabf32d72f42a62dc14168ea5da908ac514e51a3cc8c27e"
+    },
+    {
+      "file": "project-analysis.png",
+      "sha256": "0b9d3c007813c410841f102629a214ff9295d7e5073bd055da71255131c0b303"
+    },
+    {
+      "file": "repository-import.png",
+      "sha256": "d788f11f00bb98967415c7f0c7f5dec113e19e0cf425cf4095032e02c4f60d81"
+    },
+    {
+      "file": "source-code.png",
+      "sha256": "7617335f7c4fcaa59f845e437ce1c5354e0f0529506d6c94495cf42bde496889"
+    }
+  ],
+  "gallery": {
+    "pairs": 14,
+    "image_links_validated": 28,
+    "html_browser_preview": "Not verified: automatic approval review rejected the attempted local gallery server with blocked by policy. Markdown comparison is supplied for direct GitHub review."
+  },
+  "deployment": "Not deployed; review branch disabled in vercel.json"
+}

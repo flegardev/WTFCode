@@ -1,0 +1,139 @@
+{
+    "repository": "https://github.com/gothinkster/node-express-realworld-example-app",
+    "commit": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b",
+    "scanned_at": "2026-10-28 16:08:40.489209+00",
+    "profile": "quick",
+    "summary": "This project appears to provide a web API: code that receives requests and returns responses. The detected technologies include Express, Node API, Prisma.",
+    "systems": [
+        {
+            "key": "api",
+            "label": "Express API",
+            "explanation": "This Express server receives requests and runs backend rules.",
+            "paths": [
+                "e2e/src/server/server.spec.ts",
+                "src/app/routes/article/article.controller.ts",
+                "src/app/routes/article/article.mapper.ts"
+            ]
+        },
+        {
+            "key": "auth",
+            "label": "Authentication",
+            "explanation": "This part decides who is signed in and which requests are allowed.",
+            "paths": []
+        },
+        {
+            "key": "database",
+            "label": "Application data",
+            "explanation": "This is where the application keeps durable information.",
+            "paths": [
+                "src/app/models/http-exception.model.ts",
+                "src/prisma/migrations/20210924225358_initial/migration.sql",
+                "src/prisma/migrations/20211001143221_implicit_tags/migration.sql"
+            ]
+        },
+        {
+            "key": "docker",
+            "label": "Docker environment",
+            "explanation": "Docker files describe a repeatable way to run parts of this project.",
+            "paths": [
+                "Dockerfile"
+            ]
+        }
+    ],
+    "connections": [
+        {
+            "from": "Express API",
+            "to": "Application data",
+            "relationship": "likely reads and writes",
+            "certainty": "inferred"
+        }
+    ],
+    "dependencies": [
+        {
+            "name": "express",
+            "path": "src/app/routes/article/article.controller.ts",
+            "files": 7
+        },
+        {
+            "name": "@prisma/client",
+            "path": "src/prisma/prisma-client.ts",
+            "files": 3
+        },
+        {
+            "name": "axios",
+            "path": "e2e/src/server/server.spec.ts",
+            "files": 2
+        },
+        {
+            "name": "bcryptjs",
+            "path": "src/app/routes/auth/auth.service.ts",
+            "files": 2
+        },
+        {
+            "name": "@ngneat/falso",
+            "path": "src/prisma/seed.ts",
+            "files": 1
+        },
+        {
+            "name": "@nx/jest/preset",
+            "path": "jest.preset.js",
+            "files": 1
+        }
+    ],
+    "question": "Where does authentication happen?",
+    "answer": "The scan found request handlers related to \"authentication\": GET /user, PUT /user, POST /users. These are places where the application accepts a request. Open the references to check the implementation. This scan cannot confirm that the feature works, or establish the order in which every part runs. [1] [2] [3] [4]",
+    "references": [
+        {
+            "id": 1,
+            "kind": "route",
+            "label": "GET /user",
+            "path": "src/app/routes/auth/auth.controller.ts",
+            "line": 45,
+            "confidence": "high"
+        },
+        {
+            "id": 2,
+            "kind": "route",
+            "label": "PUT /user",
+            "path": "src/app/routes/auth/auth.controller.ts",
+            "line": 61,
+            "confidence": "high"
+        },
+        {
+            "id": 3,
+            "kind": "route",
+            "label": "POST /users",
+            "path": "src/app/routes/auth/auth.controller.ts",
+            "line": 14,
+            "confidence": "high"
+        },
+        {
+            "id": 4,
+            "kind": "route",
+            "label": "POST /users/login",
+            "path": "src/app/routes/auth/auth.controller.ts",
+            "line": 30,
+            "confidence": "high"
+        }
+    ],
+    "change": {
+        "target": "src/app/routes/auth/auth.ts",
+        "matched": 4,
+        "files": [
+            "src/app/routes/auth/auth.ts",
+            "src/app/routes/article/article.controller.ts",
+            "src/app/routes/auth/auth.controller.ts",
+            "src/app/routes/profile/profile.controller.ts",
+            "src/app/routes/tag/tag.controller.ts",
+            "src/app/routes/routes.ts",
+            "src/main.ts"
+        ],
+        "checks": [
+            "Run the matched tests first, then the repository-wide suite.",
+            "Test external-service failure, timeout, and retry behavior without exposing credentials.",
+            "Review every direct consumer before merge and confirm the highest-risk path manually.",
+            "Rescan after the edit and compare the resulting evidence before merge."
+        ],
+        "limitations": "This is deterministic static evidence. Dynamic dispatch, generated code, runtime configuration, and infrastructure outside the repository can extend the impact."
+    }
+}
