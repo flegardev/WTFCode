@@ -59,6 +59,8 @@ All seven requested widths were tested in both themes: **320, 375, 390, 430, 768
 
 Repeated capture runs reached registration throttling. The final capture reuses an existing authenticated disposable empty account; throttling was not bypassed or relaxed. The original browser acceptance has a deterministic dark-theme setup so both theme transitions are tested regardless of previous browser state.
 
+The first hosted CI run passed the portable job but exposed a quote-style-dependent source assertion in `V3GraphTest.php` after JavaScript formatting. The assertion now accepts either JavaScript string quote style and also checks the actual level options in the PHP controls. This is a test-contract correction; graph features remain covered by the live browser checks. Hosted CI completion is recorded separately from the local results.
+
 ## Screenshots and measurements
 
 The [Markdown gallery](UX-V2-COMPARISON.md) provides 14 paired comparisons directly reviewable in GitHub. The [HTML gallery](UX-V2-COMPARISON.html) uses the same original PNGs with independently scrollable columns. Its 28 image paths were checked. Automatic approval review rejected starting its local preview server with “blocked by policy”; no browser rendering claim is made for that HTML document. The application images themselves were captured and inspected in the real running browser.
@@ -156,3 +158,5 @@ The following inventory covers this review’s source, assets, tests and evidenc
 - [views/project-nav.php](../views/project-nav.php)
 - [views/public-example.php](../views/public-example.php)
 - `docs/screenshots-v2/*.png`: 23 actual browser captures, individually indexed above.
+
+- [tests/V3GraphTest.php](../tests/V3GraphTest.php): quote-independent graph-level contract and matching UI options.
