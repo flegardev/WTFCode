@@ -40,7 +40,7 @@ $change = (string) file_get_contents(__DIR__ . '/../public/change.php');
 foreach (['feature', 'symbol', 'file', 'route', 'table'] as $target) {
     modes_assert(str_contains($change, "'$target'"), 'Change mode must support ' . $target . ' targets');
 }
-foreach (['What will this change break?', 'Critical impact', 'Likely tests', 'Recommended before merge', 'Implementation prompt'] as $section) {
+foreach (['What could this change affect?', 'Critical impact', 'Likely tests', 'Recommended before merge', 'Implementation prompt'] as $section) {
     modes_assert(str_contains($change, $section), 'Change workbench must include ' . $section);
 }
 modes_assert(str_contains($change, "PromptSafetyService::build"), 'Change workbench must build a bounded implementation prompt');

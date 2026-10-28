@@ -1,0 +1,54 @@
+# Disposable LOCAL staging. No existing Supabase database is contacted.
+name: wtfcode-staging
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile.vercel
+  environment: &environment
+    APP_ENV: production
+    APP_DEBUG: "false"
+    DATABASE_URL: postgresql://wtfcode:${STAGING_DB_PASSWORD:?Set STAGING_DB_PASSWORD in your shell}@database:5432/wtfcode?sslmode=disable
+    SESSION_DRIVER: database
+    WTF_STORAGE_PATH: /tmp/wtfcode
+    WTF_PRIVATE_REPOSITORIES_ENABLED: "false"
+    WTF_CODE_EXPLANATION_PROVIDER: deterministic
+  depends_on:
+    database:
+      condition: service_healthy
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp/wtfcode:uid=10001,gid=10001,mode=0700,size=512m
+
+services:
+  database:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: wtfcode
+      POSTGRES_USER: wtfcode
+      POSTGRES_PASSWORD: ${STAGING_DB_PASSWORD:?Set STAGING_DB_PASSWORD in your shell}
+    volumes:
+      - staging_database:/var/lib/postgresql/data
+      - ./supabase/production-schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U wtfcode -d wtfcode"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:8088:8080"
+    restart: unless-stopped
+  worker:
+    <<: *app
+    command: [php, tools/scan-worker.php, --loop, --poll=3]
+    init: true
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+    stop_grace_period: 90s
+
+volumes:
+  staging_database:

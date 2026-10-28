@@ -1,3 +1,5 @@
+> Historical report. Its scores, SQLite claims, timing measurements and readiness statements were not verified in the October 2026 SaaS audit. See [the current evidence-based handoff](docs/SAAS-MVP-REPORT.md).
+
 # 🏛️ WTFCode — Professional Production Modernization Report
 
 ## 1. Baseline
