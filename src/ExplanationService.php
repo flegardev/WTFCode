@@ -13,7 +13,7 @@ final class ExplanationService
             ? ' ' . $directCount . ' other file' . ($directCount === 1 ? '' : 's') . ' directly depend on it.'
             : ' The scanner did not find another project file that directly imports it.';
         if ($transitiveCount > 0) $human .= ' ' . $transitiveCount . ' additional file' . ($transitiveCount === 1 ? '' : 's') . ' are reachable through that static dependency chain.';
-        $technical = 'WTFCode classified this as ' . $file['role_name'] . '. It contains ' . $file['line_count'] . ' lines, has ' . count($imports) . ' detected outgoing dependency ' . (count($imports) === 1 ? 'entry' : 'entries') . ', and uses static import/include evidence only.';
+        $technical = 'WTFCode classified this as ' . $file['role_name'] . ' using static naming and source patterns. This role is a heuristic. It contains ' . $file['line_count'] . ' lines, has ' . count($imports) . ' detected outgoing dependency ' . (count($imports) === 1 ? 'entry' : 'entries') . ', and uses static import/include evidence only.';
         $advice = $directCount + $transitiveCount > 4
             ? 'Before changing it, inspect the confirmed direct and transitive dependents below, then make one small, testable change at a time.'
             : 'Before changing it, check the connected files below and keep the change scoped to one behavior.';

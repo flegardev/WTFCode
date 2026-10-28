@@ -39,7 +39,7 @@ require __DIR__ . '/../views/header.php';
 <section class="app-shell v2-shell change-workbench">
     <div class="breadcrumb"><a href="<?= e(url('project.php?id=' . (int) $project['id'])) ?>"><?= e($project['name']) ?></a><span>/</span><span>Change</span></div>
     <div class="project-heading compact">
-        <div><p class="landing-kicker">Change intelligence</p><h1>What will this change break?</h1><p>Select a concrete target. WTFCode follows stored routes, symbols, data boundaries, and dependents before you edit.</p></div>
+        <div><p class="landing-kicker">Change intelligence</p><h1>What could this change affect?</h1><p>Select a concrete target. Follow the dependencies before you edit.</p></div>
         <a class="button button-secondary" href="<?= e(url('compare.php?id=' . (int) $project['id'])) ?>">Review Git diff</a>
     </div>
     <?php require __DIR__ . '/../views/project-nav.php'; ?>
@@ -53,6 +53,7 @@ require __DIR__ . '/../views/header.php';
     </form>
 
     <?php if ($impact !== null): ?>
+        <section class="impact-certainty"><p><strong>Detected relationships</strong> Imports, references and stored dependency paths link the files below.</p><p><strong>Potential consequences · inferred</strong> The risk level and suggested checks are heuristics, not predictions of runtime failure. <?= e($impact['limitations']) ?></p></section>
         <section class="change-risk-hero <?= e($impact['risk']['level']) ?>" aria-labelledby="change-risk-title">
             <div><span>Change risk</span><strong id="change-risk-title"><?= e(strtoupper($impact['risk']['level'])) ?></strong></div>
             <ul><?php foreach ($impact['risk']['reasons'] as $reason): ?><li><?= e($reason) ?></li><?php endforeach; ?></ul>
@@ -60,10 +61,12 @@ require __DIR__ . '/../views/header.php';
 
         <section class="change-impact-metrics" aria-label="Change impact summary">
             <div><strong><?= count($impact['files']) ?></strong><span>files in radius</span></div>
-            <div><strong><?= count($impact['symbols']) + count($impact['direct']) + count($impact['transitive']) ?></strong><span>symbols affected</span></div>
-            <div><strong><?= count($impact['routes']) ?></strong><span>routes affected</span></div>
+            <div><strong><?= count($impact['symbols']) + count($impact['direct']) + count($impact['transitive']) ?></strong><span>symbols in radius</span></div>
+            <div><strong><?= count($impact['routes']) ?></strong><span>routes in radius</span></div>
             <div><strong><?= count($impact['tables']) + count($impact['services']) ?></strong><span>data and service boundaries</span></div>
         </section>
+
+        <?php if ($impact['files'] !== []): ?><section class="change-evidence-section"><h2>Files to inspect</h2><div class="impact-file-list"><?php foreach (array_slice($impact['files'], 0, 12) as $affectedFile): ?><a href="<?= e(url('files.php?id=' . (int) $project['id'] . '&q=' . urlencode((string) $affectedFile['path']))) ?>"><strong><?= e($affectedFile['path']) ?></strong><span>Inspect source <span aria-hidden="true">→</span></span></a><?php endforeach; ?></div></section><?php endif; ?>
 
         <section class="change-result-grid">
             <article class="change-evidence-section">

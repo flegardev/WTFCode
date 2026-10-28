@@ -15,6 +15,13 @@ final class FileCollectorTest extends TestCase
 {
     private string $fixtureRoot;
 
+    public function testMiddlewareInARouteDirectoryDoesNotProveAnHttpEndpoint(): void
+    {
+        $summary = (new SourceClassifier())->summaryFor('src/routes/auth.ts', 'export function getTokenFromHeaders(req) { return req.headers.authorization; }');
+        self::assertStringNotContainsString('defines a page or route that users can reach', $summary);
+        self::assertStringContainsString('does not prove', $summary);
+    }
+
     protected function setUp(): void
     {
         $this->fixtureRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wtfcode-file-collector-' . bin2hex(random_bytes(6));

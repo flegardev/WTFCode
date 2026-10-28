@@ -84,7 +84,7 @@ final class SourceClassifier
     public function summaryFor(string $path, string $content): string
     {
         return match ($this->roleFor($path, $content)) {
-            'route' => 'This file defines a page or route that users can reach in the application.',
+            'route' => 'This file appears to contain routing-related code. Its location alone does not prove that it exposes a reachable HTTP endpoint.',
             'api endpoint' => 'This file exposes server-side work that another part of the application can call.',
             'middleware' => 'This file runs before selected requests and can protect, redirect, or reshape them.',
             'authentication' => 'This file participates in identifying users or keeping them signed in.',
