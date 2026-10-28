@@ -58,7 +58,8 @@ COPY tools/*.php ./tools/
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && printf '%s\n' 'expose_php=0' 'display_errors=0' 'log_errors=1' 'memory_limit=1024M' 'max_execution_time=0' 'upload_max_filesize=2M' 'post_max_size=2M' > "$PHP_INI_DIR/conf.d/wtfcode-production.ini" \
-    && useradd --system --home-dir /app --shell /usr/sbin/nologin wtfcode \
+    && groupadd --gid 10001 wtfcode \
+    && useradd --uid 10001 --gid 10001 --no-create-home --home-dir /app --shell /usr/sbin/nologin wtfcode \
     && mkdir -p /tmp/wtfcode/repos /tmp/wtfcode/cache /tmp/wtfcode/tmp /data/caddy /config/caddy \
     && chown -R wtfcode:wtfcode /tmp/wtfcode /data/caddy /config/caddy \
     && setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp

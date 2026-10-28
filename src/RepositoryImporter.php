@@ -101,12 +101,12 @@ final class RepositoryImporter
         return self::storageRoot() . DIRECTORY_SEPARATOR . 'repos' . DIRECTORY_SEPARATOR . 'project-' . $projectId . $suffix;
     }
 
-    public static function workingCopy(array $project): string
+    public static function workingCopy(array $project, bool $fresh = false): string
     {
         $projectId = (int) ($project['id'] ?? 0);
         $current = (string) ($project['local_path'] ?? '');
-        if ($current !== '' && is_dir($current . DIRECTORY_SEPARATOR . '.git')) return $current;
-        if (isset(self::$requestCopies[$projectId]) && is_dir(self::$requestCopies[$projectId] . DIRECTORY_SEPARATOR . '.git')) return self::$requestCopies[$projectId];
+        if (!$fresh && $current !== '' && is_dir($current . DIRECTORY_SEPARATOR . '.git')) return $current;
+        if (!$fresh && isset(self::$requestCopies[$projectId]) && is_dir(self::$requestCopies[$projectId] . DIRECTORY_SEPARATOR . '.git')) return self::$requestCopies[$projectId];
         $url = self::normalizeGithubUrl((string) ($project['repository_url'] ?? ''));
         if ($projectId < 1 || $url === null) throw new RuntimeException('The project repository cannot be rehydrated.');
         $installationRecordId = (int) ($project['github_installation_id'] ?? 0);

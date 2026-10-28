@@ -41,7 +41,7 @@ final class PublicAvailabilityTest extends TestCase
                 $body = @file_get_contents('http://' . $address . '/index.php');
             }
             self::assertIsString($body);
-            self::assertStringContainsString('Understand unfamiliar code', $body);
+            self::assertStringContainsString('Understand what your AI built', $body);
             self::assertStringContainsString('200', $http_response_header[0]);
             $context = stream_context_create(['http' => ['ignore_errors' => true]]);
             $health = file_get_contents('http://' . $address . '/health.php', false, $context);

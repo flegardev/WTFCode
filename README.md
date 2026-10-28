@@ -1,4 +1,8 @@
-# WTFCode — evidence-backed code intelligence
+# WTFCode — understand what your AI built
+
+The current SaaS MVP work is documented in the [verified implementation report](docs/SAAS-MVP-REPORT.md), [real application screenshots](docs/SAAS-MVP-SCREENSHOTS.md), and [staging/launch guide](docs/STAGING-AND-LAUNCH.md). Production deployment and billing have not been activated by this upgrade.
+
+The free trial enforces one public project and five queued scans per rolling 30 days. Paid plan limits are proposals, not active subscriptions. Private repository access requires a separate operator release gate (`WTF_PRIVATE_REPOSITORIES_ENABLED=false` by default), in addition to GitHub App credentials. Customer Q&A stays deterministic and local until AI budgets and consent exist.
 
 Stop asking “WTF does this code do?” WTFCode maps unfamiliar repositories, explains how systems connect, and shows what can break before you change them.
 

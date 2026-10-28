@@ -36,6 +36,7 @@ $transport = static function (string $method, string $url, ?string $bearer, ?arr
 
 GitHubAppService::configureForTests($transport, [
     'environment' => 'test',
+    'private_repositories_enabled' => true,
     'github_app_id' => '12345',
     'github_app_slug' => 'wtfcode-test',
     'github_app_client_id' => 'Iv1.test',

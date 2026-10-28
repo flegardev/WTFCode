@@ -18,6 +18,7 @@ $tiers = [
     'analyzers' => [
         'tests/V3AstTest.php',
         'tests/V3StructuralTest.php',
+        'tests/TypeScriptWorkerSafetyTest.php',
     ],
     'integration' => [
         'tests/V2IntegrationTest.php',
@@ -27,6 +28,7 @@ $tiers = [
         'tests/V3ExplanationTest.php',
         'tests/V3PerformanceTest.php',
         'tests/QueueRuntimeTest.php',
+        'tests/EntitlementsIntegrationTest.php',
     ],
     'security' => [
         'tests/V3SecurityTest.php',
