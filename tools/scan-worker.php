@@ -30,6 +30,11 @@ foreach ($arguments as $argument) {
 
 $host = preg_replace('/[^A-Za-z0-9_.-]/', '-', (string) (gethostname() ?: 'host')) ?: 'host';
 $workerId = substr($host . ':' . getmypid() . ':' . bin2hex(random_bytes(4)), 0, 100);
+register_shutdown_function(static function () use ($workerId): void {
+    try {
+        if (Database::isPostgres()) Database::connection()->prepare('DELETE FROM worker_heartbeats WHERE worker_id = ?')->execute([$workerId]);
+    } catch (Throwable) { /* A crashed/unreachable worker ages out after five minutes. */ }
+});
 $runner = new ScanJobRunner();
 $isDatabaseFailure = static function (Throwable $exception): bool {
     $current = $exception;
@@ -43,8 +48,20 @@ $isDatabaseFailure = static function (Throwable $exception): bool {
     return false;
 };
 
+$stopping = false;
+if (function_exists('pcntl_async_signals')) {
+    pcntl_async_signals(true);
+    pcntl_signal(SIGTERM, static function () use (&$stopping): void { $stopping = true; });
+    pcntl_signal(SIGINT, static function () use (&$stopping): void { $stopping = true; });
+}
+$lastMaintenance = 0;
 do {
     try {
+        if (Database::isPostgres()) {
+            \WTFCode\Application\PilotOperations::heartbeat($workerId);
+            \WTFCode\Application\AccountLifecycle::drainRequests();
+            if (time() - $lastMaintenance >= 60) { \WTFCode\Application\PilotOperations::cleanup(); $lastMaintenance = time(); }
+        }
         $job = AnalysisJobStore::claimNext($workerId);
         if ($job === null) {
             if ($once) {
@@ -82,4 +99,4 @@ do {
         }
         sleep($pollSeconds);
     }
-} while ($loop);
+} while ($loop && !$stopping);

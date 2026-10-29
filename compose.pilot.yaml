@@ -1,0 +1,32 @@
+# LOCAL pilot rehearsal overlay. No cloud resources are created.
+# docker compose -f compose.staging.yaml -f compose.pilot.yaml config
+services:
+  web:
+    environment:
+      APP_URL: ${PILOT_APP_URL:-http://127.0.0.1:8088}
+      WTF_PILOT_ACCESS: ${WTF_PILOT_ACCESS:-closed}
+      WTF_PILOT_EMAILS: ${WTF_PILOT_EMAILS:-}
+      WTF_REQUIRE_EMAIL_VERIFICATION: "true"
+      WTF_MAIL_TRANSPORT: disabled
+      WTF_LIVE_MAIL_APPROVED: "false"
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 128
+  worker:
+    environment:
+      APP_URL: ${PILOT_APP_URL:-http://127.0.0.1:8088}
+      WTF_PILOT_ACCESS: ${WTF_PILOT_ACCESS:-closed}
+      WTF_PILOT_EMAILS: ${WTF_PILOT_EMAILS:-}
+      WTF_REQUIRE_EMAIL_VERIFICATION: "true"
+      WTF_MAIL_TRANSPORT: disabled
+      WTF_LIVE_MAIL_APPROVED: "false"
+    mem_limit: 2g
+    cpus: 1.0
+    pids_limit: 128
+    healthcheck:
+      disable: false
+      test: [CMD, php, tools/pilot-worker-health.php]
+      interval: 60s
+      timeout: 10s
+      start_period: 60s
+      retries: 3

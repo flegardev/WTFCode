@@ -1,0 +1,25 @@
+{
+    "status": "passed",
+    "separate_supervised_worker": true,
+    "account_export_and_deletion": true,
+    "scans": [
+        {
+            "repository": "octocat\/Hello-World",
+            "project_id": 1,
+            "state": "completed",
+            "seconds": 3.265,
+            "files": 0,
+            "readme_only": true,
+            "commit": "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d"
+        },
+        {
+            "repository": "gothinkster\/node-express-realworld-example-app",
+            "project_id": 2,
+            "state": "completed",
+            "seconds": 5.315,
+            "files": 57,
+            "readme_only": false,
+            "commit": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b"
+        }
+    ]
+}

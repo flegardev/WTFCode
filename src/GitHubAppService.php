@@ -59,6 +59,11 @@ final class GitHubAppService
             }
             return null;
         }
+        // GitHub reports repository size in KiB. This is a conservative preflight,
+        // in addition to the post-clone byte cap and container disk limit.
+        if (is_numeric($repository['size'] ?? null) && (float) $repository['size'] > 102400) {
+            throw new GitHubAccessException('This repository exceeds the 100 MB pilot import limit. Choose a smaller public repository.', 'Repository size preflight rejected.', 'repository_too_large');
+        }
         $result = self::normalizeRepository($repository);
         if ($result !== null && (bool) $result['private']) {
             throw new GitHubAccessException('Private repository detected. Connect GitHub and select it from the repository picker.', 'Unauthenticated API unexpectedly reported a private repository.', 'private_repository');

@@ -10,10 +10,11 @@ header('Cache-Control: no-store, max-age=0');
 $database = 'unavailable';
 try {
     // Verify the request/session and worker queue contracts, not just one table.
-    Database::connection()->query('SELECT id, is_suspended FROM users LIMIT 0');
+    Database::connection()->query('SELECT id, is_suspended, email_verified_at, session_version FROM users LIMIT 0');
     Database::connection()->query('SELECT id, state, lease_token, attempt_count, max_attempts, available_at FROM analysis_jobs LIMIT 0');
     Database::connection()->query('SELECT id, user_id, status FROM projects LIMIT 0');
-    Database::connection()->query('SELECT session_id, payload, expires_at FROM sessions LIMIT 0');
+    Database::connection()->query('SELECT session_id, user_id, payload, expires_at FROM sessions LIMIT 0');
+    foreach (['account_tokens', 'account_link_requests', 'worker_heartbeats', 'storage_cleanup_tasks', 'pilot_feedback'] as $table) Database::connection()->query("SELECT * FROM $table LIMIT 0");
     $ready = true;
     $database = $ready ? 'ready' : 'unavailable';
 } catch (Throwable) {

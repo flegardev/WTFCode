@@ -1,0 +1,584 @@
+{
+  "assessment_date": "2026-10-29",
+  "test_dates": [
+    "2026-10-28",
+    "2026-10-29"
+  ],
+  "assessment": "external_pilot_blocked",
+  "review_branch": "codex/pilot-launch-readiness",
+  "base_branch": "codex/premium-ux-v2",
+  "base_commit": "f873f83bc77fe9242c880a30967fbd3cabac6bda",
+  "mvp_commit": "d399e8ec91e6b03485154079c6b51f3961d31322",
+  "base_pr": {
+    "url": "https://github.com/flegardev/WTFCode/pull/3",
+    "draft": true,
+    "merged": false
+  },
+  "environment": {
+    "web": "PHP 8.5.12 native development server bound to 127.0.0.1:8879",
+    "database": "Disposable PostgreSQL 18.6, loopback port 55440; independent cluster",
+    "node": "24.19.0",
+    "playwright_cli": "0.1.22",
+    "hosted_deployment": false,
+    "docker_image_built": true,
+    "real_email_sent": false,
+    "private_imports_enabled": false,
+    "payments_enabled": false,
+    "actual_participants": 0
+  },
+  "test_exit_codes": {
+    "security": 0,
+    "npm_audit": 0,
+    "composer_validate": 0,
+    "e2e": 0,
+    "quality": 0,
+    "javascript": 0,
+    "composer_audit": 0,
+    "integration": 0,
+    "analyzers": 0
+  },
+  "phpunit": {
+    "tests": 36,
+    "assertions": 96,
+    "passed": true
+  },
+  "scripts": {
+    "portable": 10,
+    "analyzers": 3,
+    "integration": 9,
+    "security": 2,
+    "e2e": 2
+  },
+  "lifecycle": {
+    "status": "passed",
+    "checks": 33,
+    "expired_verify": true,
+    "expired_reset": true,
+    "single_use": true,
+    "resend_revokes_previous": true,
+    "digest_only_tokens": true,
+    "no_auto_login_before_verification": true,
+    "duplicate_signup_does_not_overwrite_password": true,
+    "session_epoch_and_late_write_fence": true,
+    "cross_owner_export": true,
+    "deletion_running_job_fence": true,
+    "legacy_provider_cache_invalidated": true,
+    "symlink_root_test": {
+      "windows": "skipped: no symlink creation privilege",
+      "linux_ci": "passed: external target preserved",
+      "job_id": 123371715449
+    }
+  },
+  "browser": {
+    "core": {
+      "status": "passed",
+      "projectId": "15",
+      "evidence": 40,
+      "checks": [
+        "Real worker completion received through status API",
+        "CSRF rejected",
+        "Source-backed deterministic question answered",
+        "Evidence link opens owned source explanation",
+        "Change analysis presents uncertainty",
+        "Dependency graph rendered",
+        "1440px project.php?id=15 loads",
+        "1440px project.php?id=15 fits viewport",
+        "1440px map.php?id=15 loads",
+        "1440px map.php?id=15 fits viewport",
+        "1440px account.php loads",
+        "1440px account.php fits viewport",
+        "1440px feedback.php loads",
+        "1440px feedback.php fits viewport",
+        "1440px settings.php loads",
+        "1440px settings.php fits viewport",
+        "390px project.php?id=15 loads",
+        "390px project.php?id=15 fits viewport",
+        "390px map.php?id=15 loads",
+        "390px map.php?id=15 fits viewport",
+        "390px account.php loads",
+        "390px account.php fits viewport",
+        "390px feedback.php loads",
+        "390px feedback.php fits viewport",
+        "390px settings.php loads",
+        "390px settings.php fits viewport",
+        "320px project.php?id=15 loads",
+        "320px project.php?id=15 fits viewport",
+        "320px map.php?id=15 loads",
+        "320px map.php?id=15 fits viewport",
+        "320px account.php loads",
+        "320px account.php fits viewport",
+        "320px feedback.php loads",
+        "320px feedback.php fits viewport",
+        "320px settings.php loads",
+        "320px settings.php fits viewport",
+        "Light theme persists",
+        "Keyboard moves focus",
+        "Optional structured feedback submitted without source or free text",
+        "Second public project blocked by trial entitlement",
+        "Recovery request returns generic response"
+      ]
+    },
+    "reset_export": {
+      "status": "passed",
+      "checks": [
+        "Reset signs out existing authenticated sessions",
+        "New password signs in",
+        "Real download and authenticated metadata export exclude credentials",
+        "Second allowed account registers with verification required"
+      ]
+    },
+    "isolation": {
+      "status": "passed",
+      "checks": [
+        "New same-page fragment link replaces stale code and clears fragment",
+        "Cross-owner project.php blocked",
+        "Cross-owner map.php blocked",
+        "Cross-owner files.php blocked",
+        "Cross-owner change.php blocked",
+        "Cross-owner ask.php blocked",
+        "Cross-owner scan-status.php blocked",
+        "Forged export user ID ignored",
+        "Second test account deleted through reauthenticated form",
+        "Deleting another account leaves original owner intact"
+      ]
+    },
+    "deletion": {
+      "status": "passed",
+      "deletedProjectId": "15",
+      "pendingJobId": 30,
+      "checks": [
+        "Account and analysis survive actual database and web service restarts",
+        "Repeated rescans produce durable pending work while worker is stopped",
+        "Deletion refuses an incorrect password",
+        "Reauthenticated deletion completes with pending work",
+        "Deleted account cannot sign in or access old project"
+      ]
+    },
+    "accessibility": {
+      "status": "passed",
+      "results": [
+        {
+          "path": "account.php",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "feedback.php",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-request.php?purpose=reset",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-token.php?purpose=reset",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account.php",
+          "theme": "dark",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "feedback.php",
+          "theme": "dark",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-request.php?purpose=reset",
+          "theme": "dark",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-token.php?purpose=reset",
+          "theme": "dark",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account.php",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "feedback.php",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-request.php?purpose=reset",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-token.php?purpose=reset",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account.php",
+          "theme": "light",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "feedback.php",
+          "theme": "light",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-request.php?purpose=reset",
+          "theme": "light",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        },
+        {
+          "path": "account-token.php?purpose=reset",
+          "theme": "light",
+          "width": 320,
+          "overflow": false,
+          "violations": [],
+          "manualReviewItems": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "deletion_sql_and_filesystem": {
+    "accounts_remaining": 0,
+    "pending_job_remaining": 0,
+    "projects_remaining": 0,
+    "file_records_remaining": 0,
+    "feedback_remaining": 0,
+    "checkout_paths_remaining": 0,
+    "status": "passed"
+  },
+  "worker_crash": {
+    "status": "passed",
+    "real_process_killed": true,
+    "replacement_real_public_scan": true,
+    "lease_and_backoff_clock_advanced_only_for_disposable_fixture": true,
+    "missing_remote_actual_git_attempts": 3,
+    "missing_remote_final_state": "failed",
+    "oversized_repository": "torvalds/linux rejected using real GitHub size metadata before clone"
+  },
+  "database_outage": {
+    "before_and_during": {
+      "safeResponse": true,
+      "before": 200,
+      "during": 503
+    },
+    "recovery": {
+      "webRestarted": true,
+      "after": 200,
+      "port": 55440,
+      "localRecoveryFix": "PostgreSQL log moved outside PGDATA to avoid Windows file sharing failure during crash recovery",
+      "database": "wtfcode_pilot"
+    },
+    "worker_exit_code_on_outage": 1,
+    "worker_restarted_successfully": true
+  },
+  "backup": {
+    "created": {
+      "backup": "encrypted",
+      "encrypted_bytes": 201300,
+      "created_at": "2026-10-28T17:58:10+00:00"
+    },
+    "restore": {
+      "restore": "completed",
+      "target": "wtfcode_pilot_restore_20261028",
+      "counts": {
+        "users": 1,
+        "projects": 1,
+        "scan_runs": 1,
+        "project_files": 57,
+        "schema_migrations": 2
+      }
+    },
+    "safety": {
+      "restoreExit": 0,
+      "rehearsalSeconds": 0.9434037,
+      "wrongKeyRejected": true,
+      "nonemptyTargetRejected": true
+    },
+    "comparison": {
+      "status": "passed",
+      "checks": {
+        "users": true,
+        "projects": true,
+        "scan_runs": true,
+        "project_files": true,
+        "schema_migrations": true,
+        "restored_password_verifies": true
+      }
+    },
+    "separate_empty_target": true,
+    "live_database_overwritten": false,
+    "disposable_key_discarded": true
+  },
+  "postgres_security": {
+    "tables": 28,
+    "roles": 3,
+    "privileges_per_role_per_table": 4,
+    "failures": [],
+    "status": "passed"
+  },
+  "dependency_audits": {
+    "composer_advisories": 0,
+    "npm": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "container_audit": "Completed: 19 Critical/144 High scanner matches remain in vendor-deferred/unfixed dependencies; zero fixable High/Critical matches. Release triage remains blocked."
+  },
+  "measurements": [
+    {
+      "repository": "octocat/Hello-World",
+      "commit_sha": "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+      "profile": "quick",
+      "state": "completed",
+      "import_to_result_seconds": 1.363,
+      "php_peak_allocated_bytes": 8388608,
+      "retained_checkout_bytes_including_git": 29536,
+      "stored_project_row_bytes_excluding_indexes_toast": 2541,
+      "php_peak_excludes_child_processes": true,
+      "filesystem_measurement_is_end_of_scan_not_peak": true
+    },
+    {
+      "repository": "gothinkster/node-express-realworld-example-app",
+      "commit_sha": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b",
+      "profile": "quick",
+      "state": "completed",
+      "import_to_result_seconds": 4.55,
+      "php_peak_allocated_bytes": 14680064,
+      "retained_checkout_bytes_including_git": 797278,
+      "stored_project_row_bytes_excluding_indexes_toast": 1784322,
+      "php_peak_excludes_child_processes": true,
+      "filesystem_measurement_is_end_of_scan_not_peak": true
+    }
+  ],
+  "measurement_limits": [
+    "Not a load benchmark",
+    "PHP allocation peak excludes Node child processes and OS/container peak RSS",
+    "Checkout size measured at end of local testing-mode scan, not a sampled peak",
+    "Stored row bytes exclude indexes, TOAST and complete physical database allocation",
+    "One worker; maximum five approved pilot users; one project and five durable jobs per account per rolling 30 days; three attempts per job",
+    "Pilot profile Quick only; unowned provider caches bypassed",
+    "CI Docker worker cgroup peak measured at 1364070400 bytes before intentional disk-cap probe; one RealWorld source scan and a README-only fixture, not a worst-case benchmark",
+    "CI worker cgroup peak before disk probe: 1364070400 bytes; includes processes/page cache across README-only and RealWorld fixtures. Not a worst-case benchmark."
+  ],
+  "remaining_hosted_gates": [
+    "Review residual vendor-deferred image advisories before external launch",
+    "Repeat load/resource/restart tests on the actual approved provider; two sample scans are not a worst-case capacity proof",
+    "Review unresolved vendor-deferred image advisories; do not infer security approval from passing CI",
+    "Repeat resource/load/restart checks on the actual approved provider; two sample scans are not a worst-case capacity proof",
+    "Public TLS/proxy secure cookies and remote database certificate validation",
+    "Approved SMTP handoff configuration and real inbox delivery",
+    "Off-host encrypted backup schedule, retention and deletion reconciliation",
+    "Alert destination and notification delivery",
+    "Controlled hosted network timeout and remote-removal fault injection",
+    "Operator identity, approved support/privacy contact and reviewed notices",
+    "Real five-person usability and value evidence"
+  ],
+  "screenshots": [
+    {
+      "path": "docs/pilot-screenshots/01-verification-required.png",
+      "width": 1685,
+      "height": 1239,
+      "sha256": "10003a040f9bc6ac8bf14663302d38fe7f5097cbe52858d3a3c557574ff5c0d6"
+    },
+    {
+      "path": "docs/pilot-screenshots/02-confirm-email.png",
+      "width": 1685,
+      "height": 1239,
+      "sha256": "9440b4da8dbe7204c2fa1dc398a47ec3af31d950f0b4462658f75c536519dd12"
+    },
+    {
+      "path": "docs/pilot-screenshots/03-account-controls.png",
+      "width": 1425,
+      "height": 1003,
+      "sha256": "cbfad4a6c294f85aae03670a47fc26e8d81cf87806fdf0d07c85d8bf85114946"
+    },
+    {
+      "path": "docs/pilot-screenshots/04-account-light.png",
+      "width": 1425,
+      "height": 1003,
+      "sha256": "6553259678bef176c269ed846f8c29cc017e0e08e192af040c23540f847a174f"
+    },
+    {
+      "path": "docs/pilot-screenshots/05-optional-feedback.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "3c4a8b94237df8229d1557b932315ac1c8dc1cdbd8611c64b02cb838e60547fb"
+    },
+    {
+      "path": "docs/pilot-screenshots/06-password-recovery.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "1175f6765b74e0c1498a55305abec5344454b73db6e457afd1b6dc9e82df2fec"
+    },
+    {
+      "path": "docs/pilot-screenshots/07-account-mobile.png",
+      "width": 305,
+      "height": 1417,
+      "sha256": "d4ea18fcd3e544fee1956ed4627101fa00aecc5ea40416f0d10f082b6e366882"
+    },
+    {
+      "path": "docs/pilot-screenshots/08-deletion-confirmation.png",
+      "width": 1425,
+      "height": 1066,
+      "sha256": "68f1a73396bb0cf0bbae96a6bd883dbf495d1b24a938c6e6a78646e0a82ae362"
+    }
+  ],
+  "preserved_ux_screenshots": 23,
+  "unapproved_actions_performed": [],
+  "ci": {
+    "status": "passed",
+    "run_id": 40855049669,
+    "url": "https://github.com/flegardev/WTFCode/actions/runs/40855049669",
+    "verified_commit": "64a70934e2a55724475139c7320a484c6fe54be5",
+    "jobs": [
+      {
+        "name": "Portable quality gates",
+        "conclusion": "success"
+      },
+      {
+        "name": "Database, security, and E2E suite",
+        "conclusion": "success"
+      },
+      {
+        "name": "Disposable container pilot smoke",
+        "conclusion": "success"
+      }
+    ],
+    "compose_config_validated": true,
+    "docker_image_boot_tested": true,
+    "linux_symlink_test": "passed",
+    "security_release_gate": "blocked: remaining vendor-deferred image advisories require review"
+  },
+  "pull_request": {
+    "url": "https://github.com/flegardev/WTFCode/pull/4",
+    "draft": true,
+    "base": "codex/premium-ux-v2",
+    "merged": false
+  },
+  "deployment_checks": {
+    "review_branch_disabled_in_vercel_config": true,
+    "connected_vercel_projects": 2,
+    "deployments_for_pilot_branch": 0,
+    "checked_date": "2026-10-29"
+  },
+  "preserved_ux_screenshots_verified_sha256": 23,
+  "container": {
+    "scope": "Disposable GitHub Actions Docker runner, loopback web, synthetic accounts only",
+    "flow": {
+      "status": "passed",
+      "separate_supervised_worker": true,
+      "account_export_and_deletion": true,
+      "scans": [
+        {
+          "repository": "octocat/Hello-World",
+          "project_id": 1,
+          "state": "completed",
+          "seconds": 3.102,
+          "files": 0,
+          "readme_only": true,
+          "commit": "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d"
+        },
+        {
+          "repository": "gothinkster/node-express-realworld-example-app",
+          "project_id": 2,
+          "state": "completed",
+          "seconds": 6.731,
+          "files": 57,
+          "readme_only": false,
+          "commit": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b"
+        }
+      ]
+    },
+    "resources": {
+      "status": "passed",
+      "production_checkout_cleanup": true,
+      "cgroup": {
+        "memory_limit": "2147483648",
+        "memory_peak_before_disk_probe": "1364070400",
+        "cpu_max": "100000 100000",
+        "pids_max": "128"
+      },
+      "tmpfs_enospc_observed": true,
+      "probe_bytes_written": 536870912,
+      "probe_removed": true,
+      "memory_peak_after_disk_probe": "1364070400"
+    },
+    "image_audit": {
+      "run_url": "https://github.com/flegardev/WTFCode/actions/runs/40855049669",
+      "commit": "64a70934e2a55724475139c7320a484c6fe54be5",
+      "image_id": "sha256:f63f58f82d13f8c0a70264cfb6e5c49872d73190b32b0e68a6b92b432540bcdb",
+      "manifest_digest": "sha256:e1a24a082a176b8e12756781f9edd23c00c2ed803d32e2235a190bf4ed5ba992",
+      "counts": {
+        "Negligible": 684,
+        "Critical": 19,
+        "High": 144,
+        "Medium": 89,
+        "Unknown": 50,
+        "Low": 18
+      },
+      "fixable_high_critical_matches": 0,
+      "full_audit_sha256": "cd6472f361e2393ffcafc508290a67b49a1c48406969bca96fa97d9bf77ba6e5",
+      "status": "requires_triage_before_external_launch"
+    },
+    "all_services_and_volumes_removed": true,
+    "node_image": "24.22.1-trixie-slim",
+    "php_base": "dunglas/frankenphp:1-php8.4-trixie",
+    "advanced_security_binaries_in_default_pilot_image": false
+  }
+}

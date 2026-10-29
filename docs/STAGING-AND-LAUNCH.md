@@ -1,3 +1,5 @@
+> Pilot 3.0: the current gated procedure is [PILOT-DEPLOYMENT-GUIDE.md](../PILOT-DEPLOYMENT-GUIDE.md). Do not use historical “deploy now” steps or replay old migrations to open the pilot. A web deployment alone does not run the worker.
+
 # Local staging and launch gates
 
 ## Reproduce with Docker Compose

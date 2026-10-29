@@ -29,6 +29,7 @@ $tiers = [
         'tests/V3PerformanceTest.php',
         'tests/QueueRuntimeTest.php',
         'tests/EntitlementsIntegrationTest.php',
+        'tests/PilotLifecycleTest.php',
     ],
     'security' => [
         'tests/V3SecurityTest.php',
@@ -36,6 +37,7 @@ $tiers = [
     ],
     'e2e' => [
         'tests/PublicRepositoryImportTest.php',
+        'tests/PilotWorkerRecoveryTest.php',
     ],
 ];
 

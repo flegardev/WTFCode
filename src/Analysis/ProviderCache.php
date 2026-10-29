@@ -6,9 +6,11 @@ final class ProviderCache
 {
     private string $root;
     private bool $databaseBacked;
+    private bool $explicitTestRoot;
 
     public function __construct(?string $root = null)
     {
+        $this->explicitTestRoot = $root !== null;
         $this->databaseBacked = $root === null && (app_config()['environment'] ?? 'local') === 'production' && Database::isPostgres();
         $this->root = $root ?? app_config()['storage_path'] . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'providers';
     }
@@ -20,6 +22,7 @@ final class ProviderCache
 
     public function load(AnalysisRequest $request, AnalyzerProviderInterface $provider, ?string $revision = null): ?AnalyzerResult
     {
+        if (!$this->explicitTestRoot && \WTFCode\Application\PilotAccess::mode() !== 'open') return null;
         $key = $this->key($request, $provider, $revision);
         if ($this->databaseBacked) {
             try {
@@ -46,6 +49,7 @@ final class ProviderCache
 
     public function save(AnalysisRequest $request, AnalyzerProviderInterface $provider, AnalyzerResult $result): ?string
     {
+        if (!$this->explicitTestRoot && \WTFCode\Application\PilotAccess::mode() !== 'open') return null;
         if (!in_array($result->status, [AnalyzerResult::SUCCESS, AnalyzerResult::PARTIAL], true)) return null;
         if (count($result->graph['relationships'] ?? []) > 8000 || count($result->graph['symbols'] ?? []) > 5000) return null;
         $key = $this->key($request, $provider);

@@ -1,3 +1,5 @@
+> Pilot 3.0: the current gated procedure is [PILOT-DEPLOYMENT-GUIDE.md](../PILOT-DEPLOYMENT-GUIDE.md). Do not use historical “deploy now” steps or replay old migrations to open the pilot. A web deployment alone does not run the worker.
+
 # Supabase production database
 
 WTFCode uses Supabase only as managed PostgreSQL. Authentication, sessions, CSRF, rate limiting, and ownership checks stay in PHP. Do not configure Supabase Auth, an anon key, a publishable key, or a service-role key in Vercel.

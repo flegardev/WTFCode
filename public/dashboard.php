@@ -13,7 +13,7 @@ require __DIR__ . '/../views/header.php';
 ?>
 <section class="app-shell dashboard-page">
     <div class="workspace-content">
-        <div class="app-heading"><div><p class="landing-kicker">Your workspace</p><h1>Your projects</h1><p>Understand your applications and keep track of what matters.</p></div><a class="button button-primary" href="<?= e(url('project-create.php')) ?>"><span aria-hidden="true">+</span> Add project</a></div>
+        <div class="app-heading"><div><p class="landing-kicker">Your workspace</p><h1>Your projects</h1><p>Understand your applications and keep track of what matters.</p></div><?php if ($projects !== []): ?><a class="button button-primary" href="<?= e(url('project-create.php')) ?>"><span aria-hidden="true">+</span> Add project</a><?php endif; ?></div>
         <?php if ($projects === []): ?>
             <div class="empty-panel"><span class="empty-mark"><?= ui_icon('folder-git-2') ?></span><h2>Your first project starts here.</h2><p>Connect a public GitHub repository. We'll map what is there, show how the pieces connect, and help you plan your next change.</p><a class="button button-primary" href="<?= e(url('project-create.php')) ?>">Analyze your first GitHub project <span aria-hidden="true">→</span></a><small>No repository code is executed. No payment details needed.</small><a class="example-link" href="<?= e(url('example.php')) ?>">Or explore a real public example →</a></div>
         <?php else: ?>

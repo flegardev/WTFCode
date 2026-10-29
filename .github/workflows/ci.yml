@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -72,7 +76,7 @@ jobs:
       - name: Validate isolated staging configuration
         env:
           STAGING_DB_PASSWORD: ci-validation-only
-        run: docker compose -f compose.staging.yaml config --quiet
+        run: docker compose -f compose.staging.yaml -f compose.pilot.yaml config --quiet
 
   full-suite:
     name: Database, security, and E2E suite
@@ -130,6 +134,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql --host=127.0.0.1 --username=postgres --dbname=wtfcode --set=ON_ERROR_STOP=1 --file=supabase/production-schema.sql
 
+      - name: Verify idempotent pilot schema upgrade
+        run: |
+          php tools/pilot-upgrade.php
+          php tools/pilot-upgrade.php
+
       - name: Run the complete reproducible test matrix
         run: composer test:all
 
@@ -137,3 +146,77 @@ jobs:
         env:
           APP_ENV: production
         run: php tests/HostedPublicScanTest.php
+
+  container-pilot:
+    name: Disposable container pilot smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      STAGING_DB_PASSWORD: ci-disposable-only
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Build actual production image and start isolated services
+        run: |
+          mkdir -p output
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml build
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml up -d --wait --wait-timeout 180
+      - name: Verify web health and closed registration
+        run: |
+          curl --fail --silent http://127.0.0.1:8088/health.php | tee output/container-health.json
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T web php tools/pilot-upgrade.php
+          python3 - <<'PY'
+          import http.cookiejar, re, urllib.parse, urllib.request
+          opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+          url = 'http://127.0.0.1:8088/register.php'
+          body = opener.open(url).read().decode()
+          csrf = re.search(r'name="csrf_token" value="([^"]+)"', body).group(1)
+          form = urllib.parse.urlencode({'csrf_token': csrf, 'name': 'Closed registration probe', 'email': 'blocked@container.local', 'password': 'Disposable-container-48271', 'password_confirmation': 'Disposable-container-48271'}).encode()
+          result = opener.open(url, data=form)
+          assert 'account-request.php' in result.url, 'Closed signup must return the generic verification response'
+          print('Closed registration HTTP response verified; the next fixture also asserts zero accounts were created.')
+          PY
+      - name: Run real public scans through the separate supervised worker
+        run: |
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T -e WTF_DISPOSABLE_CONTAINER_TEST=true web php tools/ci-container-pilot.php | tee output/container-pilot.json
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T -e WTF_DISPOSABLE_CONTAINER_TEST=true worker php tools/ci-container-resources.php | tee output/container-resources.json
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T worker php tools/pilot-worker-health.php
+      - name: Audit built image packages
+        run: |
+          bash tools/install-security-tools.sh
+          container=$(docker compose -f compose.staging.yaml -f compose.pilot.yaml ps -q web)
+          image=$(docker inspect --format '{{.Config.Image}}' "$container")
+          docker save "$image" -o output/pilot-image.tar
+          tools/bin/grype docker-archive:output/pilot-image.tar -o json > output/container-image-audit.json
+          rm output/pilot-image.tar
+          python3 - <<'PY'
+          import json
+          report = json.load(open('output/container-image-audit.json'))
+          counts = {}
+          fixable_high_critical = 0
+          for match in report.get('matches', []):
+              severity = match.get('vulnerability', {}).get('severity', 'Unknown')
+              counts[severity] = counts.get(severity, 0) + 1
+              if severity in ('High', 'Critical') and match.get('vulnerability', {}).get('fix', {}).get('state') == 'fixed':
+                  fixable_high_critical += 1
+          summary = {'severity_counts': counts, 'fixable_high_critical_matches': fixable_high_critical, 'certification': False, 'deployment_gate': 'requires_triage' if counts else 'no_matches_reported'}
+          json.dump(summary, open('output/container-image-audit-summary.json', 'w'), indent=2)
+          print(json.dumps(summary))
+          if fixable_high_critical:
+              raise SystemExit('Fixable High/Critical runtime findings block this check; no matches were suppressed.')
+          PY
+      - name: Capture private test logs
+        if: always()
+        run: docker compose -f compose.staging.yaml -f compose.pilot.yaml logs --no-color > output/container-services.log
+      - name: Retain disposable verification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-container-verification
+          path: |
+            output/container-*.json
+            output/container-services.log
+          retention-days: 7
+      - name: Stop disposable services
+        if: always()
+        run: docker compose -f compose.staging.yaml -f compose.pilot.yaml down -v

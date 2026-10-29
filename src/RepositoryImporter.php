@@ -131,6 +131,13 @@ final class RepositoryImporter
 
     public static function cleanup(string $directory): void
     {
+        // Never descend through a checkout root replaced by a symlink.
+        if (is_link($directory)) {
+            $parent = realpath(dirname($directory));
+            $root = realpath(self::storageRoot() . DIRECTORY_SEPARATOR . 'repos');
+            if ($parent !== false && $root !== false && $parent === $root) @unlink($directory);
+            return;
+        }
         $reposRoot = realpath(self::storageRoot() . DIRECTORY_SEPARATOR . 'repos');
         $parent = realpath(dirname($directory));
         if (!is_dir($directory) || $reposRoot === false || $parent === false || rtrim(str_replace('\\', '/', $parent), '/') !== rtrim(str_replace('\\', '/', $reposRoot), '/')) {

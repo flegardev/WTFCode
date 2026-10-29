@@ -1,3 +1,5 @@
+> Pilot 3.0: the current gated procedure is [PILOT-DEPLOYMENT-GUIDE.md](../PILOT-DEPLOYMENT-GUIDE.md). Do not use historical “deploy now” steps or replay old migrations to open the pilot. A web deployment alone does not run the worker.
+
 # Vercel container deployment
 
 The repository is ready for Vercel's Dockerfile container runtime. Vercel detects `Dockerfile.vercel` at the repository root, builds the image, injects `PORT`, and routes requests to FrankenPHP. No `vercel.json` is required.
