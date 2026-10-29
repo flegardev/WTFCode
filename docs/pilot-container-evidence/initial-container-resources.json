@@ -1,0 +1,14 @@
+{
+    "status": "passed",
+    "production_checkout_cleanup": true,
+    "cgroup": {
+        "memory_limit": "2147483648",
+        "memory_peak_before_disk_probe": "1338695680",
+        "cpu_max": "100000 100000",
+        "pids_max": "128"
+    },
+    "tmpfs_enospc_observed": true,
+    "probe_bytes_written": 536870912,
+    "probe_removed": true,
+    "memory_peak_after_disk_probe": "1338695680"
+}

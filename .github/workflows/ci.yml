@@ -193,11 +193,17 @@ jobs:
           import json
           report = json.load(open('output/container-image-audit.json'))
           counts = {}
+          fixable_high_critical = 0
           for match in report.get('matches', []):
               severity = match.get('vulnerability', {}).get('severity', 'Unknown')
               counts[severity] = counts.get(severity, 0) + 1
-          json.dump({'severity_counts': counts, 'certification': False, 'deployment_gate': 'requires_triage' if counts else 'no_matches_reported'}, open('output/container-image-audit-summary.json', 'w'), indent=2)
-          print(json.dumps(counts))
+              if severity in ('High', 'Critical') and match.get('vulnerability', {}).get('fix', {}).get('state') == 'fixed':
+                  fixable_high_critical += 1
+          summary = {'severity_counts': counts, 'fixable_high_critical_matches': fixable_high_critical, 'certification': False, 'deployment_gate': 'requires_triage' if counts else 'no_matches_reported'}
+          json.dump(summary, open('output/container-image-audit-summary.json', 'w'), indent=2)
+          print(json.dumps(summary))
+          if fixable_high_critical:
+              raise SystemExit('Fixable High/Critical runtime findings block this check; no matches were suppressed.')
           PY
       - name: Capture private test logs
         if: always()

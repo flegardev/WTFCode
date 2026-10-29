@@ -16,9 +16,11 @@ Assessment: LOCAL CONTROLS VERIFIED; EXTERNAL PILOT BLOCKED. Updated 29 October 
 - [x] Changed screens reviewed; desktop/mobile and both themes checked, with automated accessibility results recorded.
 - [x] Optional minimal feedback, five-user script and blank measurement templates prepared. Billing and private imports remain unavailable.
 
+- [x] Disposable CI image build/boot and real scan/export/deletion flow, cgroup limits, 512 MiB hard disk cap, production checkout cleanup and final image inventory completed.
+
 ## BLOCKED
 
-- [ ] Build and boot the final Docker image and both Compose services on a machine with a working Docker engine. Local verification used native PHP/PostgreSQL, not containers.
+- [ ] Review residual image advisories: 19 Critical/144 High scanner matches in vendor-deferred/unfixed packages. Refreshed runtime has zero fixable High/Critical matches; this is not a security waiver. See PILOT-IMAGE-AUDIT.md.
 - [ ] Run the hosted web → database → worker → result flow on the intended plans/region, including hard disk/memory caps, process restarts and load with representative participant repositories.
 - [ ] Verify the public HTTPS origin, secure cookies behind the actual proxy and database TLS/certificate validation. Local HTTP cannot prove these gates.
 - [ ] Configure the approved SMTP relay/secret file, then explicitly approve and test real email delivery, link preservation, spam placement and sender authentication. Only the controlled local mailbox was used.

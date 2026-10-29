@@ -1,0 +1,3580 @@
+{
+  "run_url": "https://github.com/flegardev/WTFCode/actions/runs/40853817783",
+  "commit": "3edd2aee02fb882ccb20af08ae0de430efbb1b27",
+  "scanner_version": "0.117.0",
+  "database_built": null,
+  "distro": {
+    "name": "debian",
+    "version": "12.15",
+    "idLike": []
+  },
+  "counts": {
+    "Critical": 36,
+    "High": 253,
+    "Negligible": 693,
+    "Medium": 173,
+    "Unknown": 39,
+    "Low": 24
+  },
+  "fixable_high_critical_matches": 106,
+  "full_audit_sha256": "b0c6cacfa2c21c77c5448d644141746cbe9dbc45b8f82b8b749281cb8deeca6e",
+  "status": "not_launch_ready",
+  "inventory_is_not_exploit_confirmation": true,
+  "high_critical_findings": [
+    {
+      "id": "CVE-2026-111497",
+      "severity": "Critical",
+      "package": "node",
+      "version": "24.19.0",
+      "type": "binary",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "11.0.0",
+        "22.23.4",
+        "24.22.1",
+        "26.12.1"
+      ],
+      "locations": [
+        "/usr/local/bin/node"
+      ],
+      "source": "https://nvd.nist.gov/vuln/detail/CVE-2026-111497"
+    },
+    {
+      "id": "GO-2026-4887",
+      "severity": "High",
+      "package": "github.com/docker/docker",
+      "version": "v28.5.2+incompatible",
+      "type": "go-module",
+      "fix_state": "",
+      "fix_versions": [],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://github.com/moby/moby/security/advisories/GHSA-x744-4wpc-v9h2"
+    },
+    {
+      "id": "GO-2026-4341",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.24.12",
+        "1.25.6"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/736712"
+    },
+    {
+      "id": "CVE-2023-2953",
+      "severity": "High",
+      "package": "libldap-2.5-0",
+      "version": "2.5.13+dfsg-5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2023-2953"
+    },
+    {
+      "id": "GO-2026-5026",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/767220"
+    },
+    {
+      "id": "GO-2026-5026",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/767220"
+    },
+    {
+      "id": "CVE-2026-19931",
+      "severity": "Critical",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19931"
+    },
+    {
+      "id": "CVE-2026-19931",
+      "severity": "Critical",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19931"
+    },
+    {
+      "id": "CVE-2026-19931",
+      "severity": "Critical",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19931"
+    },
+    {
+      "id": "CVE-2025-13151",
+      "severity": "High",
+      "package": "libtasn1-6",
+      "version": "4.19.0-2+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2025-13151"
+    },
+    {
+      "id": "GO-2026-4337",
+      "severity": "Critical",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.24.13",
+        "1.25.7",
+        "1.26.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://groups.google.com/g/golang-announce/c/K09ubi9FQFk"
+    },
+    {
+      "id": "CVE-2026-11856",
+      "severity": "Critical",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-11856"
+    },
+    {
+      "id": "CVE-2026-11856",
+      "severity": "Critical",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-11856"
+    },
+    {
+      "id": "CVE-2026-11856",
+      "severity": "Critical",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-11856"
+    },
+    {
+      "id": "CVE-2026-58015",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58015"
+    },
+    {
+      "id": "GO-2026-4977",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.10",
+        "1.26.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/78987"
+    },
+    {
+      "id": "CVE-2026-8924",
+      "severity": "Critical",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8924"
+    },
+    {
+      "id": "CVE-2026-8924",
+      "severity": "Critical",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8924"
+    },
+    {
+      "id": "CVE-2026-8924",
+      "severity": "Critical",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8924"
+    },
+    {
+      "id": "GO-2026-4986",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.10",
+        "1.26.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/78566"
+    },
+    {
+      "id": "GO-2026-4601",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.8",
+        "1.26.1"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/752180"
+    },
+    {
+      "id": "GO-2026-6612",
+      "severity": "Critical",
+      "package": "golang.org/x/net",
+      "version": "v0.57.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.60.0"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/847187"
+    },
+    {
+      "id": "GO-2026-6612",
+      "severity": "Critical",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847187"
+    },
+    {
+      "id": "GO-2026-6612",
+      "severity": "Critical",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/847187"
+    },
+    {
+      "id": "GO-2026-6612",
+      "severity": "Critical",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847187"
+    },
+    {
+      "id": "CVE-2026-10536",
+      "severity": "Critical",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-10536"
+    },
+    {
+      "id": "CVE-2026-10536",
+      "severity": "Critical",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-10536"
+    },
+    {
+      "id": "CVE-2026-10536",
+      "severity": "Critical",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-10536"
+    },
+    {
+      "id": "CVE-2026-18924",
+      "severity": "Critical",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-18924"
+    },
+    {
+      "id": "CVE-2026-18924",
+      "severity": "Critical",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-18924"
+    },
+    {
+      "id": "CVE-2026-18924",
+      "severity": "Critical",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-18924"
+    },
+    {
+      "id": "CVE-2026-74860",
+      "severity": "High",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-74860"
+    },
+    {
+      "id": "GO-2026-6604",
+      "severity": "Critical",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/847305"
+    },
+    {
+      "id": "GO-2026-6604",
+      "severity": "Critical",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847305"
+    },
+    {
+      "id": "GHSA-2v4p-qf9q-27wj",
+      "severity": "High",
+      "package": "google.golang.org/grpc",
+      "version": "v1.82.1",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.82.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://github.com/advisories/GHSA-2v4p-qf9q-27wj"
+    },
+    {
+      "id": "GHSA-2v4p-qf9q-27wj",
+      "severity": "High",
+      "package": "google.golang.org/grpc",
+      "version": "v1.83.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.83.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://github.com/advisories/GHSA-2v4p-qf9q-27wj"
+    },
+    {
+      "id": "GHSA-vp52-pcj8-j9qc",
+      "severity": "High",
+      "package": "google.golang.org/grpc",
+      "version": "v1.82.1",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.83.1"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://github.com/advisories/GHSA-vp52-pcj8-j9qc"
+    },
+    {
+      "id": "GHSA-vp52-pcj8-j9qc",
+      "severity": "High",
+      "package": "google.golang.org/grpc",
+      "version": "v1.83.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.83.1"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://github.com/advisories/GHSA-vp52-pcj8-j9qc"
+    },
+    {
+      "id": "CVE-2026-58016",
+      "severity": "Critical",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58016"
+    },
+    {
+      "id": "GO-2026-4971",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.10",
+        "1.26.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/79006"
+    },
+    {
+      "id": "CVE-2026-82560",
+      "severity": "High",
+      "package": "libperl5.36",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82560"
+    },
+    {
+      "id": "CVE-2026-82560",
+      "severity": "High",
+      "package": "perl",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82560"
+    },
+    {
+      "id": "CVE-2026-82560",
+      "severity": "High",
+      "package": "perl-base",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82560"
+    },
+    {
+      "id": "CVE-2026-82560",
+      "severity": "High",
+      "package": "perl-modules-5.36",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82560"
+    },
+    {
+      "id": "CVE-2026-5450",
+      "severity": "Critical",
+      "package": "libc-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5450"
+    },
+    {
+      "id": "CVE-2026-5450",
+      "severity": "Critical",
+      "package": "libc-dev-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5450"
+    },
+    {
+      "id": "CVE-2026-5450",
+      "severity": "Critical",
+      "package": "libc6",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5450"
+    },
+    {
+      "id": "CVE-2026-5450",
+      "severity": "Critical",
+      "package": "libc6-dev",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5450"
+    },
+    {
+      "id": "GO-2026-6603",
+      "severity": "High",
+      "package": "golang.org/x/net",
+      "version": "v0.57.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.60.0"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/847185"
+    },
+    {
+      "id": "GO-2026-6603",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847185"
+    },
+    {
+      "id": "GO-2026-6603",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/847185"
+    },
+    {
+      "id": "GO-2026-6603",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847185"
+    },
+    {
+      "id": "GO-2026-4870",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.9",
+        "1.26.2"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/763767"
+    },
+    {
+      "id": "CVE-2026-41992",
+      "severity": "High",
+      "package": "gzip",
+      "version": "1.12-1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-41992"
+    },
+    {
+      "id": "GO-2026-4947",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.9",
+        "1.26.2"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/758320"
+    },
+    {
+      "id": "GO-2026-6611",
+      "severity": "High",
+      "package": "golang.org/x/net",
+      "version": "v0.57.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.60.0"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847186"
+    },
+    {
+      "id": "GO-2026-6611",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847186"
+    },
+    {
+      "id": "GO-2026-6611",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/847186"
+    },
+    {
+      "id": "GO-2026-6611",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847186"
+    },
+    {
+      "id": "CVE-2026-8927",
+      "severity": "Critical",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8927"
+    },
+    {
+      "id": "CVE-2026-8927",
+      "severity": "Critical",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8927"
+    },
+    {
+      "id": "CVE-2026-8927",
+      "severity": "Critical",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8927"
+    },
+    {
+      "id": "CVE-2026-58014",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58014"
+    },
+    {
+      "id": "GO-2026-5037",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.11",
+        "1.26.4"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/783621"
+    },
+    {
+      "id": "GO-2026-5037",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.11",
+        "1.26.4"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/783621"
+    },
+    {
+      "id": "GO-2026-5972",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/80405"
+    },
+    {
+      "id": "GO-2026-6088",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/80481"
+    },
+    {
+      "id": "GO-2026-6090",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/80528"
+    },
+    {
+      "id": "GO-2026-5972",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/issue/80405"
+    },
+    {
+      "id": "GO-2026-6088",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/issue/80481"
+    },
+    {
+      "id": "GO-2026-6090",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/issue/80528"
+    },
+    {
+      "id": "GO-2026-5972",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/issue/80405"
+    },
+    {
+      "id": "GO-2026-6088",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/issue/80481"
+    },
+    {
+      "id": "GO-2026-6090",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/issue/80528"
+    },
+    {
+      "id": "GO-2026-6089",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/80205"
+    },
+    {
+      "id": "GO-2026-6089",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/issue/80205"
+    },
+    {
+      "id": "GO-2026-6089",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.13",
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/issue/80205"
+    },
+    {
+      "id": "GO-2026-5942",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/786345"
+    },
+    {
+      "id": "GO-2026-5942",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.6",
+        "1.27.0-rc.3"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/786345"
+    },
+    {
+      "id": "CVE-2026-58013",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58013"
+    },
+    {
+      "id": "GO-2026-6607",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847312"
+    },
+    {
+      "id": "GO-2026-6607",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/847312"
+    },
+    {
+      "id": "GO-2026-6607",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847312"
+    },
+    {
+      "id": "CVE-2026-9538",
+      "severity": "High",
+      "package": "libperl5.36",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-9538"
+    },
+    {
+      "id": "CVE-2026-9538",
+      "severity": "High",
+      "package": "perl",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-9538"
+    },
+    {
+      "id": "CVE-2026-9538",
+      "severity": "High",
+      "package": "perl-base",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-9538"
+    },
+    {
+      "id": "CVE-2026-9538",
+      "severity": "High",
+      "package": "perl-modules-5.36",
+      "version": "5.36.0-7+deb12u4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-9538"
+    },
+    {
+      "id": "CVE-2026-58010",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58010"
+    },
+    {
+      "id": "CVE-2026-58012",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58012"
+    },
+    {
+      "id": "GO-2026-6608",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847307"
+    },
+    {
+      "id": "GO-2026-6608",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/847307"
+    },
+    {
+      "id": "GO-2026-6608",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847307"
+    },
+    {
+      "id": "GO-2026-6355",
+      "severity": "High",
+      "package": "golang.org/x/crypto",
+      "version": "v0.54.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.56.0"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/issue/81317"
+    },
+    {
+      "id": "CVE-2026-13608",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-13608"
+    },
+    {
+      "id": "CVE-2026-13608",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-13608"
+    },
+    {
+      "id": "CVE-2026-13608",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-13608"
+    },
+    {
+      "id": "CVE-2026-113351",
+      "severity": "High",
+      "package": "libexpat1",
+      "version": "2.5.0-1+deb12u5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-113351"
+    },
+    {
+      "id": "CVE-2026-85091",
+      "severity": "High",
+      "package": "zlib1g",
+      "version": "1:1.2.13.dfsg-1",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-85091"
+    },
+    {
+      "id": "CVE-2026-115506",
+      "severity": "High",
+      "package": "libexpat1",
+      "version": "2.5.0-1+deb12u5",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-115506"
+    },
+    {
+      "id": "GO-2026-6617",
+      "severity": "High",
+      "package": "golang.org/x/net",
+      "version": "v0.57.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.60.0"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847188"
+    },
+    {
+      "id": "GO-2026-6617",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847188"
+    },
+    {
+      "id": "GO-2026-6617",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/847188"
+    },
+    {
+      "id": "GO-2026-6617",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847188"
+    },
+    {
+      "id": "GO-2026-6609",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847309"
+    },
+    {
+      "id": "GO-2026-5970",
+      "severity": "High",
+      "package": "golang.org/x/text",
+      "version": "v0.22.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.39.0"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/issue/80142"
+    },
+    {
+      "id": "CVE-2025-69720",
+      "severity": "High",
+      "package": "libtinfo6",
+      "version": "6.4-4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2025-69720"
+    },
+    {
+      "id": "CVE-2025-69720",
+      "severity": "High",
+      "package": "ncurses-base",
+      "version": "6.4-4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2025-69720"
+    },
+    {
+      "id": "CVE-2025-69720",
+      "severity": "High",
+      "package": "ncurses-bin",
+      "version": "6.4-4",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2025-69720"
+    },
+    {
+      "id": "CVE-2026-58011",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-58011"
+    },
+    {
+      "id": "GO-2026-6605",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/847306"
+    },
+    {
+      "id": "GO-2026-6605",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847306"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "cpp-12",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "g++-12",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "gcc-12",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "gcc-12-base",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libasan8",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libatomic1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libcc1-0",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libgcc-12-dev",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libgcc-s1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libgomp1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libitm1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "liblsan0",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libquadmath0",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libstdc++-12-dev",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libstdc++6",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libtsan2",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-95619",
+      "severity": "High",
+      "package": "libubsan1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-95619"
+    },
+    {
+      "id": "CVE-2026-6653",
+      "severity": "Critical",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-6653"
+    },
+    {
+      "id": "GO-2026-6354",
+      "severity": "High",
+      "package": "golang.org/x/crypto",
+      "version": "v0.54.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.56.0"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/issue/81316"
+    },
+    {
+      "id": "GO-2026-6610",
+      "severity": "High",
+      "package": "golang.org/x/net",
+      "version": "v0.57.0",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "0.60.0"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/835145"
+    },
+    {
+      "id": "GO-2026-6610",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://go.dev/cl/835145"
+    },
+    {
+      "id": "GO-2026-6610",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/835145"
+    },
+    {
+      "id": "CVE-2026-105482",
+      "severity": "High",
+      "package": "node",
+      "version": "24.19.0",
+      "type": "binary",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "22.23.4",
+        "24.22.1",
+        "26.12.1"
+      ],
+      "locations": [
+        "/usr/local/bin/node"
+      ],
+      "source": "https://nvd.nist.gov/vuln/detail/CVE-2026-105482"
+    },
+    {
+      "id": "GO-2026-6613",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/847311"
+    },
+    {
+      "id": "GO-2026-6613",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/cl/847311"
+    },
+    {
+      "id": "GO-2026-6613",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.5",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.26.9",
+        "1.27.2"
+      ],
+      "locations": [
+        "/usr/local/bin/osv-scanner"
+      ],
+      "source": "https://go.dev/cl/847311"
+    },
+    {
+      "id": "CVE-2026-12064",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-12064"
+    },
+    {
+      "id": "CVE-2026-12064",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-12064"
+    },
+    {
+      "id": "CVE-2026-12064",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-12064"
+    },
+    {
+      "id": "CVE-2026-107778",
+      "severity": "High",
+      "package": "libgssapi-krb5-2",
+      "version": "1.20.1-2+deb12u5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-107778"
+    },
+    {
+      "id": "CVE-2026-107778",
+      "severity": "High",
+      "package": "libk5crypto3",
+      "version": "1.20.1-2+deb12u5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-107778"
+    },
+    {
+      "id": "CVE-2026-107778",
+      "severity": "High",
+      "package": "libkrb5-3",
+      "version": "1.20.1-2+deb12u5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-107778"
+    },
+    {
+      "id": "CVE-2026-107778",
+      "severity": "High",
+      "package": "libkrb5support0",
+      "version": "1.20.1-2+deb12u5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-107778"
+    },
+    {
+      "id": "CVE-2026-41080",
+      "severity": "High",
+      "package": "libexpat1",
+      "version": "2.5.0-1+deb12u5",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-41080"
+    },
+    {
+      "id": "CVE-2026-8932",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8932"
+    },
+    {
+      "id": "CVE-2026-8932",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8932"
+    },
+    {
+      "id": "CVE-2026-8932",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8932"
+    },
+    {
+      "id": "CVE-2025-7458",
+      "severity": "Critical",
+      "package": "libsqlite3-0",
+      "version": "3.40.1-2+deb12u2",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2025-7458"
+    },
+    {
+      "id": "CVE-2026-82209",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82209"
+    },
+    {
+      "id": "CVE-2026-82209",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82209"
+    },
+    {
+      "id": "CVE-2026-82209",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-82209"
+    },
+    {
+      "id": "CVE-2026-11822",
+      "severity": "High",
+      "package": "libsqlite3-0",
+      "version": "3.40.1-2+deb12u2",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-11822"
+    },
+    {
+      "id": "CVE-2026-80230",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-80230"
+    },
+    {
+      "id": "CVE-2026-80230",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-80230"
+    },
+    {
+      "id": "CVE-2026-80230",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-80230"
+    },
+    {
+      "id": "CVE-2026-5928",
+      "severity": "High",
+      "package": "libc-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5928"
+    },
+    {
+      "id": "CVE-2026-5928",
+      "severity": "High",
+      "package": "libc-dev-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5928"
+    },
+    {
+      "id": "CVE-2026-5928",
+      "severity": "High",
+      "package": "libc6",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5928"
+    },
+    {
+      "id": "CVE-2026-5928",
+      "severity": "High",
+      "package": "libc6-dev",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5928"
+    },
+    {
+      "id": "GHSA-mgcc-cww5-fp2q",
+      "severity": "High",
+      "package": "github.com/go-jose/go-jose/v3",
+      "version": "v3.0.5",
+      "type": "go-module",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/usr/local/bin/frankenphp"
+      ],
+      "source": "https://github.com/advisories/GHSA-mgcc-cww5-fp2q"
+    },
+    {
+      "id": "GHSA-mgcc-cww5-fp2q",
+      "severity": "High",
+      "package": "github.com/go-jose/go-jose/v4",
+      "version": "v4.1.4",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "4.1.6"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://github.com/advisories/GHSA-mgcc-cww5-fp2q"
+    },
+    {
+      "id": "GO-2026-4946",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.24.11",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.9",
+        "1.26.2"
+      ],
+      "locations": [
+        "/usr/local/bin/gitleaks"
+      ],
+      "source": "https://go.dev/cl/758061"
+    },
+    {
+      "id": "CVE-2026-107161",
+      "severity": "High",
+      "package": "libsasl2-2",
+      "version": "2.1.28+dfsg-10",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-107161"
+    },
+    {
+      "id": "CVE-2026-107161",
+      "severity": "High",
+      "package": "libsasl2-modules-db",
+      "version": "2.1.28+dfsg-10",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-107161"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "cpp-12",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "g++-12",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "gcc-12",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "gcc-12-base",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libasan8",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libatomic1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libcc1-0",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libgcc-12-dev",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libgcc-s1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libgomp1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libitm1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "liblsan0",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libquadmath0",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libstdc++-12-dev",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libstdc++6",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libtsan2",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-102010",
+      "severity": "High",
+      "package": "libubsan1",
+      "version": "12.2.0-14+deb12u1",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-102010"
+    },
+    {
+      "id": "CVE-2026-8286",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8286"
+    },
+    {
+      "id": "CVE-2026-8286",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8286"
+    },
+    {
+      "id": "CVE-2026-8286",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-8286"
+    },
+    {
+      "id": "CVE-2026-19499",
+      "severity": "High",
+      "package": "libc-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19499"
+    },
+    {
+      "id": "CVE-2026-19499",
+      "severity": "High",
+      "package": "libc-dev-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19499"
+    },
+    {
+      "id": "CVE-2026-19499",
+      "severity": "High",
+      "package": "libc6",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19499"
+    },
+    {
+      "id": "CVE-2026-19499",
+      "severity": "High",
+      "package": "libc6-dev",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-19499"
+    },
+    {
+      "id": "CVE-2026-6276",
+      "severity": "High",
+      "package": "curl",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-6276"
+    },
+    {
+      "id": "CVE-2026-6276",
+      "severity": "High",
+      "package": "libcurl3-gnutls",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-6276"
+    },
+    {
+      "id": "CVE-2026-6276",
+      "severity": "High",
+      "package": "libcurl4",
+      "version": "7.88.1-10+deb12u15",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-6276"
+    },
+    {
+      "id": "CVE-2026-106069",
+      "severity": "High",
+      "package": "node",
+      "version": "24.19.0",
+      "type": "binary",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "22.23.4",
+        "24.22.1",
+        "26.12.1"
+      ],
+      "locations": [
+        "/usr/local/bin/node"
+      ],
+      "source": "https://nvd.nist.gov/vuln/detail/CVE-2026-106069"
+    },
+    {
+      "id": "CVE-2026-105483",
+      "severity": "High",
+      "package": "node",
+      "version": "24.19.0",
+      "type": "binary",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "24.22.1",
+        "26.12.1"
+      ],
+      "locations": [
+        "/usr/local/bin/node"
+      ],
+      "source": "https://nvd.nist.gov/vuln/detail/CVE-2026-105483"
+    },
+    {
+      "id": "GO-2026-4970",
+      "severity": "High",
+      "package": "stdlib",
+      "version": "go1.26.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "1.25.12",
+        "1.26.5",
+        "1.27.0-rc.2"
+      ],
+      "locations": [
+        "/usr/local/bin/grype"
+      ],
+      "source": "https://go.dev/issue/79005"
+    },
+    {
+      "id": "CVE-2026-5435",
+      "severity": "High",
+      "package": "libc-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5435"
+    },
+    {
+      "id": "CVE-2026-5435",
+      "severity": "High",
+      "package": "libc-dev-bin",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5435"
+    },
+    {
+      "id": "CVE-2026-5435",
+      "severity": "High",
+      "package": "libc6",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5435"
+    },
+    {
+      "id": "CVE-2026-5435",
+      "severity": "High",
+      "package": "libc6-dev",
+      "version": "2.36-9+deb12u14",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-5435"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "bsdutils",
+      "version": "1:2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "libblkid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "libmount1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "libsmartcols1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "libuuid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "mount",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "util-linux",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "High",
+      "package": "util-linux-extra",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+    },
+    {
+      "id": "CVE-2026-16118",
+      "severity": "High",
+      "package": "libglib2.0-0",
+      "version": "2.74.6-2+deb12u9",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-16118"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "bsdutils",
+      "version": "1:2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "libblkid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "libmount1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "libsmartcols1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "libuuid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "mount",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "util-linux",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "High",
+      "package": "util-linux-extra",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    },
+    {
+      "id": "CVE-2026-11824",
+      "severity": "High",
+      "package": "libsqlite3-0",
+      "version": "3.40.1-2+deb12u2",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-11824"
+    },
+    {
+      "id": "CVE-2026-86143",
+      "severity": "High",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-86143"
+    },
+    {
+      "id": "CVE-2026-86144",
+      "severity": "High",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-86144"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "bsdutils",
+      "version": "1:2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "libblkid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "libmount1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "libsmartcols1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "libuuid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "mount",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "util-linux",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "High",
+      "package": "util-linux-extra",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53615"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "bsdutils",
+      "version": "1:2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "libblkid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "libmount1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "libsmartcols1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "libuuid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "mount",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "util-linux",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "High",
+      "package": "util-linux-extra",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "bsdutils",
+      "version": "1:2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "libblkid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "libmount1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "libsmartcols1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "libuuid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "mount",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "util-linux",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "High",
+      "package": "util-linux-extra",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+    },
+    {
+      "id": "CVE-2026-86140",
+      "severity": "High",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-86140"
+    },
+    {
+      "id": "CVE-2026-86142",
+      "severity": "High",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-86142"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "bsdutils",
+      "version": "1:2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "libblkid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "libmount1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "libsmartcols1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "libuuid1",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "mount",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "util-linux",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "severity": "High",
+      "package": "util-linux-extra",
+      "version": "2.38.1-5+deb12u3",
+      "type": "deb",
+      "fix_state": "not-fixed",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-53613"
+    },
+    {
+      "id": "CVE-2026-54369",
+      "severity": "High",
+      "package": "libacl1",
+      "version": "2.3.1-3",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-54369"
+    },
+    {
+      "id": "CVE-2026-86138",
+      "severity": "High",
+      "package": "libxml2",
+      "version": "2.9.14+dfsg-1.3~deb12u6",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-86138"
+    },
+    {
+      "id": "GHSA-p7v4-vr35-mj6f",
+      "severity": "High",
+      "package": "github.com/containerd/containerd/v2",
+      "version": "v2.3.3",
+      "type": "go-module",
+      "fix_state": "fixed",
+      "fix_versions": [
+        "2.3.4"
+      ],
+      "locations": [
+        "/usr/local/bin/syft"
+      ],
+      "source": "https://github.com/advisories/GHSA-p7v4-vr35-mj6f"
+    },
+    {
+      "id": "CVE-2026-54370",
+      "severity": "High",
+      "package": "libacl1",
+      "version": "2.3.1-3",
+      "type": "deb",
+      "fix_state": "wont-fix",
+      "fix_versions": [],
+      "locations": [
+        "/var/lib/dpkg/status"
+      ],
+      "source": "https://security-tracker.debian.org/tracker/CVE-2026-54370"
+    }
+  ]
+}

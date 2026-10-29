@@ -28,7 +28,7 @@ P0: lifecycle, controlled access, worker/deletion fences, monitoring, recovery a
 
 ## Actual tests
 
-Final local exits: zero for Composer validation, PHP syntax, PHPUnit, PHPStan, scoped formatting, JavaScript syntax and every applicable tier. **36 PHPUnit tests / 96 assertions; 10 portable, 3 analyzer, 9 PostgreSQL integration, 2 security and 2 import/worker E2E scripts.** Composer found no advisories and npm reported zero known lockfile vulnerabilities. This is not a security certification or container-image audit.
+Final local exits: zero for Composer validation, PHP syntax, PHPUnit, PHPStan, scoped formatting, JavaScript syntax and every applicable tier. **36 PHPUnit tests / 96 assertions; 10 portable, 3 analyzer, 9 PostgreSQL integration, 2 security and 2 import/worker E2E scripts.** Composer found no advisories and npm reported zero known lockfile vulnerabilities. These Composer/npm results are separate from the container audit below and do not establish security certification.
 
 Lifecycle coverage includes both expiries, single use, resend invalidation, duplicate signup/password preservation, admission/profile limits, rate limiting, session revocation/late writes, owner export, running-job deletion and legacy-cache invalidation. The symlink-root fixture was explicitly skipped on Windows because this account cannot create symlinks; Linux CI includes it without ignoring failures.
 
@@ -75,7 +75,7 @@ Future billing needs approved seller identity, invoicing/VAT/cancellation/refund
 
 ## Remaining blockers
 
-**Do not invite external users yet.** Build/boot/audit the actual image and both services; test whole-process peaks, hard disk caps and hosted restarts; verify HTTPS/proxy cookies and database certificates; approve SMTP and test real delivery; configure off-host backup/deletion reconciliation and alert notifications; supply operator identity/support/privacy contact and reviewed notices.
+**Do not invite external users yet.** Review the residual vendor-deferred image advisories and repeat load/resource/restart checks on the approved provider; verify HTTPS/proxy cookies and database certificates; approve SMTP and test real delivery; configure off-host backup/deletion reconciliation and alert notifications; supply operator identity/support/privacy contact and reviewed notices.
 
 The MTA adapter/file mailbox is not proof of live delivery. Cloud cgroup/tmpfs behavior and controlled hosted network-timeout/remote-removal fault injection remain incomplete. README-only/unsupported-file and bounded subprocess/provider fixtures do not exhaustively establish hostile-input safety. A recent heartbeat can outlive a hard-killed process for five minutes; unhealthy Docker state alone does not restart a hung process. One worker can delay account messages behind analysis. Keep concurrency/profile/source limits and monitor the queue.
 
@@ -94,5 +94,16 @@ These are questions, not a compliance opinion or permission to operate through a
 
 Review the stacked PRs, then approve hosting/email/identity/retention decisions in the checklist. Review-branch Vercel auto-deploy suppression includes this branch. No automatic merge/deployment is part of this work.
 
-[Draft pilot PR #4](https://github.com/flegardev/WTFCode/pull/4) is open against the unmerged UX branch. [Pilot CI run 40851468254](https://github.com/flegardev/WTFCode/actions/runs/40851468254) passed both jobs on 7f909dd, including PostgreSQL 17/PHP 8.3, idempotent upgrade, Compose configuration validation, the complete matrix and real checkout cleanup. Its Linux log confirms the symlink-root cleanup fixture passed and preserved its external target. This resolves the Windows-specific test limitation; it does not build/boot the final image or establish hosted application readiness. Both connected Vercel projects returned zero deployments for the pilot branch after pushing.
+[Draft pilot PR #4](https://github.com/flegardev/WTFCode/pull/4) is open against the unmerged UX branch. [Pilot CI run 40851468254](https://github.com/flegardev/WTFCode/actions/runs/40851468254) passed both jobs on 7f909dd, including PostgreSQL 17/PHP 8.3, idempotent upgrade, Compose configuration validation, the complete matrix and real checkout cleanup. Its Linux log confirms the symlink-root cleanup fixture passed and preserved its external target. This resolves the Windows-specific test limitation; subsequent actual container evidence is recorded below. Both connected Vercel projects returned zero deployments for the pilot branch after pushing.
 
+
+
+## Subsequent container verification and runtime remediation
+
+[CI run 40855049669](https://github.com/flegardev/WTFCode/actions/runs/40855049669) passed all three jobs on 64a7093. It built the actual image and booted loopback-only web, PostgreSQL and separately supervised worker containers. Closed registration, real Quick scans, export/deletion, production checkout cleanup and worker health passed. Hello-World correctly has no analyzable source (only an extensionless README); RealWorld produced 57 file records. Container import-to-result times were 3.102 and 6.731 seconds, including worker polling. All disposable services/volumes were removed.
+
+The worker's 2 GB, 1 CPU and 128-PID limits were observed. Its cgroup memory peak before the intentional disk probe was **1,364,070,400 bytes (about 1.27 GiB)**, including processes and page cache, unlike the native PHP-only allocation figure. ENOSPC occurred at 536,870,912 bytes and the probe file was removed. This supports the 2 GB worker budget and rejects a 512 MB worker for the measured case. It does not prove maximum-source/concurrent-user capacity on a cloud plan.
+
+The first image audit reported 36 Critical/253 High raw matches, including 106 fixable High/Critical matches. Updating Node to 24.22.1, using the supported Trixie base and excluding unused advanced analyzer binaries from the default Quick-only image reduced this to **zero fixable High/Critical matches**. The full image inventory still reports **19 Critical and 144 High matches** in vendor-deferred/unfixed stable packages. These are scanner/package matches, not 163 demonstrated application exploits. They remain an explicit release-review gate; no ignore list or finding suppression was added. See [the retained before/after findings and primary-source review](PILOT-IMAGE-AUDIT.md). The workflow now rejects fixable High/Critical runtime findings while retaining all other results for review.
+
+The new container fixture initially assumed every repository contained source and a shell pipeline failed to propagate that error. The fixture now explicitly distinguishes README-only from source-bearing repositories, and the workflow uses Bash pipefail. A Docker image-reference error in the audit command was also corrected. Failing evidence was retained rather than treated as a successful scan. These were test-harness corrections, not removal of coverage.

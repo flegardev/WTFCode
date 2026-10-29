@@ -20,7 +20,7 @@
     "node": "24.19.0",
     "playwright_cli": "0.1.22",
     "hosted_deployment": false,
-    "docker_image_built": false,
+    "docker_image_built": true,
     "real_email_sent": false,
     "private_imports_enabled": false,
     "payments_enabled": false,
@@ -378,7 +378,7 @@
       "critical": 0,
       "total": 0
     },
-    "container_audit": "not run; Docker engine unavailable"
+    "container_audit": "Completed: 19 Critical/144 High scanner matches remain in vendor-deferred/unfixed OS packages; zero fixable High/Critical matches. Release triage remains blocked."
   },
   "measurements": [
     {
@@ -412,11 +412,15 @@
     "Checkout size measured at end of local testing-mode scan, not a sampled peak",
     "Stored row bytes exclude indexes, TOAST and complete physical database allocation",
     "One worker; maximum five approved pilot users; one project and five durable jobs per account per rolling 30 days; three attempts per job",
-    "Pilot profile Quick only; unowned provider caches bypassed"
+    "Pilot profile Quick only; unowned provider caches bypassed",
+    "CI Docker worker cgroup peak measured at 1364070400 bytes before intentional disk-cap probe; one RealWorld source scan and a README-only fixture, not a worst-case benchmark",
+    "CI worker cgroup peak before disk probe: 1364070400 bytes; includes processes/page cache across README-only and RealWorld fixtures. Not a worst-case benchmark."
   ],
   "remaining_hosted_gates": [
-    "Docker build/boot and final image audit",
-    "Hard resource/temporary-disk cap and whole-process peak verification",
+    "Review residual vendor-deferred image advisories before external launch",
+    "Repeat load/resource/restart tests on the actual approved provider; two sample scans are not a worst-case capacity proof",
+    "Review unresolved vendor-deferred image advisories; do not infer security approval from passing CI",
+    "Repeat resource/load/restart checks on the actual approved provider; two sample scans are not a worst-case capacity proof",
     "Public TLS/proxy secure cookies and remote database certificate validation",
     "Approved SMTP handoff configuration and real inbox delivery",
     "Off-host encrypted backup schedule, retention and deletion reconciliation",
@@ -479,9 +483,9 @@
   "unapproved_actions_performed": [],
   "ci": {
     "status": "passed",
-    "run_id": 40851468254,
-    "url": "https://github.com/flegardev/WTFCode/actions/runs/40851468254",
-    "verified_commit": "7f909dd76188e1ae33b6a845aa49d9d5f07bb77c",
+    "run_id": 40855049669,
+    "url": "https://github.com/flegardev/WTFCode/actions/runs/40855049669",
+    "verified_commit": "64a70934e2a55724475139c7320a484c6fe54be5",
     "jobs": [
       {
         "name": "Portable quality gates",
@@ -490,12 +494,16 @@
       {
         "name": "Database, security, and E2E suite",
         "conclusion": "success"
+      },
+      {
+        "name": "Disposable container pilot smoke",
+        "conclusion": "success"
       }
     ],
     "compose_config_validated": true,
-    "docker_image_boot_tested": false,
+    "docker_image_boot_tested": true,
     "linux_symlink_test": "passed",
-    "baseline_run": "https://github.com/flegardev/WTFCode/actions/runs/40732009225"
+    "security_release_gate": "blocked: remaining vendor-deferred image advisories require review"
   },
   "pull_request": {
     "url": "https://github.com/flegardev/WTFCode/pull/4",
@@ -509,5 +517,68 @@
     "deployments_for_pilot_branch": 0,
     "checked_date": "2026-10-29"
   },
-  "preserved_ux_screenshots_verified_sha256": 23
+  "preserved_ux_screenshots_verified_sha256": 23,
+  "container": {
+    "scope": "Disposable GitHub Actions Docker runner, loopback web, synthetic accounts only",
+    "flow": {
+      "status": "passed",
+      "separate_supervised_worker": true,
+      "account_export_and_deletion": true,
+      "scans": [
+        {
+          "repository": "octocat/Hello-World",
+          "project_id": 1,
+          "state": "completed",
+          "seconds": 3.102,
+          "files": 0,
+          "readme_only": true,
+          "commit": "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d"
+        },
+        {
+          "repository": "gothinkster/node-express-realworld-example-app",
+          "project_id": 2,
+          "state": "completed",
+          "seconds": 6.731,
+          "files": 57,
+          "readme_only": false,
+          "commit": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b"
+        }
+      ]
+    },
+    "resources": {
+      "status": "passed",
+      "production_checkout_cleanup": true,
+      "cgroup": {
+        "memory_limit": "2147483648",
+        "memory_peak_before_disk_probe": "1364070400",
+        "cpu_max": "100000 100000",
+        "pids_max": "128"
+      },
+      "tmpfs_enospc_observed": true,
+      "probe_bytes_written": 536870912,
+      "probe_removed": true,
+      "memory_peak_after_disk_probe": "1364070400"
+    },
+    "image_audit": {
+      "run_url": "https://github.com/flegardev/WTFCode/actions/runs/40855049669",
+      "commit": "64a70934e2a55724475139c7320a484c6fe54be5",
+      "image_id": "sha256:f63f58f82d13f8c0a70264cfb6e5c49872d73190b32b0e68a6b92b432540bcdb",
+      "manifest_digest": "sha256:e1a24a082a176b8e12756781f9edd23c00c2ed803d32e2235a190bf4ed5ba992",
+      "counts": {
+        "Negligible": 684,
+        "Critical": 19,
+        "High": 144,
+        "Medium": 89,
+        "Unknown": 50,
+        "Low": 18
+      },
+      "fixable_high_critical_matches": 0,
+      "full_audit_sha256": "cd6472f361e2393ffcafc508290a67b49a1c48406969bca96fa97d9bf77ba6e5",
+      "status": "requires_triage_before_external_launch"
+    },
+    "all_services_and_volumes_removed": true,
+    "node_image": "24.22.1-trixie-slim",
+    "php_base": "dunglas/frankenphp:1-php8.4-trixie",
+    "advanced_security_binaries_in_default_pilot_image": false
+  }
 }
