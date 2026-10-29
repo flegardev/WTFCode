@@ -93,7 +93,7 @@ require __DIR__ . '/../views/header.php';
         </div>
         <details class="rescan-disclosure"><summary>Rescan project</summary><form method="post" class="rescan-profile project-rescan">
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
-            <label><span>Analysis profile</span><select name="profile"><?php foreach ([AnalysisProfile::QUICK => 'Quick', AnalysisProfile::DEEP => 'Deep', AnalysisProfile::SECURITY => 'Security', AnalysisProfile::MAXIMUM => 'Maximum'] as $value => $label): ?><option value="<?= e($value) ?>"><?= e($label) ?></option><?php endforeach; ?></select></label>
+            <label><span>Analysis profile</span><select name="profile"><?php foreach ((\WTFCode\Application\PilotAccess::mode() === 'allowlist' ? [AnalysisProfile::QUICK => 'Quick'] : [AnalysisProfile::QUICK => 'Quick', AnalysisProfile::DEEP => 'Deep', AnalysisProfile::SECURITY => 'Security', AnalysisProfile::MAXIMUM => 'Maximum']) as $value => $label): ?><option value="<?= e($value) ?>"><?= e($label) ?></option><?php endforeach; ?></select></label>
             <button class="button button-quiet" type="submit">Rescan</button>
         </form></details>
     </header>

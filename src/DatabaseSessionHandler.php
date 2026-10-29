@@ -35,12 +35,32 @@ final class DatabaseSessionHandler implements SessionHandlerInterface
     public function write(string $id, string $data): bool
     {
         $this->lock($id);
-        $expiresAt = gmdate('Y-m-d H:i:sP', time() + $this->lifetimeSeconds);
-        $sql = Database::isPostgres()
-            ? 'INSERT INTO sessions (session_id, payload, expires_at, updated_at) VALUES (:id, :payload, :expires_at, CURRENT_TIMESTAMP) ON CONFLICT (session_id) DO UPDATE SET payload = EXCLUDED.payload, expires_at = EXCLUDED.expires_at, updated_at = CURRENT_TIMESTAMP'
-            : 'INSERT INTO sessions (session_id, payload, expires_at, updated_at) VALUES (:id, :payload, :expires_at, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE payload = VALUES(payload), expires_at = VALUES(expires_at), updated_at = CURRENT_TIMESTAMP';
-        $statement = Database::connection()->prepare($sql);
-        return $statement->execute(['id' => $id, 'payload' => $data, 'expires_at' => $expiresAt]);
+        $pdo = Database::connection();
+        $ownsTransaction = !$pdo->inTransaction();
+        if ($ownsTransaction) $pdo->beginTransaction();
+        try {
+            $userId = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : null;
+            if ($userId !== null) {
+                $owner = $pdo->prepare('SELECT session_version FROM users WHERE id = ?' . ' FOR SHARE');
+                $owner->execute([$userId]);
+                $version = $owner->fetchColumn();
+                if ($version === false || (int) $version !== (int) ($_SESSION['user']['session_version'] ?? 0)) {
+                    $pdo->prepare('DELETE FROM sessions WHERE session_id = ?')->execute([$id]);
+                    if ($ownsTransaction) $pdo->commit();
+                    return true;
+                }
+            }
+            $expiresAt = gmdate('Y-m-d H:i:sP', time() + $this->lifetimeSeconds);
+            $sql = Database::isPostgres()
+                ? 'INSERT INTO sessions (session_id, user_id, payload, expires_at, updated_at) VALUES (:id, :user_id, :payload, :expires_at, CURRENT_TIMESTAMP) ON CONFLICT (session_id) DO UPDATE SET user_id = EXCLUDED.user_id, payload = EXCLUDED.payload, expires_at = EXCLUDED.expires_at, updated_at = CURRENT_TIMESTAMP'
+                : 'INSERT INTO sessions (session_id, user_id, payload, expires_at, updated_at) VALUES (:id, :user_id, :payload, :expires_at, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), payload = VALUES(payload), expires_at = VALUES(expires_at), updated_at = CURRENT_TIMESTAMP';
+            $pdo->prepare($sql)->execute(['id' => $id, 'user_id' => $userId, 'payload' => $data, 'expires_at' => $expiresAt]);
+            if ($ownsTransaction) $pdo->commit();
+            return true;
+        } catch (Throwable $exception) {
+            if ($ownsTransaction && $pdo->inTransaction()) $pdo->rollBack();
+            throw $exception;
+        }
     }
 
     public function destroy(string $id): bool

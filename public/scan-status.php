@@ -34,7 +34,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
     header('Allow: GET');
     $respond(['error' => 'Method not allowed.'], 405);
 }
-if (!Auth::check() || Auth::id() === null) {
+if (!Auth::workspaceAllowed() || Auth::id() === null) {
     $respond(['error' => 'Your session expired. Sign in again.'], 401);
 }
 

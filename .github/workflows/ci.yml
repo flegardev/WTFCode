@@ -72,7 +72,7 @@ jobs:
       - name: Validate isolated staging configuration
         env:
           STAGING_DB_PASSWORD: ci-validation-only
-        run: docker compose -f compose.staging.yaml config --quiet
+        run: docker compose -f compose.staging.yaml -f compose.pilot.yaml config --quiet
 
   full-suite:
     name: Database, security, and E2E suite
@@ -129,6 +129,11 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql --host=127.0.0.1 --username=postgres --dbname=wtfcode --set=ON_ERROR_STOP=1 --file=supabase/production-schema.sql
+
+      - name: Verify idempotent pilot schema upgrade
+        run: |
+          php tools/pilot-upgrade.php
+          php tools/pilot-upgrade.php
 
       - name: Run the complete reproducible test matrix
         run: composer test:all

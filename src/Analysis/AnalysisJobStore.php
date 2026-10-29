@@ -16,6 +16,7 @@ final class AnalysisJobStore
     ): int {
         $pdo = Database::connection();
         $profile = AnalysisProfile::normalize($profile);
+        if (\WTFCode\Application\PilotAccess::mode() === 'allowlist' && $profile !== AnalysisProfile::QUICK) throw new DomainException('The controlled pilot supports Quick analysis only. Choose Quick and try again.');
         $jobKind = in_array($jobKind, ['initial', 'rescan'], true) ? $jobKind : 'rescan';
         $maxAttempts = max(1, min(10, $maxAttempts));
         $ownsTransaction = !$pdo->inTransaction();
@@ -191,7 +192,14 @@ final class AnalysisJobStore
             'id' => $jobId,
             'lease_token' => $leaseToken,
         ]);
-        return $statement->rowCount() === 1;
+        if ($statement->rowCount() !== 1) return false;
+        if (Database::isPostgres()) {
+            $worker = Database::connection()->prepare('SELECT worker_id FROM analysis_jobs WHERE id = ?');
+            $worker->execute([$jobId]);
+            $workerId = $worker->fetchColumn();
+            if (is_string($workerId) && $workerId !== '') \WTFCode\Application\PilotOperations::heartbeat($workerId);
+        }
+        return true;
     }
 
     public static function scanMetadata(int $jobId, ?string $leaseToken, ?string $commit, ?string $previousCommit, array $changedPaths): bool
@@ -453,7 +461,7 @@ final class AnalysisJobStore
 
     private static function leaseExpression(int $leaseSeconds): string
     {
-        $seconds = max(60, min(7200, $leaseSeconds));
+        $seconds = max(60, min(\WTFCode\Application\PilotAccess::mode() === 'allowlist' ? 300 : 7200, $leaseSeconds));
 
         return Database::isPostgres()
             ? "CURRENT_TIMESTAMP + INTERVAL '{$seconds} seconds'"

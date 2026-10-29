@@ -22,9 +22,9 @@ ARG SYFT_SHA256=2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f
 ARG GRYPE_VERSION=0.117.0
 ARG GRYPE_SHA256=38525dab1e06f162ebaa02f94d82d1f807076b011a44180cf2777edf1a7b9c26
 
-RUN install-php-extensions pdo_pgsql mbstring curl openssl opcache
+RUN install-php-extensions pdo_pgsql mbstring curl openssl opcache pcntl
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl git libcap2-bin ripgrep tar \
+    && apt-get install -y --no-install-recommends ca-certificates curl git libcap2-bin ripgrep tar msmtp \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
@@ -57,7 +57,7 @@ COPY deploy/Caddyfile /etc/caddy/Caddyfile
 COPY tools/*.php ./tools/
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && printf '%s\n' 'expose_php=0' 'display_errors=0' 'log_errors=1' 'memory_limit=1024M' 'max_execution_time=0' 'upload_max_filesize=2M' 'post_max_size=2M' > "$PHP_INI_DIR/conf.d/wtfcode-production.ini" \
+    && printf '%s\n' 'expose_php=0' 'display_errors=0' 'log_errors=1' 'memory_limit=1024M' 'max_execution_time=0' 'upload_max_filesize=2M' 'post_max_size=2M' 'sendmail_path=/usr/bin/msmtp -t' > "$PHP_INI_DIR/conf.d/wtfcode-production.ini" \
     && groupadd --gid 10001 wtfcode \
     && useradd --uid 10001 --gid 10001 --no-create-home --home-dir /app --shell /usr/sbin/nologin wtfcode \
     && mkdir -p /tmp/wtfcode/repos /tmp/wtfcode/cache /tmp/wtfcode/tmp /data/caddy /config/caddy \

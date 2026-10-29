@@ -44,6 +44,9 @@ final class ScanJobRunner
             // A long-running worker must not reuse its previous checkout when
             // a user requests a rescan; that would analyze the old commit again.
             $path = RepositoryImporter::workingCopy($project, true);
+            if (!AnalysisJobStore::heartbeat($jobId, $leaseToken, 'Repository fetched', 1, 4)) {
+                throw new \ScanLeaseLostException('Scan ownership ended after checkout.');
+            }
             $this->markScanning($projectId, $path, $jobKind);
 
             (new RepoScanner())->scan(
