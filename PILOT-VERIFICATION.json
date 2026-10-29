@@ -63,7 +63,11 @@
     "cross_owner_export": true,
     "deletion_running_job_fence": true,
     "legacy_provider_cache_invalidated": true,
-    "symlink_root_test": "skipped on Windows due to symlink privilege; Linux CI required"
+    "symlink_root_test": {
+      "windows": "skipped: no symlink creation privilege",
+      "linux_ci": "passed: external target preserved",
+      "job_id": 123371715449
+    }
   },
   "browser": {
     "core": {
@@ -474,8 +478,36 @@
   "preserved_ux_screenshots": 23,
   "unapproved_actions_performed": [],
   "ci": {
-    "pilot_run_status": "pending push",
-    "baseline_run": "https://github.com/flegardev/WTFCode/actions/runs/40732009225",
-    "baseline_passed": true
-  }
+    "status": "passed",
+    "run_id": 40851468254,
+    "url": "https://github.com/flegardev/WTFCode/actions/runs/40851468254",
+    "verified_commit": "7f909dd76188e1ae33b6a845aa49d9d5f07bb77c",
+    "jobs": [
+      {
+        "name": "Portable quality gates",
+        "conclusion": "success"
+      },
+      {
+        "name": "Database, security, and E2E suite",
+        "conclusion": "success"
+      }
+    ],
+    "compose_config_validated": true,
+    "docker_image_boot_tested": false,
+    "linux_symlink_test": "passed",
+    "baseline_run": "https://github.com/flegardev/WTFCode/actions/runs/40732009225"
+  },
+  "pull_request": {
+    "url": "https://github.com/flegardev/WTFCode/pull/4",
+    "draft": true,
+    "base": "codex/premium-ux-v2",
+    "merged": false
+  },
+  "deployment_checks": {
+    "review_branch_disabled_in_vercel_config": true,
+    "connected_vercel_projects": 2,
+    "deployments_for_pilot_branch": 0,
+    "checked_date": "2026-10-29"
+  },
+  "preserved_ux_screenshots_verified_sha256": 23
 }

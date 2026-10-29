@@ -1,4 +1,5 @@
 async (page) => {
+  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(page.url()).hostname)) throw new Error("Pilot replay requires a disposable loopback application.");
   const base = new URL(page.url()).origin;
   const id = new URL(page.url()).searchParams.get('id');
   const checks=[]; const check=(ok,name)=>{if(!ok)throw new Error(name);checks.push(name);};

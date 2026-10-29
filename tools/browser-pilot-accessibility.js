@@ -1,4 +1,5 @@
 async (page) => {
+  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(page.url()).hostname)) throw new Error("Pilot replay requires a disposable loopback application.");
  const base=new URL(page.url()).origin;const results=[];const errors=[];page.on('pageerror',error=>errors.push(error.message));
  for(const theme of ['dark','light']){
   await page.evaluate(theme=>localStorage.setItem('wtfcode-theme',theme),theme);

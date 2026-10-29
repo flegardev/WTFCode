@@ -1,4 +1,5 @@
 async (page) => {
+  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(page.url()).hostname)) throw new Error("Pilot replay requires a disposable loopback application.");
   const base=new URL(page.url()).origin; const id='15'; const checks=[];
   await page.getByRole('button',{name:'Verify email',exact:true}).click();await page.waitForURL('**/login.php?account_updated=1');
   await page.goto(`${base}/account-token.php?purpose=verify#token=${'a'.repeat(64)}`);

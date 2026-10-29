@@ -1,4 +1,5 @@
 async (page) => {
+  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(page.url()).hostname)) throw new Error("Pilot replay requires a disposable loopback application.");
  const base=new URL(page.url()).origin;const checks=[];
  await page.goto(`${base}/login.php`);await page.getByLabel('Email',{exact:true}).fill('pilot-one@wtfcode.local');await page.getByLabel('Password',{exact:true}).fill('Changed-pilot-password-48271');
  await page.getByRole('button',{name:'Log in',exact:true}).click();await page.waitForURL('**/dashboard.php');

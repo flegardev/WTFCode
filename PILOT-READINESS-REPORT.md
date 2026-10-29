@@ -92,5 +92,7 @@ These are questions, not a compliance opinion or permission to operate through a
 
 ## Handoff
 
-Review the stacked PRs, then approve hosting/email/identity/retention decisions in the checklist. Review-branch Vercel auto-deploy suppression includes this branch. No automatic merge/deployment is part of this work. Pilot PR/CI evidence is appended below after pushing; baseline green CI does not satisfy the hosted launch gates.
+Review the stacked PRs, then approve hosting/email/identity/retention decisions in the checklist. Review-branch Vercel auto-deploy suppression includes this branch. No automatic merge/deployment is part of this work.
+
+[Draft pilot PR #4](https://github.com/flegardev/WTFCode/pull/4) is open against the unmerged UX branch. [Pilot CI run 40851468254](https://github.com/flegardev/WTFCode/actions/runs/40851468254) passed both jobs on 7f909dd, including PostgreSQL 17/PHP 8.3, idempotent upgrade, Compose configuration validation, the complete matrix and real checkout cleanup. Its Linux log confirms the symlink-root cleanup fixture passed and preserved its external target. This resolves the Windows-specific test limitation; it does not build/boot the final image or establish hosted application readiness. Both connected Vercel projects returned zero deployments for the pilot branch after pushing.
 

@@ -1,4 +1,5 @@
 async (page) => {
+  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(page.url()).hostname)) throw new Error("Pilot replay requires a disposable loopback application.");
   const base=new URL(page.url()).origin; const checks=[];
   if(!page.url().includes('account-token.php?purpose=reset'))throw new Error('Open controlled recovery link');
   const stale=await page.context().browser().newContext({storageState:await page.context().storageState()});
