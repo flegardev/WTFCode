@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -179,7 +183,8 @@ jobs:
           docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T worker php tools/pilot-worker-health.php
       - name: Audit built image packages
         run: |
-          image=$(docker compose -f compose.staging.yaml -f compose.pilot.yaml images -q web)
+          container=$(docker compose -f compose.staging.yaml -f compose.pilot.yaml ps -q web)
+          image=$(docker inspect --format '{{.Config.Image}}' "$container")
           docker save "$image" -o output/pilot-image.tar
           docker run --rm --user root --entrypoint grype -v "$PWD/output/pilot-image.tar:/tmp/pilot-image.tar:ro" "$image" docker-archive:/tmp/pilot-image.tar -o json > output/container-image-audit.json
           rm output/pilot-image.tar
@@ -208,4 +213,3 @@ jobs:
       - name: Stop disposable services
         if: always()
         run: docker compose -f compose.staging.yaml -f compose.pilot.yaml down -v
-

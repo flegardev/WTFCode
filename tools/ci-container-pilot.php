@@ -29,8 +29,12 @@ foreach (['octocat/Hello-World', 'gothinkster/node-express-realworld-example-app
         $project = Project::findForUser($id, $owner);
         if (($project['local_path'] ?? null) !== '' || ($project['status'] ?? '') !== 'ready') throw new RuntimeException('Production checkout paths must not be retained.');
         $export = \WTFCode\Application\AccountData::export($owner);
-        if (count($export['projects']) !== 1 || $export['projects'][0]['project_files'] === []) throw new RuntimeException('The container result/export lacks real persisted file metadata.');
-        $results[] = ['repository' => $repository, 'project_id' => $id, 'state' => $state, 'seconds' => round(microtime(true) - $start, 3), 'files' => count($export['projects'][0]['project_files']), 'commit' => SymbolRepository::latestScan($id)['commit_sha'] ?? null];
+        if (count($export['projects']) !== 1) throw new RuntimeException('The container export lacks the owned project.');
+        $files = count($export['projects'][0]['project_files']);
+        // Hello-World contains only extensionless README, not application source.
+        // RealWorld must provide actual analyzable source and persisted evidence.
+        if (($repository === 'octocat/Hello-World' && $files !== 0) || ($repository !== 'octocat/Hello-World' && $files === 0)) throw new RuntimeException('The source/README-only fixture outcome differs from its public repository contents.');
+        $results[] = ['repository' => $repository, 'project_id' => $id, 'state' => $state, 'seconds' => round(microtime(true) - $start, 3), 'files' => $files, 'readme_only' => $files === 0, 'commit' => SymbolRepository::latestScan($id)['commit_sha'] ?? null];
     } finally {
         if (!\WTFCode\Application\AccountData::delete($owner, $password, 'DELETE')) throw new RuntimeException('Disposable container account cleanup failed.');
     }
