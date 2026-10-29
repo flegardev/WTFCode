@@ -17,6 +17,8 @@ The supported [FrankenPHP Trixie variant](https://frankenphp.dev/docs/docker/) a
 
 The current image is Debian 13.7. All 19 remaining Critical matches have vendor fix state wont-fix in the scanner; High matches are 135 wont-fix and 9 not-fixed. “Wont-fix” here is scanner metadata, not proof of safety or a permanent upstream refusal. The Debian tracker explains these stable-release deferrals. No ignore list, severity editing or suppression was added.
 
+Of the High matches, 143 are Debian package matches and one is an embedded Go dependency: go-jose/v3 v3.0.5 in the FrankenPHP binary, [GHSA-mgcc-cww5-fp2q](https://github.com/advisories/GHSA-mgcc-cww5-fp2q). The advisory describes excessive CPU when parsing hostile RSA JWKs and has no v3 patched release; the v4 line has a fix. The configured Caddyfile does not enable JWT/JWK handlers, and PHP uses database sessions. That is a limited configuration observation, not proof that every bundled server module is unreachable. Replacing/rebuilding the server dependency needs a separately reviewed vendor/update path; this finding is retained in the release-review gate rather than mislabeled as an OS-only issue.
+
 CI fails if a High/Critical match has an available fix; it preserves the full inventory and marks remaining matches requires_triage. A green functional/audit-execution job does not clear this document's release gate.
 
 ## The seven distinct Critical IDs

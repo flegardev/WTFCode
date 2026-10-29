@@ -378,7 +378,7 @@
       "critical": 0,
       "total": 0
     },
-    "container_audit": "Completed: 19 Critical/144 High scanner matches remain in vendor-deferred/unfixed OS packages; zero fixable High/Critical matches. Release triage remains blocked."
+    "container_audit": "Completed: 19 Critical/144 High scanner matches remain in vendor-deferred/unfixed dependencies; zero fixable High/Critical matches. Release triage remains blocked."
   },
   "measurements": [
     {
