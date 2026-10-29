@@ -183,10 +183,11 @@ jobs:
           docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T worker php tools/pilot-worker-health.php
       - name: Audit built image packages
         run: |
+          bash tools/install-security-tools.sh
           container=$(docker compose -f compose.staging.yaml -f compose.pilot.yaml ps -q web)
           image=$(docker inspect --format '{{.Config.Image}}' "$container")
           docker save "$image" -o output/pilot-image.tar
-          docker run --rm --user root --entrypoint grype -v "$PWD/output/pilot-image.tar:/tmp/pilot-image.tar:ro" "$image" docker-archive:/tmp/pilot-image.tar -o json > output/container-image-audit.json
+          tools/bin/grype docker-archive:output/pilot-image.tar -o json > output/container-image-audit.json
           rm output/pilot-image.tar
           python3 - <<'PY'
           import json
