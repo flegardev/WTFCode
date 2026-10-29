@@ -142,3 +142,70 @@ jobs:
         env:
           APP_ENV: production
         run: php tests/HostedPublicScanTest.php
+
+  container-pilot:
+    name: Disposable container pilot smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      STAGING_DB_PASSWORD: ci-disposable-only
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Build actual production image and start isolated services
+        run: |
+          mkdir -p output
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml build
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml up -d --wait --wait-timeout 180
+      - name: Verify web health and closed registration
+        run: |
+          curl --fail --silent http://127.0.0.1:8088/health.php | tee output/container-health.json
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T web php tools/pilot-upgrade.php
+          python3 - <<'PY'
+          import http.cookiejar, re, urllib.parse, urllib.request
+          opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+          url = 'http://127.0.0.1:8088/register.php'
+          body = opener.open(url).read().decode()
+          csrf = re.search(r'name="csrf_token" value="([^"]+)"', body).group(1)
+          form = urllib.parse.urlencode({'csrf_token': csrf, 'name': 'Closed registration probe', 'email': 'blocked@container.local', 'password': 'Disposable-container-48271', 'password_confirmation': 'Disposable-container-48271'}).encode()
+          result = opener.open(url, data=form)
+          assert 'account-request.php' in result.url, 'Closed signup must return the generic verification response'
+          print('Closed registration HTTP response verified; the next fixture also asserts zero accounts were created.')
+          PY
+      - name: Run real public scans through the separate supervised worker
+        run: |
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T -e WTF_DISPOSABLE_CONTAINER_TEST=true web php tools/ci-container-pilot.php | tee output/container-pilot.json
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T -e WTF_DISPOSABLE_CONTAINER_TEST=true worker php tools/ci-container-resources.php | tee output/container-resources.json
+          docker compose -f compose.staging.yaml -f compose.pilot.yaml exec -T worker php tools/pilot-worker-health.php
+      - name: Audit built image packages
+        run: |
+          image=$(docker compose -f compose.staging.yaml -f compose.pilot.yaml images -q web)
+          docker save "$image" -o output/pilot-image.tar
+          docker run --rm --user root --entrypoint grype -v "$PWD/output/pilot-image.tar:/tmp/pilot-image.tar:ro" "$image" docker-archive:/tmp/pilot-image.tar -o json > output/container-image-audit.json
+          rm output/pilot-image.tar
+          python3 - <<'PY'
+          import json
+          report = json.load(open('output/container-image-audit.json'))
+          counts = {}
+          for match in report.get('matches', []):
+              severity = match.get('vulnerability', {}).get('severity', 'Unknown')
+              counts[severity] = counts.get(severity, 0) + 1
+          json.dump({'severity_counts': counts, 'certification': False, 'deployment_gate': 'requires_triage' if counts else 'no_matches_reported'}, open('output/container-image-audit-summary.json', 'w'), indent=2)
+          print(json.dumps(counts))
+          PY
+      - name: Capture private test logs
+        if: always()
+        run: docker compose -f compose.staging.yaml -f compose.pilot.yaml logs --no-color > output/container-services.log
+      - name: Retain disposable verification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-container-verification
+          path: |
+            output/container-*.json
+            output/container-services.log
+          retention-days: 7
+      - name: Stop disposable services
+        if: always()
+        run: docker compose -f compose.staging.yaml -f compose.pilot.yaml down -v
+
